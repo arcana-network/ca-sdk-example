@@ -5,6 +5,7 @@ import PreLogin from './components/PreLogin.vue'
 import BalanceSidebar from './components/BalanceSidebar.vue'
 import './style.css'
 import { onMounted, ref } from 'vue';
+import { getCA } from './utils/getCA'
 
 const currentTab = ref<'transfer' | 'bridge' | 'refund'>('transfer')
 
@@ -19,8 +20,16 @@ const connect = async () => {
 }
 const disconnect = async () => {
   localStorage.removeItem("xar-casdk-last-connected-wallet")
+  const ca = await getCA()
+  await ca.request({
+    method: "wallet_revokePermissions",
+    params: [{
+      eth_accounts: {}
+    }]
+  })
   connected.value = false
 }
+
 onMounted(async () => {
 })
 
