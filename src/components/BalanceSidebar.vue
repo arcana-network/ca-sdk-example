@@ -18,7 +18,7 @@ const setBalancePolling = (ca: CA) => {
 onMounted(async () => {
     const ca = await getCA();
 
-    const accounts = (await ca.request({ method: "eth_accounts" })) as string[][0]
+    const accounts = (await ca.request({ method: "eth_accounts" }) as string[])[0]
     console.log({ accounts })
     address.value = accounts;
 
@@ -51,7 +51,7 @@ onMounted(async () => {
                             <Accordion.ItemTrigger class="flex items-center gap-1">
                                 <span class="text-[12px] text-gray-500">{{ balance.breakdown.length }} chain{{
                                     balance.breakdown.length > 1 ? "s" : ""
-                                }}</span>
+                                    }}</span>
                                 <Accordion.ItemIndicator>
                                     <ChevronDownIcon class="h-3 w-3 text-gray-500" />
                                 </Accordion.ItemIndicator>
