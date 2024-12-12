@@ -8,7 +8,7 @@ const props = defineProps<{
 </script>
 
 <template>
-    <aside id="logo-sidebar" class="basis-1/5 min-h-screen" aria-label="Sidebar">
+    <aside id="logo-sidebar" class="basis-1/6 min-h-screen" aria-label="Sidebar">
         <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
             <h5 id="drawer-navigation-label" class="text-base font-semibold text-gray-500 uppercase dark:text-gray-400">
                 Menu</h5>

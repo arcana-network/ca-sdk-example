@@ -30,7 +30,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <aside id="logo-sidebar" class="basis-1/5 min-h-screen" aria-label="Sidebar">
+    <aside id="logo-sidebar" class="basis-1/6 min-h-screen" aria-label="Sidebar">
         <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
             <p
                 class="text-center p-4 mb-4 font-bold leading-none tracking-tight text-gray-900 border-2 border-gray-200 rounded-lg dark:text-white">
@@ -40,7 +40,7 @@ onMounted(async () => {
             <!-- <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"> -->
 
             <Accordion.Root collapsible multiple
-                class="flex flex-col overflow-y-auto field divide-y divide-gray-200 dark:divide-gray-700"
+                class="flex px-3 flex-col overflow-y-auto field divide-y divide-gray-200 dark:divide-gray-700"
                 v-if="balances.length">
                 <Accordion.Item v-for="balance in balances" :key="JSON.stringify(balance.breakdown)"
                     :value="JSON.stringify(balance.breakdown)" class="py-3">
@@ -51,7 +51,7 @@ onMounted(async () => {
                             <Accordion.ItemTrigger class="flex items-center gap-1">
                                 <span class="text-[12px] text-gray-500">{{ balance.breakdown.length }} chain{{
                                     balance.breakdown.length > 1 ? "s" : ""
-                                    }}</span>
+                                }}</span>
                                 <Accordion.ItemIndicator>
                                     <ChevronDownIcon class="h-3 w-3 text-gray-500" />
                                 </Accordion.ItemIndicator>
@@ -62,7 +62,7 @@ onMounted(async () => {
                         </div>
                     </div>
                     <Accordion.ItemContent class="pt-2">
-                        <div class="p-3 bg-gray-900 font-xs rounded-lg space-y-4">
+                        <div class="p-3 bg-gray-200 font-xs rounded-lg space-y-4 dark:bg-gray-900">
                             <div v-for="token in balance.breakdown" class="flex items-center justify-between ">
                                 <div class="text-xs text-gray-900 dark:text-white">{{ `${balance.symbol}
                                     (${token.chain.name})` }}

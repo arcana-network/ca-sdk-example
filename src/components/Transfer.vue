@@ -31,9 +31,9 @@ const bridgeValue = ref<{
   chain: number,
   loading: boolean
 }>({
-  token: "USDT",
-  amount: 0.5,
-  chain: 42161,
+  token: "",
+  amount: 0,
+  chain: 0,
   loading: false
 })
 
@@ -42,13 +42,13 @@ const transferValue = ref<{
   amount: string,
   chain: number,
   loading: boolean,
-  to: `0x${string}`
+  to: string
 }>({
-  token: "USDT",
-  amount: "0.09",
-  chain: 42161,
+  token: "",
+  amount: "",
+  chain: 0,
   loading: false,
-  to: "0xEa46Fb4b4Dc7755BA29D09Ef2a57C67bab383A2f"
+  to: ""
 })
 
 let ca: CA | null = null
@@ -81,7 +81,7 @@ const intentModal = ref<{
   refresh: null,
   intent: null,
   open: false,
-  sourcesOpen: false,
+  sourcesOpen: true,
   feesBreakupOpen: false
 })
 
@@ -105,7 +105,9 @@ onMounted(async () => {
         console.log({ v })
         if (v) {
           v.done = true
-          v.data = data.data.data
+          if (data.data.data) {
+            v.data = data.data.data
+          }
         }
         break;
       }
@@ -202,7 +204,7 @@ const resetIntentModal = () => {
   intentModal.value.deny = () => { }
   intentModal.value.refresh = null
   intentModal.value.intent = null
-  intentModal.value.sourcesOpen = false
+  intentModal.value.sourcesOpen = true
   intentModal.value.feesBreakupOpen = false
 }
 
@@ -227,7 +229,7 @@ const handleTransfer = async () => {
         .amount(Number(transferValue.value.amount))
         .chain(Number(transferValue.value.chain))
         .token(transferValue.value.token)
-        .to(transferValue.value.to)
+        .to(transferValue.value.to as `0x${string}`)
         .exec()
 
       state.value.completed = true
@@ -281,7 +283,7 @@ const handleBridge = async () => {
 
       <div class="mb-5">
         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="to">To</label>
-        <input type="text" v-model="transferValue.to"
+        <input type="text" v-model="transferValue.to" placeholder="0x..."
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
       </div>
       <div class="mb-5">
@@ -297,7 +299,7 @@ const handleBridge = async () => {
       </div>
       <div class="mb-5">
         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="to">Amount</label>
-        <input type="number" v-model="transferValue.amount"
+        <input type="number" v-model="transferValue.amount" placeholder="1.1"
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
       </div>
 
@@ -500,7 +502,7 @@ const handleBridge = async () => {
             </div>
           </div>
           <div class="p-2 text-gray-900 dark:text-white" v-if="intentModal.sourcesOpen">
-            <div class="p-5 w-full flex flex-col space-y-6 bg-gray-900 font-xs rounded">
+            <div class="p-5 bg-gray-200 w-full flex flex-col space-y-6 dark:bg-gray-900 font-xs rounded">
               <div class="flex" v-for="source in intentModal.intent?.sources">
                 <div class="basis-1/2 text-xs">
                   {{ `${intentModal.intent?.token.symbol} (${source.chainName})` }}
@@ -527,7 +529,7 @@ const handleBridge = async () => {
             </div>
           </div>
           <div class="p-2 text-gray-900 dark:text-white " v-if="intentModal.feesBreakupOpen">
-            <div class="p-5 w-full flex flex-col space-y-6 bg-gray-900 font-xs rounded">
+            <div class="p-5 w-full bg-gray-200 flex flex-col space-y-6 dark: bg-gray-900 font-xs rounded">
               <div class="flex">
                 <div class="basis-1/2 text-xs">
                   CA Gas Fees:

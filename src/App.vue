@@ -39,11 +39,11 @@ onMounted(async () => {
   <div class="min-h-screen bg-white dark:bg-gray-900">
     <div v-if="connected" class="flex">
       <Sidebar :onSidebarClick="onSidebarClick" :disconnect="disconnect"></Sidebar>
-      <div class="basis-3/5 mx-auto p-6">
+      <div class="basis-4/6 mx-auto p-6">
         <div class="py-6">
           <h1
-            class="text-center mb-10 text-3xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
-            Chain abstraction demo
+            class="text-center mb-10 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">
+            Chain Abstraction Demo
           </h1>
           <hr class="h-px my-8 bg-gray-200 border-0 dark:bg-gray-700">
 
