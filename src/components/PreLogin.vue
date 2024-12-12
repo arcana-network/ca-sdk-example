@@ -1,13 +1,31 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue';
 import { initCA } from "../utils/getCA"
+import { EthereumProvider } from '../utils/typings';
 
 const props = defineProps<{ connect: () => void }>()
-const providers = ref([])
+const providers = ref<Array<{ provider: any, info: EIP6963ProviderInfo }>>([])
 const loading = ref(true)
 const connectingMsg = ref("")
 
-const onAnnouncement = (event) => {
+interface EIP6963ProviderInfo {
+    uuid: string;
+    name: string;
+    icon: string;
+    rdns: string;
+}
+
+interface EIP6963AnnounceProviderEvent extends CustomEvent {
+    type: "eip6963:announceProvider";
+    detail: EIP6963ProviderDetail;
+}
+
+interface EIP6963ProviderDetail {
+    info: EIP6963ProviderInfo;
+    provider: EthereumProvider;
+}
+
+const onAnnouncement = (event: EIP6963AnnounceProviderEvent) => {
     if (providers.value.map(p => p.info.uuid).includes(event.detail.info.uuid)) return
     providers.value = [...providers.value, event.detail]
     const lastConnectedWallet = localStorage.getItem("xar-casdk-last-connected-wallet")
@@ -22,16 +40,18 @@ const onAnnouncement = (event) => {
 }
 
 onMounted(() => {
+    // @ts-ignore
     window.addEventListener("eip6963:announceProvider", onAnnouncement);
     window.dispatchEvent(new Event("eip6963:requestProvider"));
     // loading.value = false
 })
 
 onUnmounted(() => {
+    // @ts-ignore
     window.removeEventListener("eip6963:announceProvider", onAnnouncement)
 })
 
-const connectWallet = async (p) => {
+const connectWallet = async (p: EIP6963ProviderDetail) => {
     console.log(p.provider, loading)
     loading.value = true
     connectingMsg.value = `Connecting to ${p.info.name}`
@@ -39,7 +59,7 @@ const connectWallet = async (p) => {
     try {
         const accounts = await p.provider.request({
             method: "eth_requestAccounts",
-        });
+        }) as string[];
         await initCA(p.provider)
         localStorage.setItem("xar-casdk-last-connected-wallet", p.info.rdns)
         props.connect()

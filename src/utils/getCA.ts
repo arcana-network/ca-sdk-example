@@ -1,4 +1,5 @@
 import { CA } from "@arcana/ca-sdk";
+import { EthereumProvider } from "./typings";
 
 let ca: CA | null = null;
 
@@ -11,7 +12,7 @@ const getCA = async () => {
   return ca;
 };
 
-const initCA = async (provider) => {
+const initCA = async (provider: EthereumProvider) => {
   ca = new CA(provider);
   await ca.init();
 };

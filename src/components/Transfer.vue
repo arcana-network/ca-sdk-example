@@ -51,7 +51,7 @@ const transferValue = ref<{
   to: "0xEa46Fb4b4Dc7755BA29D09Ef2a57C67bab383A2f"
 })
 
-let ca: CA = props.ca
+let ca: CA | null = null
 
 const allowanceModal = ref<{
   data: AllowanceHookInput,
@@ -93,7 +93,7 @@ onMounted(async () => {
     switch (data.type) {
       case "EXPECTED_STEPS": {
         console.log("Expected steps", data.data)
-        state.value.steps = data.data.map(s => ({ ...s, done: false }))
+        state.value.steps = data.data.map((s: ProgressStep) => ({ ...s, done: false }))
         state.value.inProgress = true
         break;
       }
@@ -224,7 +224,7 @@ const handleTransfer = async () => {
     console.log({ transferValue: transferValue.value })
     if (ca) {
       await ca.transfer()
-        .amount(transferValue.value.amount)
+        .amount(Number(transferValue.value.amount))
         .chain(Number(transferValue.value.chain))
         .token(transferValue.value.token)
         .to(transferValue.value.to)
@@ -255,7 +255,7 @@ const handleBridge = async () => {
   } catch (e) {
     resetState()
     messages.value.error = true
-    messages.value.errorMsg = e.message
+    // messages.value.errorMsg = e.message
     console.error("Bridge failed with error", e);
   } finally {
     bridgeValue.value.loading = false
