@@ -5,7 +5,17 @@ import Modal from './Modal.vue';
 import type { CA, Intent, ProgressStep } from '@arcana/ca-sdk';
 import { AllowanceHookInput } from '@arcana/ca-sdk';
 import { getTextFromStep } from "../utils/getTextFromSteps"
-
+import { CHAINS } from '../utils/chains';
+import { Toast, Toaster, createToaster } from '@ark-ui/vue/toast'
+const toaster = createToaster({ placement: 'top-end', overlap: false, gap: 24, duration: 5000 })
+const createErrorToast = (message: string) => {
+  console.log({ errorToast: message })
+  toaster.create({
+    title: 'Error',
+    description: message ?? "An unknown error occurred",
+    type: 'error',
+  })
+}
 const props = defineProps<
   {
     currentTab: 'transfer' | 'bridge' | 'refund'
@@ -27,12 +37,12 @@ const messages = ref<{
 
 const bridgeValue = ref<{
   token: string,
-  amount: number,
+  amount: string,
   chain: number,
   loading: boolean
 }>({
   token: "",
-  amount: 0,
+  amount: "",
   chain: 0,
   loading: false
 })
@@ -75,6 +85,8 @@ const intentModal = ref<{
   intent: Intent | null
   sourcesOpen: boolean
   feesBreakupOpen: boolean
+  intervalHandler: number
+  intentRefreshing: boolean
 }>({
   allow: () => { },
   deny: () => { },
@@ -82,7 +94,9 @@ const intentModal = ref<{
   intent: null,
   open: false,
   sourcesOpen: true,
-  feesBreakupOpen: false
+  feesBreakupOpen: false,
+  intervalHandler: 0,
+  intentRefreshing: false
 })
 
 // let client: WalletClient | null = null
@@ -131,6 +145,13 @@ onMounted(async () => {
     intentModal.value.refresh = refresh
     intentModal.value.intent = intent
     intentModal.value.open = true
+    intentModal.value.intervalHandler = window.setInterval(async () => {
+      if (intentModal.value.refresh) {
+        intentModal.value.intentRefreshing = true
+        intentModal.value.intent = await intentModal.value.refresh()
+        intentModal.value.intentRefreshing = false
+      }
+    }, 5000)
   })
   await ca.init()
   console.log(await ca.getUnifiedBalances())
@@ -199,6 +220,9 @@ const resetState = () => {
 }
 
 const resetIntentModal = () => {
+  if (intentModal.value.intervalHandler != 0) {
+    clearInterval(intentModal.value.intervalHandler)
+  }
   intentModal.value.open = false
   intentModal.value.allow = () => { }
   intentModal.value.deny = () => { }
@@ -206,6 +230,7 @@ const resetIntentModal = () => {
   intentModal.value.intent = null
   intentModal.value.sourcesOpen = true
   intentModal.value.feesBreakupOpen = false
+  intentModal.value.intervalHandler = 0
 }
 
 const allowIntent = () => {
@@ -237,6 +262,7 @@ const handleTransfer = async () => {
   } catch (e) {
     resetState()
     console.error("Transfer failed with error", e);
+    createErrorToast((e as Error).message)
   } finally {
     transferValue.value.loading = false
   }
@@ -258,6 +284,7 @@ const handleBridge = async () => {
     resetState()
     messages.value.error = true
     // messages.value.errorMsg = e.message
+    createErrorToast((e as Error).message)
     console.error("Bridge failed with error", e);
   } finally {
     bridgeValue.value.loading = false
@@ -267,14 +294,36 @@ const handleBridge = async () => {
 </script>
 
 <template>
-  <div v-if="messages.success"
-    class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
-    {{ messages.successMsg }}
-  </div>
-  <div v-if="messages.error"
-    class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
-    <span class="font-medium">Error:</span> {{ messages.errorMsg }}
-  </div>
+  <Toaster :toaster="toaster" v-slot="toast" class="w-full">
+    <Toast.Root
+      class="flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-500 dark:bg-gray-900">
+      <!-- <Toast.Title>{{ toast.title }}</Toast.Title> -->
+      <Toast.Description class="basis-5/6 flex items-center">
+        <div
+          class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
+          <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+            viewBox="0 0 20 20">
+            <path
+              d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z" />
+          </svg>
+          <span class="sr-only">Error icon</span>
+        </div>
+        <div class="ms-3 text-sm font-normal">{{ toast.description }}</div>
+      </Toast.Description>
+      <Toast.CloseTrigger class="basis-1/6">
+        <button type="button"
+          class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700"
+          data-dismiss-target="#toast-danger" aria-label="Close">
+          <span class="sr-only">Close</span>
+          <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+          </svg>
+        </button>
+      </Toast.CloseTrigger>
+    </Toast.Root>
+  </Toaster>
+
   <div v-if="!state.inProgress" class="space-x-4">
     <div v-if="props.currentTab === 'transfer'"
       class="mx-auto w-1/2 p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
@@ -283,7 +332,7 @@ const handleBridge = async () => {
 
       <div class="mb-5">
         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="to">To</label>
-        <input type="text" v-model="transferValue.to" placeholder="0x..."
+        <input type="text" v-model="transferValue.to" placeholder="Receiver's address"
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
       </div>
       <div class="mb-5">
@@ -294,12 +343,15 @@ const handleBridge = async () => {
 
       <div class="mb-5">
         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="to">Chain</label>
-        <input type="text" v-model="transferValue.chain"
+        <select id="chains" name="Chain" v-model="transferValue.chain"
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+          <option disabled value="0">Select chain</option>
+          <option v-for="chain in CHAINS" :value="chain.chainID">{{ chain.chainName }}</option>
+        </select>
       </div>
       <div class="mb-5">
         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="to">Amount</label>
-        <input type="number" v-model="transferValue.amount" placeholder="1.1"
+        <input type="number" v-model="transferValue.amount" placeholder="Token amount ex - 1.1"
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
       </div>
 
@@ -338,18 +390,21 @@ const handleBridge = async () => {
       </div>
       <div class="mb-5">
         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="to">Token</label>
-        <input type="string" placeholder="USDT" v-model="bridgeValue.token"
+        <input type="string" placeholder="Token symbol ex - USDT, ETH" v-model="bridgeValue.token"
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
       </div>
       <div class="mb-5">
         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="to">Amount</label>
-        <input type="string" placeholder="1.1" v-model="bridgeValue.amount"
+        <input type="string" placeholder="Token amount ex - 1.1" v-model="bridgeValue.amount"
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
       </div>
       <div class="mb-5">
         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="to">Chain</label>
-        <input type="text" v-model="bridgeValue.chain"
+        <select id="chains" name="Chain" v-model="bridgeValue.chain"
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+          <option disabled value="0">Select chain</option>
+          <option v-for="chain in CHAINS" :value="chain.chainID">{{ chain.chainName }}</option>
+        </select>
       </div>
 
       <button @click="handleBridge" :disabled="bridgeValue.loading"
@@ -475,7 +530,8 @@ const handleBridge = async () => {
 
     </template>
   </Modal>
-  <Modal :isOpen="intentModal.open" @modal-close="rejectIntent" @submit="allowIntent" name="intent-modal">
+  <Modal :isDisabled="intentModal.intentRefreshing" :isOpen="intentModal.open" @modal-close="rejectIntent"
+    @submit="allowIntent" name="intent-modal">
     <template #header>
       <h5 class="text-xl font-semibold text-gray-900 dark:text-white">
         Intent details
