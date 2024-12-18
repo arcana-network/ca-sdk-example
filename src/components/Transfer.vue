@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { getCA } from "../utils/getCA"
 import Modal from './Modal.vue';
 import type { CA, Intent, ProgressStep } from '@arcana/ca-sdk';
@@ -7,12 +7,22 @@ import { AllowanceHookInput } from '@arcana/ca-sdk';
 import { getTextFromStep } from "../utils/getTextFromSteps"
 import { CHAINS } from '../utils/chains';
 import { Toast, Toaster, createToaster } from '@ark-ui/vue/toast'
+import { setAsyncInterval, clearAsyncInterval } from '../utils/async_interval';
+
+
 const toaster = createToaster({ placement: 'top-end', overlap: false, gap: 24, duration: 5000 })
-const createErrorToast = (message: string) => {
+const createErrorToast = (error: Error | string | unknown) => {
+  console.log({ error })
+  let message = "An unknown error occurred";
+  if (error instanceof Error) {
+    message = error.message
+  } else if (typeof error === "string") {
+    message = error
+  }
   console.log({ errorToast: message })
   toaster.create({
     title: 'Error',
-    description: message ?? "An unknown error occurred",
+    description: message,
     type: 'error',
   })
 }
@@ -101,36 +111,39 @@ const intentModal = ref<{
 
 // let client: WalletClient | null = null
 
+const eventListener = (data: any) => {
+  switch (data.type) {
+    case "EXPECTED_STEPS": {
+      console.log("Expected steps", data.data)
+      state.value.steps = data.data.map((s: ProgressStep) => ({ ...s, done: false }))
+      state.value.inProgress = true
+      break;
+    }
+    case "STEP_DONE": {
+      console.log("Step done", data.data)
+      const v = state.value.steps.find(s => {
+        return s.typeID === data.data.typeID
+      })
+      console.log({ v })
+      if (v) {
+        v.done = true
+        if (data.data.data) {
+          v.data = data.data.data
+        }
+      }
+      break;
+    }
+  }
+}
+
+onUnmounted(() => {
+  if (ca) {
+    ca.removeCAEventListener(eventListener)
+  }
+})
 onMounted(async () => {
   ca = await getCA()
-  ca.addCAEventListener((data) => {
-    switch (data.type) {
-      case "EXPECTED_STEPS": {
-        console.log("Expected steps", data.data)
-        state.value.steps = data.data.map((s: ProgressStep) => ({ ...s, done: false }))
-        state.value.inProgress = true
-        break;
-      }
-      case "STEP_DONE": {
-        console.log("Step done", data.data)
-        const v = state.value.steps.find(s => {
-          return s.typeID === data.data.typeID
-        })
-        console.log({ v })
-        if (v) {
-          v.done = true
-          if (data.data.data) {
-            v.data = data.data.data
-          }
-        }
-        break;
-      }
-    }
-  })
-  // client = createWalletClient({
-  //   chain: optimism,
-  //   transport: custom(ca),
-  // });
+  ca.addCAEventListener(eventListener)
   ca.setOnAllowanceHook(async ({ allow, deny, sources }) => {
     console.log({ allowancesInput: sources })
     allowanceModal.value.allow = allow;
@@ -145,12 +158,17 @@ onMounted(async () => {
     intentModal.value.refresh = refresh
     intentModal.value.intent = intent
     intentModal.value.open = true
-    intentModal.value.intervalHandler = window.setInterval(async () => {
-      if (intentModal.value.refresh) {
-        intentModal.value.intentRefreshing = true
-        intentModal.value.intent = await intentModal.value.refresh()
-        intentModal.value.intentRefreshing = false
-      }
+    setTimeout(() => {
+      intentModal.value.intervalHandler =
+        setAsyncInterval(async () => {
+          if (intentModal.value.refresh) {
+            console.log("intentRefreshStarted")
+            intentModal.value.intentRefreshing = true
+            intentModal.value.intent = await intentModal.value.refresh!()
+            intentModal.value.intentRefreshing = false
+            console.log("intentRefreshEnded")
+          }
+        }, 5000)
     }, 5000)
   })
   await ca.init()
@@ -219,9 +237,10 @@ const resetState = () => {
   state.value.completed = false
 }
 
-const resetIntentModal = () => {
+const resetIntentModal = async () => {
   if (intentModal.value.intervalHandler != 0) {
-    clearInterval(intentModal.value.intervalHandler)
+    clearAsyncInterval(intentModal.value.intervalHandler)
+    intentModal.value.intervalHandler = 0
   }
   intentModal.value.open = false
   intentModal.value.allow = () => { }
@@ -230,7 +249,6 @@ const resetIntentModal = () => {
   intentModal.value.intent = null
   intentModal.value.sourcesOpen = true
   intentModal.value.feesBreakupOpen = false
-  intentModal.value.intervalHandler = 0
 }
 
 const allowIntent = () => {
@@ -262,7 +280,7 @@ const handleTransfer = async () => {
   } catch (e) {
     resetState()
     console.error("Transfer failed with error", e);
-    createErrorToast((e as Error).message)
+    createErrorToast(e)
   } finally {
     transferValue.value.loading = false
   }
@@ -284,7 +302,7 @@ const handleBridge = async () => {
     resetState()
     messages.value.error = true
     // messages.value.errorMsg = e.message
-    createErrorToast((e as Error).message)
+    createErrorToast(e)
     console.error("Bridge failed with error", e);
   } finally {
     bridgeValue.value.loading = false
