@@ -1,0 +1,23 @@
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <g clip-path="url(#xar-svg-exclamation-mark-circle-icon-clipPath)">
+      <path
+        d="M10.0002 6.66683L10.0002 10.0002M10.0002 13.3335L9.99183 13.3335M1.66683 10.0002C1.66683 5.39779 5.39779 1.66683 10.0002 1.66683C14.6025 1.66683 18.3335 5.39779 18.3335 10.0002C18.3335 14.6025 14.6025 18.3335 10.0002 18.3335C5.39779 18.3335 1.66683 14.6025 1.66683 10.0002Z"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </g>
+    <defs>
+      <clipPath id="xar-svg-exclamation-mark-circle-icon-clipPath">
+        <rect width="20" height="20" transform="translate(20 20) rotate(180)" />
+      </clipPath>
+    </defs>
+  </svg>
+
