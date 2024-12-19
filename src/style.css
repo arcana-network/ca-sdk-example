@@ -3,5 +3,153 @@
 @tailwind utilities;
 
 * {
-  font-family: "Inter", sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Noto Serif', serif, Ariel, Helvetica, sans-serif;
+  background: #ffffff;
+}
+
+.button-primary {
+  @apply bg-transparent text-blueGray-800 transition-all enabled:hover:bg-blueGray-800 enabled:focus-visible:bg-blueGray-800 enabled:hover:text-background-300  rounded-full disabled:opacity-30 border-2 border-blueGray-800 hover:bg-rose-500 focus:outline-blueGray-800 active:border-blueGray-800 font-inter text-sm font-semibold;
+}
+
+.button-secondary {
+  @apply bg-blueGray-800 border border-solid border-blueGray-800 text-background-300 transition-all enabled:hover:bg-blueGray-800 enabled:focus-visible:bg-blueGray-800 rounded-full h-11 disabled:opacity-30 font-inter text-sm font-semibold;
+}
+
+.card {
+  @apply w-35% bg-white-300 border border-background-400 rounded-2xl shadow-lg p-6 max-w-full max-md:w-3/4;
+}
+
+button {
+  @apply select-none cursor-pointer;
+}
+
+input,
+select {
+  @apply h-10 px-4 py-2 rounded-md font-inter text-base font-medium text-blueGray-800;
+}
+
+a {
+  @apply cursor-pointer hover:underline underline-offset-2 focus-visible:underline;
+}
+
+/* Ark UI Transitions and Animations */
+/* [data-scope='select'] {
+  @apply h-10 px-4 py-2 rounded-md font-inter text-base font-medium text-blueGray-800;
+} */
+
+[data-scope='tooltip'][data-part='content'] {
+  @apply bg-background-400 text-blueGray-800 px-2 py-1 rounded shadow;
+}
+
+[data-scope='radio-group'][data-part='item-control'] {
+  @apply relative;
+}
+
+[data-scope='radio-group'][data-part='item-control']::after {
+  @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-200;
+  content: '';
+  height: calc(100% - 4px);
+  width: calc(100% - 4px);
+  background-color: transparent;
+}
+
+[data-scope='radio-group'][data-part='item-control'][data-state='checked']::after {
+  background-color: currentColor;
+}
+
+:where(
+    [data-scope='tooltip'],
+    [data-scope='popover'],
+    [data-scope='select'],
+    [data-scope='combobox'],
+    [data-scope='menu'],
+    [data-scope='hover-card']
+  )[data-part='content'][data-state='open'] {
+  animation: tooltipFadeIn 300ms ease-out;
+}
+
+:where(
+    [data-scope='tooltip'],
+    [data-scope='popover'],
+    [data-scope='select'],
+    [data-scope='combobox'],
+    [data-scope='menu'],
+    [data-scope='hover-card']
+  )[data-part='content'][data-state='closed'] {
+  animation: tooltipFadeOut 300ms ease-in;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    translate: 0 -10px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes tooltipFadeOut {
+  from {
+    opacity: 1;
+    translate: 0 0;
+  }
+  to {
+    opacity: 0;
+    translate: 0 -10px;
+  }
+}
+
+[data-scope='accordion'][data-part='item-content'][data-state='open'] {
+  animation: accordionSlideDown 300ms ease-in-out;
+}
+
+[data-scope='accordion'][data-part='item-content'][data-state='closed'] {
+  animation: accordionSlideUp 300ms ease-in-out;
+  overflow: hidden;
+}
+
+@keyframes accordionSlideDown {
+  from {
+    opacity: 0;
+    height: 0;
+  }
+  to {
+    opacity: 1;
+    height: var(--height);
+  }
+}
+
+@keyframes accordionSlideUp {
+  from {
+    opacity: 1;
+    height: var(--height);
+  }
+  to {
+    opacity: 0;
+    height: 0;
+  }
+}
+
+[data-scope='combobox'][data-part='trigger'],
+[data-scope='select'][data-part='indicator'],
+[data-scope='accordion'][data-part='item-indicator'],
+[data-scope='menu'][data-part='indicator'] {
+  @apply transition-all duration-300;
+}
+
+:where(
+    [data-scope='combobox'][data-part='trigger'],
+    [data-scope='select'][data-part='indicator'],
+    [data-scope='accordion'][data-part='item-indicator'],
+    [data-scope='menu'][data-part='indicator']
+  )[data-state='open'] {
+  @apply -rotate-180;
 }
