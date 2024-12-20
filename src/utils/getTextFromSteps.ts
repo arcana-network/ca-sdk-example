@@ -1,4 +1,4 @@
-export const getStatusMessage = (status: string): string => {
+export const getTextFromStep = (status: string): string => {
   switch (status) {
     case "FAUCET_REQUEST":
       return `Requesting Funds`;
