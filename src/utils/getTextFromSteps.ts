@@ -1,46 +1,28 @@
-import type { ProgressStep } from "@arcana/ca-sdk";
-
-export const getTextFromStep = (step: ProgressStep): string => {
-  switch (step.type) {
+export const getStatusMessage = (status: string): string => {
+  switch (status) {
     case "FAUCET_REQUEST":
-      return `Requesting funds for ERC20 approvals`;
+      return `Requesting Funds`;
     case "FAUCET_RECEIVED":
-      return `Faucet funds received`;
+      return `Faucet Received`;
     case "ALLOWANCE_USER_APPROVAL":
-      return `Allowance approved on ${
-        (step.data as { chainName: string }).chainName
-      }`;
+      return `Allowance Verified`;
     case "ALLOWANCE_APPROVAL_MINED":
-      return `Allowance verified on ${
-        (step.data as { chainName: string }).chainName
-      }`;
+      return `Allowance Mined`;
     case "ALLOWANCE_ALL_DONE":
-      return "Allowances approved";
+      return "Allowances Approved";
     case "INTENT_ACCEPTED":
-      return "User accepted the intent and associated fees";
+      return "Verifying Request";
     case "INTENT_HASH_SIGNED":
-      return "User signed the intent hash";
+      return "Collecting on Source Chains";
     case "INTENT_SUBMITTED":
-      return `Intent submitted to the chain: Link - ${
-        (step.data as { explorerURL: string }).explorerURL
-      }`;
+      return "Supplying Liquidity";
     case "INTENT_COLLECTION":
-      return `Intent collected on the chain ${
-        (step.data as { confirmed: number })?.confirmed
-      }/${(step.data as { total: number })?.total}`;
+      return "Submitting Transaction";
     case "INTENT_MINED":
-      return "Intent mined on the chain";
-    case "INTENT_DEPOSIT":
-      return `Deposited ${(
-        step.data as { amount: string; chainName: string }
-      )?.amount.substring(0, 8)} on ${
-        (step.data as { amount: string; chainName: string })?.chainName
-      }`;
-    case "INTENT_DEPOSITS_CONFIRMED":
-      return "Deposits confirmed";
+      return "Transaction Mined";
     case "INTENT_FULFILLED":
-      return "Intent is fulfilled";
+      return "Transaction Success";
     default:
-      return step.type;
+      return "Unknown status. Please contact support.";
   }
 };

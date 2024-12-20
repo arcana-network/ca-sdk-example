@@ -1,152 +1,106 @@
 <script lang="ts" setup>
-import { Accordion, Checkbox } from '@ark-ui/vue'
-import { useAppKitAccount } from '@reown/appkit/vue'
-import Decimal from 'decimal.js'
-import { ref, computed } from 'vue'
+import { Accordion, Checkbox } from "@ark-ui/vue";
+import Decimal from "decimal.js";
+import { ref, computed } from "vue";
 
-import ChevronDownIcon from '@/assets/images/svg/ChevronDown.svg'
-import InfoIcon from '@/assets/images/svg/InfoCircle.svg'
-import LinkIcon from '@/assets/images/svg/Link.svg'
-import ArrowRightIcon from '@/assets/images/svg/TransactionArrow.svg'
-import AppTooltip from '@/components/shared/AppTooltip.vue'
-import { useStorage } from '@/composables/activities'
-import { getCoinbasePrices } from '@/services/coinbase'
-import { AllowanceDataType } from '@/types/allowanceTypes'
-import { IntentDataType } from '@/types/intentTypes'
-import { TransactionActivityData } from '@/types/TxTypes'
+import ChevronDownIcon from "@/assets/images/svg/ChevronDown.svg";
+import InfoIcon from "@/assets/images/svg/InfoCircle.svg";
+import LinkIcon from "@/assets/images/svg/Link.svg";
+import ArrowRightIcon from "@/assets/images/svg/TransactionArrow.svg";
+import AppTooltip from "@/components/shared/AppTooltip.vue";
+import { getCoinbasePrices } from "@/services/coinbase";
+import { AllowanceDataType } from "@/types/allowanceTypes";
+import { IntentDataType } from "@/types/intentTypes";
 import {
   getChainDetails,
   getExplorerUrl,
   getLogo,
   truncateString,
-} from '@/utils/commonFunction'
-import { symbolToLogo } from '@/utils/getLogoFromSymbol'
-import { getStatusMessage } from '@/utils/getTextFromSteps'
+} from "@/utils/commonFunction";
+import { symbolToLogo } from "@/utils/getLogoFromSymbol";
+import { getStatusMessage } from "@/utils/getTextFromSteps";
 
 const props = defineProps<{
-  allowanceDetails: AllowanceDataType
-  intentDetails: IntentDataType
-  formAddress: string
-  toAddress: string
-  timer: string
-  submitLoader: boolean
-  txError: boolean
-  openIntentLoader: boolean
-  type: 'Send' | 'Receive'
-  txHash?: string
-  chainExplorerToken?: string
+  allowanceDetails: AllowanceDataType;
+  intentDetails: IntentDataType;
+  formAddress: string;
+  toAddress: string;
+  timer: string;
+  submitLoader: boolean;
+  txError: boolean;
+  openIntentLoader: boolean;
+  type: "Send" | "Receive";
+  txHash?: string;
+  chainExplorerToken?: string;
   submitSteps: {
-    inProgress: boolean
-    completed: boolean
+    inProgress: boolean;
+    completed: boolean;
     steps: {
-      type: string
-      typeID: string
-      done: boolean
-      data: any
-    }[]
-  }
-}>()
-
-const storageStore = useStorage()
-const useAccount = useAppKitAccount()
+      type: string;
+      typeID: string;
+      done: boolean;
+      data: any;
+    }[];
+  };
+}>();
 
 const emit = defineEmits([
-  'restIntentData',
-  'startTimer',
-  'closeModal',
-  'startSubmitLoader',
-  'intentDataClose',
-  'clearTime',
-])
+  "restIntentData",
+  "startTimer",
+  "closeModal",
+  "startSubmitLoader",
+  "intentDataClose",
+  "clearTime",
+]);
 
-const rates = ref<Record<string, string>>({})
+const rates = ref<Record<string, string>>({});
 
 getCoinbasePrices().then((data: any) => {
-  rates.value = data
-})
+  rates.value = data;
+});
 
 const totalSpend = () => {
   return (
     Number(props.intentDetails.intent?.destination.amount) +
     Number(props.intentDetails.intent?.fees.total)
-  )
-}
+  );
+};
 
 const submitIntentData = async () => {
-  emit('clearTime')
+  emit("clearTime");
   if (props.intentDetails.allow) {
-    emit('intentDataClose')
-    emit('startTimer')
-    await props.intentDetails.allow()
-    emit('startSubmitLoader')
-
-    const activityData: TransactionActivityData = {
-      date: new Date().toString(),
-      type: props.type,
-      chainIcon: props.intentDetails.intent?.destination.chainLogo
-        ? props.intentDetails.intent?.destination.chainLogo
-        : '',
-      chain: props.intentDetails.intent?.destination.chainName
-        ? props.intentDetails.intent?.destination.chainName
-        : '',
-      tokenIcon: props.intentDetails.intent?.token.logo
-        ? props.intentDetails.intent?.token.logo
-        : '',
-      token: props.intentDetails.intent?.token.symbol
-        ? props.intentDetails.intent?.token.symbol
-        : '',
-      address:
-        props.type === 'Send'
-          ? props.toAddress
-          : (useAccount.value.address as string),
-      amount: props.intentDetails.intent?.destination.amount
-        ? Number(props.intentDetails.intent?.destination.amount)
-        : 0,
-      abstracted: true,
-    }
-    storageStore.setActivity(useAccount.value.address as string, activityData)
+    emit("intentDataClose");
+    emit("startTimer");
+    await props.intentDetails.allow();
+    emit("startSubmitLoader");
   }
-}
+};
 
 const rejectIntentData = () => {
   if (props.intentDetails.deny) {
-    props.intentDetails.deny()
-    emit('closeModal')
-    emit('restIntentData')
-    emit('clearTime')
+    props.intentDetails.deny();
+    emit("closeModal");
+    emit("restIntentData");
+    emit("clearTime");
   }
-}
+};
 
 const closeModal = () => {
-  emit('closeModal')
-  emit('restIntentData')
-  emit('clearTime')
-}
+  emit("closeModal");
+  emit("restIntentData");
+  emit("clearTime");
+};
 
 const intentSteps = computed(() => {
   return props.submitSteps.steps.filter((item) =>
-    item.type.startsWith('INTENT'),
-  )
-})
+    item.type.startsWith("INTENT")
+  );
+});
 </script>
 
 <template>
   <div class="h-full w-full flex flex-col overflow-y-auto">
     <div class="w-full h-full p-2 pb-0 flex flex-col overflow-y-auto">
-      <div class="flex flex-col gap-4">
-        <div class="flex w-full items-center">
-          <div
-            v-if="!submitLoader"
-            class="text-center font-nohemi flex-grow text-2xl font-semibold text-blueGray-800"
-          >
-            {{
-              props.type === 'Receive'
-                ? 'Transaction Details'
-                : 'Send Transaction'
-            }}
-          </div>
-        </div>
-      </div>
       <div
         v-if="!props.intentDetails.open && !submitLoader"
         class="flex flex-col items-center justify-center text-center align-middle text-ellipsis overflow-hidden text-base font-inter font-normal leading-4 text-blueGray-800"
@@ -178,10 +132,10 @@ const intentSteps = computed(() => {
         />
         {{
           props.txError
-            ? 'Failed!'
+            ? "Failed!"
             : props.txHash
-              ? 'Transaction Successfull'
-              : 'Loading...'
+            ? "Transaction Successfull"
+            : "Loading..."
         }}
         <div
           v-if="props.txHash && props.chainExplorerToken"
@@ -193,7 +147,7 @@ const intentSteps = computed(() => {
               getExplorerUrl(
                 props.txHash,
                 getChainDetails(Number(props.chainExplorerToken))
-                  ?.blockExplorers?.default?.url,
+                  ?.blockExplorers?.default?.url
               )
             "
             class="flex items-center gap-1 font-inter text-rose-500 text-lg font-medium no-underline hover:no-underline active:no-underline"
@@ -341,7 +295,7 @@ const intentSteps = computed(() => {
                 getExplorerUrl(
                   props.txHash,
                   getChainDetails(Number(props.chainExplorerToken))
-                    ?.blockExplorers?.default?.url,
+                    ?.blockExplorers?.default?.url
                 )
               "
               class="flex items-center gap-1 font-inter text-rose-500 text-lg font-medium no-underline hover:no-underline active:no-underline"
@@ -361,7 +315,7 @@ const intentSteps = computed(() => {
       <div v-else class="flex flex-col flex-grow gap-4 mt-4">
         <div
           v-if="type === 'Receive'"
-          class="flex flex-col flex-grow overflow-y-auto bg-background-600 rounded-2xl border border-background-400 font-inter"
+          class="flex flex-col flex-grow overflow-y-auto bg-orange-200 rounded-2xl border border-background-400 font-inter"
         >
           <Accordion.Root
             multiple
@@ -386,7 +340,7 @@ const intentSteps = computed(() => {
                           getLogo(
                             symbolToLogo[
                               props.intentDetails.intent?.token.symbol
-                            ],
+                            ]
                           )
                         "
                         class="h-7 w-7 rounded-full bg-white-100"
@@ -433,9 +387,7 @@ const intentSteps = computed(() => {
                       :src="
                         props.intentDetails.intent?.token.symbol &&
                         getLogo(
-                          symbolToLogo[
-                            props.intentDetails.intent?.token.symbol
-                          ],
+                          symbolToLogo[props.intentDetails.intent?.token.symbol]
                         )
                       "
                       class="h-7 w-7 rounded-full bg-white-100"
@@ -444,7 +396,7 @@ const intentSteps = computed(() => {
                     <img
                       :src="
                         getLogo(
-                          props.intentDetails.intent?.destination.chainLogo,
+                          props.intentDetails.intent?.destination.chainLogo
                         )
                       "
                       class="absolute z-50 rounded-full border border-solid border-white-100 h-3.5 w-3.5 -bottom-1 -right-1"
@@ -467,7 +419,7 @@ const intentSteps = computed(() => {
                 <div class="text-left text-xs font-medium text-blueGray-800">
                   {{
                     new Decimal(
-                      props.intentDetails.intent?.destination.amount || 0,
+                      props.intentDetails.intent?.destination.amount || 0
                     ).toDecimalPlaces(6)
                   }}
                   {{ props.intentDetails.intent?.token.symbol }}
@@ -492,7 +444,7 @@ const intentSteps = computed(() => {
                       <span class="font-medium text-sm"
                         >~{{
                           new Decimal(
-                            intentDetails.intent?.fees.total || 0,
+                            intentDetails.intent?.fees.total || 0
                           ).toDecimalPlaces(6)
                         }}
                         {{ intentDetails.intent?.token.symbol }}</span
@@ -506,14 +458,14 @@ const intentSteps = computed(() => {
                         >{{
                           new Decimal(
                             new Decimal(
-                              intentDetails.intent?.fees.total || 0,
-                            ).toDecimalPlaces(6),
+                              intentDetails.intent?.fees.total || 0
+                            ).toDecimalPlaces(6)
                           )
                             .mul(
                               Decimal.div(
                                 1,
-                                rates[props.intentDetails.intent?.token.symbol],
-                              ),
+                                rates[props.intentDetails.intent?.token.symbol]
+                              )
                             )
                             .toDecimalPlaces(2)
                         }}
@@ -545,7 +497,7 @@ const intentSteps = computed(() => {
                             >
                               {{
                                 new Decimal(
-                                  props.intentDetails.intent?.fees.caGas || 0,
+                                  props.intentDetails.intent?.fees.caGas || 0
                                 ).toDecimalPlaces(6)
                               }}
                               {{ props.intentDetails.intent?.token.symbol }}
@@ -560,7 +512,7 @@ const intentSteps = computed(() => {
                             >
                               {{
                                 new Decimal(
-                                  props.intentDetails.intent?.fees.solver || 0,
+                                  props.intentDetails.intent?.fees.solver || 0
                                 ).toDecimalPlaces(6)
                               }}
                               {{ props.intentDetails.intent?.token.symbol }}
@@ -575,8 +527,7 @@ const intentSteps = computed(() => {
                             >
                               {{
                                 new Decimal(
-                                  props.intentDetails.intent?.fees.protocol ||
-                                    0,
+                                  props.intentDetails.intent?.fees.protocol || 0
                                 ).toDecimalPlaces(6) || 0
                               }}
                               {{ props.intentDetails.intent?.token.symbol }}
@@ -622,8 +573,8 @@ const intentSteps = computed(() => {
                         .mul(
                           Decimal.div(
                             1,
-                            rates[props.intentDetails.intent?.token.symbol],
-                          ),
+                            rates[props.intentDetails.intent?.token.symbol]
+                          )
                         )
                         .toDecimalPlaces(2)
                     }}
@@ -637,7 +588,7 @@ const intentSteps = computed(() => {
 
         <div
           v-else
-          class="flex flex-col flex-grow overflow-y-auto bg-background-600 rounded-2xl border border-background-400 font-inter"
+          class="flex flex-col flex-grow overflow-y-auto bg-orange-200 rounded-2xl border border-background-400 font-inter"
         >
           <Accordion.Root
             multiple
@@ -713,13 +664,13 @@ const intentSteps = computed(() => {
                         class="text-sm font-medium text-blueGray-600 font-inter"
                         >{{
                           new Decimal(
-                            props.intentDetails.intent?.destination.amount,
+                            props.intentDetails.intent?.destination.amount
                           )
                             .mul(
                               Decimal.div(
                                 1,
-                                rates[props.intentDetails.intent?.token.symbol],
-                              ),
+                                rates[props.intentDetails.intent?.token.symbol]
+                              )
                             )
                             .toDecimalPlaces(2)
                         }}
@@ -802,7 +753,7 @@ const intentSteps = computed(() => {
                       <span class="font-medium text-sm"
                         >~{{
                           new Decimal(
-                            intentDetails.intent?.fees.total || 0,
+                            intentDetails.intent?.fees.total || 0
                           ).toDecimalPlaces(6)
                         }}
                         {{ intentDetails.intent?.token.symbol }}</span
@@ -816,14 +767,14 @@ const intentSteps = computed(() => {
                         >{{
                           new Decimal(
                             new Decimal(
-                              intentDetails.intent?.fees.total || 0,
-                            ).toDecimalPlaces(6),
+                              intentDetails.intent?.fees.total || 0
+                            ).toDecimalPlaces(6)
                           )
                             .mul(
                               Decimal.div(
                                 1,
-                                rates[props.intentDetails.intent?.token.symbol],
-                              ),
+                                rates[props.intentDetails.intent?.token.symbol]
+                              )
                             )
                             .toDecimalPlaces(2)
                         }}
@@ -855,7 +806,7 @@ const intentSteps = computed(() => {
                             >
                               {{
                                 new Decimal(
-                                  props.intentDetails.intent?.fees.caGas || 0,
+                                  props.intentDetails.intent?.fees.caGas || 0
                                 ).toDecimalPlaces(6)
                               }}
                               {{ props.intentDetails.intent?.token.symbol }}
@@ -870,7 +821,7 @@ const intentSteps = computed(() => {
                             >
                               {{
                                 new Decimal(
-                                  props.intentDetails.intent?.fees.solver || 0,
+                                  props.intentDetails.intent?.fees.solver || 0
                                 ).toDecimalPlaces(6)
                               }}
                               {{ props.intentDetails.intent?.token.symbol }}
@@ -885,8 +836,7 @@ const intentSteps = computed(() => {
                             >
                               {{
                                 new Decimal(
-                                  props.intentDetails.intent?.fees.protocol ||
-                                    0,
+                                  props.intentDetails.intent?.fees.protocol || 0
                                 ).toDecimalPlaces(6) || 0
                               }}
                               {{ props.intentDetails.intent?.token.symbol }}
@@ -932,8 +882,8 @@ const intentSteps = computed(() => {
                         .mul(
                           Decimal.div(
                             1,
-                            rates[props.intentDetails.intent?.token.symbol],
-                          ),
+                            rates[props.intentDetails.intent?.token.symbol]
+                          )
                         )
                         .toDecimalPlaces(2)
                     }}
@@ -960,7 +910,7 @@ const intentSteps = computed(() => {
               @click.stop="submitIntentData"
             >
               {{
-                props.intentDetails.intentRefreshing ? 'Refreshing' : 'Confirm'
+                props.intentDetails.intentRefreshing ? "Refreshing" : "Confirm"
               }}
             </button>
           </div>

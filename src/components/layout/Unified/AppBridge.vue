@@ -1,4 +1,24 @@
 <script lang="ts" setup>
+import { useTokenStore } from "@/stores/token";
+import { useUserStore } from "@/stores/user";
+import { AllowanceDataType } from "@/types/allowanceTypes";
+import ArrowRightIcon from "@/assets/images/svg/TransactionArrow.svg";
+import CheckIcon from "@/assets/images/svg/Check.svg";
+import ChevronDownIcon from "@/assets/images/svg/ChevronDown.svg";
+import InfoIcon from "@/assets/images/svg/InfoCircle.svg";
+import { Asset, Chain as ChainDetails } from "@/types/balanceTypes";
+import { Chain } from "@/types/chainTypes";
+import { IntentDataType } from "@/types/intentTypes";
+import { clearAsyncInterval, setAsyncInterval } from "@/utils/async_interval";
+import { getLogo } from "@/utils/commonFunction";
+import { MAINNET_CHAINS } from "@/utils/constants";
+import { getCA } from "@/utils/getCA";
+import { useErrorToast } from "@/utils/useErrorToast";
+import { CA, ProgressStep } from "@arcana/ca-sdk";
+import { Avatar, Field, NumberInput, Select } from "@ark-ui/vue";
+import dayjs from "dayjs";
+import Decimal from "decimal.js";
+import { zeroAddress } from "viem";
 import {
   computed,
   nextTick,
@@ -8,26 +28,6 @@ import {
   ref,
   watch,
 } from "vue";
-import ArrowRightIcon from "@/assets/images/svg/TransactionArrow.svg";
-import CheckIcon from "@/assets/images/svg/Check.svg";
-import ChevronDownIcon from "@/assets/images/svg/ChevronDown.svg";
-import InfoIcon from "@/assets/images/svg/InfoCircle.svg";
-import { useUserStore } from "@/stores/user";
-import { CA, ProgressStep } from "@arcana/ca-sdk";
-import { useTokenStore } from "@/stores/token";
-import { useErrorToast } from "@/utils/useErrorToast";
-import { AllowanceDataType } from "@/types/allowanceTypes";
-import { IntentDataType } from "@/types/intentTypes";
-import { Asset, Chain as ChainDetails } from "@/types/balanceTypes";
-import Decimal from "decimal.js";
-import { Chain } from "@/types/chainTypes";
-import { MAINNET_CHAINS } from "@/utils/constants";
-import { zeroAddress } from "viem";
-import { clearAsyncInterval, setAsyncInterval } from "@/utils/async_interval";
-import dayjs from "dayjs";
-import { getCA } from "@/utils/getCA";
-import { Avatar, Field, NumberInput, Select } from "@ark-ui/vue";
-import { getLogo } from "@/utils/commonFunction";
 import AppTransaction from "../AppTransaction.vue";
 
 type StepState = {
@@ -68,21 +68,26 @@ const tokenStore = useTokenStore();
 const userToast = useErrorToast();
 const timer = ref<string>("0.00");
 const timerInterval = ref<any>();
-const txError = ref<boolean>(false);
-const txHash = ref<string>("");
-const allowanceLoader = ref<boolean>(false);
-const chainExplorerToken = ref<string>("");
 const openIntentLoader = ref<boolean>(false);
+const allowanceLoader = ref<boolean>(false);
+const txError = ref<boolean>(false);
 const selectedOptions = ref<{
-  to: string;
   token: string[];
   chain: string[];
   amount: string | null;
 }>({
-  to: "",
   token: [""],
   chain: [""],
   amount: null,
+});
+const submitSteps = ref<{
+  inProgress: boolean;
+  completed: boolean;
+  steps: { type: string; typeID: string; done: boolean; data: any }[];
+}>({
+  inProgress: false,
+  steps: [],
+  completed: false,
 });
 const feeData = ref<{
   maxFeePerGas: string;
@@ -108,15 +113,6 @@ const intentData = ref<IntentDataType>({
   intervalHandler: 0,
   intentRefreshing: false,
 });
-const submitSteps = ref<{
-  inProgress: boolean;
-  completed: boolean;
-  steps: { type: string; typeID: string; done: boolean; data: any }[];
-}>({
-  inProgress: false,
-  steps: [],
-  completed: false,
-});
 const allLoader = ref<{
   startTransaction: boolean;
   stepsLoader: boolean;
@@ -124,6 +120,12 @@ const allLoader = ref<{
   startTransaction: false,
   stepsLoader: false,
 });
+
+const resetSubmitSteps = () => {
+  submitSteps.value.inProgress = false;
+  submitSteps.value.steps = [];
+  submitSteps.value.completed = false;
+};
 
 const getTokenAndChainDetails = (assets: Asset[]) => {
   const tokenSet = new Set<string>();
@@ -133,8 +135,13 @@ const getTokenAndChainDetails = (assets: Asset[]) => {
     tokenSet.add(asset.symbol);
 
     asset.breakdown.forEach((breakdown) => {
+      const chainWithSymbol = {
+        ...breakdown.chain,
+        abstracted: asset.abstracted,
+      };
+
       if (!chainMap.has(breakdown.chain.id)) {
-        chainMap.set(Number(breakdown.chain.id), breakdown.chain);
+        chainMap.set(Number(breakdown.chain.id), chainWithSymbol);
       }
     });
   });
@@ -161,12 +168,6 @@ const selectedToken = computed(() => {
   });
 });
 
-const resetSubmitSteps = () => {
-  submitSteps.value.inProgress = false;
-  submitSteps.value.steps = [];
-  submitSteps.value.completed = false;
-};
-
 const availableTokens = computed(() => {
   const userAssets = user.assets;
 
@@ -187,18 +188,6 @@ const availableTokens = computed(() => {
       };
     });
 });
-
-const handleMax = async () => {
-  if (selectedToken.value) {
-    selectedOptions.value.amount = new Decimal(
-      selectedToken.value?.balance || 0
-    )
-      .minus(reduceFeeData())
-      .toString();
-
-    await nextTick();
-  }
-};
 
 const getChainById = (chainId: number) => {
   return (
@@ -244,19 +233,26 @@ const startTimer = () => {
   }, 20);
 };
 
+const intentDataOpen = () => {
+  openIntentLoader.value = true;
+};
+
+const intentDataClose = () => {
+  openIntentLoader.value = false;
+};
+
 const startSubmitLoader = () => {
   allLoader.value.stepsLoader = true;
 };
 
+const clearTime = () => {
+  clearInterval(timerInterval.value);
+};
+
 const clearTransferData = () => {
-  selectedOptions.value.to = "";
   selectedOptions.value.token = [""];
   selectedOptions.value.chain = [""];
   selectedOptions.value.amount = null;
-};
-
-const clearTime = () => {
-  clearInterval(timerInterval.value);
 };
 
 const allowanceLoaderOpen = () => {
@@ -267,12 +263,10 @@ const allowanceLoaderClose = () => {
   allowanceLoader.value = false;
 };
 
-const handleTransfer = async () => {
+const handleBridge = async () => {
   allLoader.value.startTransaction = true;
   allLoader.value.stepsLoader = false;
   txError.value = false;
-  chainExplorerToken.value = "";
-  txHash.value = "";
   resetSubmitSteps();
   try {
     const token = getSymbolByContractAddress(
@@ -281,25 +275,12 @@ const handleTransfer = async () => {
     );
 
     if (caSdkAuth) {
-      const result = await caSdkAuth
-        .transfer()
+      await caSdkAuth
+        .bridge()
         .amount(Number(selectedOptions.value.amount))
         .chain(Number(selectedOptions.value.chain[0]))
         .token(token)
-        .to(`0x${selectedOptions.value.to.slice(2)}`)
         .exec();
-
-      if (result) {
-        console.log(
-          result,
-          Number(selectedOptions.value.chain[0]).toString(),
-          "result"
-        );
-        txHash.value = result as string;
-        chainExplorerToken.value = Number(
-          selectedOptions.value.chain[0]
-        ).toString();
-      }
 
       submitSteps.value.completed = true;
     }
@@ -308,16 +289,14 @@ const handleTransfer = async () => {
     console.log("Transfer Failed:", error);
     allLoader.value.startTransaction = false;
     txError.value = true;
-    txHash.value = "";
-    chainExplorerToken.value = "";
     allowanceLoaderClose();
     clearInterval(timerInterval.value);
     userToast.createErrorToast(error);
   } finally {
     allLoader.value.startTransaction = false;
-    clearInterval(timerInterval.value);
     resetIntentData();
     clearTransferData();
+    clearInterval(timerInterval.value);
   }
 };
 
@@ -349,46 +328,17 @@ const caSDKEventListener = (data: any) => {
   }
 };
 
-const resetIntentData = () => {
-  if (intentData.value.intervalHandler != 0) {
-    clearAsyncInterval(intentData.value.intervalHandler);
-    intentData.value.intervalHandler = 0;
-  }
-  intentData.value.open = false;
-  intentData.value.allow = () => ({});
-  intentData.value.deny = () => ({});
-  intentData.value.refresh = null;
-  intentData.value.intent = null;
-};
-
-const intentDataOpen = () => {
-  openIntentLoader.value = true;
-};
-
-const intentDataClose = () => {
-  openIntentLoader.value = false;
-};
-
-const isNativeTokenInAllBreakdowns = (
-  data: Array<{
-    breakdown: Array<{
-      isNative: boolean | undefined;
-      contractAddress: string;
-    }>;
-  }>,
-  contractAddress: string
-): boolean => {
-  return data.some((item) =>
-    item.breakdown.some(
-      (token) =>
-        token.contractAddress === contractAddress && token.isNative === true
+const handleMax = async () => {
+  if (selectedToken.value) {
+    selectedOptions.value.amount = new Decimal(
+      selectedToken.value?.balance || 0
     )
-  );
-};
+      .minus(reduceFeeData())
+      .toString();
 
-const isNative = computed(() =>
-  isNativeTokenInAllBreakdowns(user.assets, selectedOptions.value.token[0])
-);
+    await nextTick();
+  }
+};
 
 const handleAmountInput = (event: Event) => {
   const input = (event.target as HTMLInputElement).value;
@@ -414,6 +364,18 @@ const handleAmountInput = (event: Event) => {
   }
 };
 
+const resetIntentData = () => {
+  if (intentData.value.intervalHandler != 0) {
+    clearAsyncInterval(intentData.value.intervalHandler);
+    intentData.value.intervalHandler = 0;
+  }
+  intentData.value.open = false;
+  intentData.value.allow = () => ({});
+  intentData.value.deny = () => ({});
+  intentData.value.refresh = null;
+  intentData.value.intent = null;
+};
+
 const resetAllowanceData = () => {
   allowanceData.value.open = false;
   allowanceData.value.allow = () => ({});
@@ -423,8 +385,6 @@ const resetAllowanceData = () => {
 
 const setupAllowanceHook = (caSdkAuth: CA) => {
   caSdkAuth.setOnAllowanceHook(async ({ allow, deny, sources }: any) => {
-    console.log({ sources });
-
     allowanceData.value.open = true;
     allowanceData.value.allow = allow;
     allowanceData.value.deny = deny;
@@ -507,24 +467,14 @@ onUnmounted(() => {
           ? "Spend Allowance"
           : intentData.open === true
           ? "Send Transaction"
-          : "Send Unified Balance"
+          : "Bridge Unified Balance"
       }}
     </h2>
+
     <div v-if="stepState.currentStep === 1">
       <div
         class="mt-5 space-y-4 text-blueGray-800 font-inter font-normal text-sm max-md:w-full"
       >
-        <Field.Root>
-          <Field.Label class="font-inter text-sm font-normal text-blueGray-800"
-            >Recipient</Field.Label
-          >
-          <Field.Input
-            v-model="selectedOptions.to"
-            class="w-full shadow-sm border border-background-400 placeholder:text-blueGray-600"
-            placeholder="0xb794f5ea0ba39494ce839613fffba74279579268"
-          />
-        </Field.Root>
-
         <Field.Root>
           <Select.Root
             v-model="selectedOptions.chain"
@@ -538,7 +488,6 @@ onUnmounted(() => {
             <Select.Control class="outline-none field">
               <Select.Trigger
                 class="flex rounded-md items-center w-full font-inter text-base font-medium text-blueGray-800 shadow-sm bg-white-100 text-start h-10 px-4 py-2 border border-background-400 placeholder:text-blueGray-600"
-                :disabled="!selectedOptions.to"
               >
                 <div
                   class="flex-grow flex items-center gap-2 font-medium text-base"
@@ -550,6 +499,17 @@ onUnmounted(() => {
                     />
                   </Avatar.Root>
                   <span>{{ selectedChain?.name || "Chain" }}</span>
+                  <div
+                    v-if="selectedChain?.abstracted"
+                    class="text-rose-500 text-0.625rem font-inter font-normal flex items-center gap-1 p-1 rounded-full bg-rose-200"
+                  >
+                    Chain Abstracted
+                    <AppTooltip message="Chain Abstracted">
+                      <InfoIcon
+                        class="h-3 w-3 stroke-rose-500 stroke-cap-round"
+                      />
+                    </AppTooltip>
+                  </div>
                 </div>
                 <Select.Indicator>
                   <ChevronDownIcon class="w-4 h-4 stroke-blueGray-800" />
@@ -578,12 +538,23 @@ onUnmounted(() => {
                         />
                       </Avatar.Root>
                       <span>{{ chain.name }}</span>
+                      <div
+                        v-if="chain?.abstracted"
+                        class="text-rose-500 text-0.625rem font-inter font-normal flex items-center gap-1 p-1 rounded-full bg-rose-200"
+                      >
+                        Chain Abstracted
+                        <AppTooltip message="Chain Abstracted">
+                          <InfoIcon
+                            class="h-3 w-3 stroke-rose-500 stroke-cap-round"
+                          />
+                        </AppTooltip>
+                      </div>
                       <Select.ItemText class="hidden">{{
                         chain.id
                       }}</Select.ItemText>
                     </div>
                     <Select.ItemIndicator
-                      ><CheckIcon class="w-4 h-4 stroke-black-700"
+                      ><CheckIcon class="w-5 h-5 stroke-black-700"
                     /></Select.ItemIndicator>
                   </Select.Item>
                 </Select.ItemGroup>
@@ -716,45 +687,31 @@ onUnmounted(() => {
           {{ selectedToken?.symbol }}
         </div>
       </div>
-
-      <div
-        class="flex items-center gap-2 bg-blue-500 rounded-xl p-2 mt-4 font-inter text-xs font-normal max-md:w-full"
-      >
-        <InfoIcon class="h-8 w-8 stroke-background-300 stroke-cap-round" />
-        <span class="text-background-300"
-          >You will need to provide allowances on the next screen to make your
-          transactions easier with Chain Abstraction. You can alternatively
-          choose a token on a specific chain if you don’t want to use Chain
-          Abstraction.</span
-        >
-      </div>
     </div>
+
     <AppTransaction
       :allowance-details="allowanceData"
       :intent-details="intentData"
-      :is-native-token="isNative"
       :form-address="user.walletAddress"
-      :to-address="selectedOptions.to"
+      :to-address="user.walletAddress"
       :submit-steps="submitSteps"
-      :open-intent-loader="openIntentLoader"
       :timer="timer"
+      :open-intent-loader="openIntentLoader"
       :interection="allLoader.startTransaction"
       :submit-loader="allLoader.stepsLoader"
       :tx-error="txError"
-      :tx-hash="txHash"
-      :chain-explorer-token="chainExplorerToken"
       :allowanceLoader="allowanceLoader"
       :stepState="stepState"
-      type="Send"
-      @rest-intent-data="resetIntentData"
-      @rest-allowance-data="resetAllowanceData"
-      @start-timer="startTimer"
-      @continue="handleTransfer"
-      @close-modal="goBack"
+      type="Receive"
       @start-submit-loader="startSubmitLoader"
+      @continue="handleBridge"
+      @rest-intent-data="resetIntentData"
+      @start-timer="startTimer"
+      @close-modal="goBack"
       @intentDataOpen="intentDataOpen"
       @intentDataClose="intentDataClose"
       @clearTime="clearTime"
+      @rest-allowance-data="resetAllowanceData"
       @allowance-loader-open="allowanceLoaderOpen"
       @next-step="goNext"
     />
