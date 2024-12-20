@@ -18,7 +18,7 @@ import {
   truncateString,
 } from "@/utils/commonFunction";
 import { symbolToLogo } from "@/utils/getLogoFromSymbol";
-import { getStatusMessage } from "@/utils/getTextFromSteps";
+import { getTextFromStep } from "@/utils/getTextFromSteps";
 
 const props = defineProps<{
   allowanceDetails: AllowanceDataType;
@@ -244,7 +244,7 @@ const intentSteps = computed(() => {
                   'text-start font-nohemi font-semibold text-base transition-all': true,
                   'opacity-40': index !== 0 && !step.done,
                 }"
-                >{{ getStatusMessage(step.type) }}
+                >{{ getTextFromStep(step.type) }}
               </Checkbox.Label>
               <Checkbox.Control
                 :class="{

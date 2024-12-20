@@ -10,7 +10,7 @@ import {
   isMaxAllowance,
 } from "@/utils/commonFunction";
 import { symbolToLogo } from "@/utils/getLogoFromSymbol";
-import { getStatusMessage } from "@/utils/getTextFromSteps";
+import { getTextFromStep } from "@/utils/getTextFromSteps";
 
 const props = defineProps<{
   allowanceDetails: AllowanceDataType;
@@ -179,7 +179,7 @@ const allowanceSteps = computed(() => {
                   'text-start font-nohemi font-semibold text-base transition-all': true,
                   'opacity-40': index !== 0 && !step.done,
                 }"
-                >{{ getStatusMessage(step.type) }}</Checkbox.Label
+                >{{ getTextFromStep(step.type) }}</Checkbox.Label
               >
               <Checkbox.Control
                 :class="{
