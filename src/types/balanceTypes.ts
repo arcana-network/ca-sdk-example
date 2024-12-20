@@ -2,6 +2,7 @@ type Chain = {
   id: number;
   name: string;
   logo: string;
+  abstracted?: boolean | undefined;
 };
 
 type Breakdown = {

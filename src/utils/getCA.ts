@@ -5,7 +5,6 @@ let ca: CA | null = null;
 
 const getCA = async () => {
   if (!ca) {
-    // @ts-ignore
     throw new Error("CA not initialized");
   }
   await ca.init();

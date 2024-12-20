@@ -11,14 +11,13 @@ import {
 import ArrowRightIcon from "@/assets/images/svg/TransactionArrow.svg";
 import CheckIcon from "@/assets/images/svg/Check.svg";
 import ChevronDownIcon from "@/assets/images/svg/ChevronDown.svg";
-import InfoIcon from "@/assets/images/svg/InfoCircle.svg";
 import { useUserStore } from "@/stores/user";
 import { CA, ProgressStep } from "@arcana/ca-sdk";
 import { useTokenStore } from "@/stores/token";
 import { useErrorToast } from "@/utils/useErrorToast";
 import { AllowanceDataType } from "@/types/allowanceTypes";
 import { IntentDataType } from "@/types/intentTypes";
-import { Asset, Chain as ChainDetails } from "@/types/balanceTypes";
+import { Asset } from "@/types/balanceTypes";
 import Decimal from "decimal.js";
 import { Chain } from "@/types/chainTypes";
 import { MAINNET_CHAINS } from "@/utils/constants";
@@ -61,6 +60,10 @@ const goNext = () => {
     stepState.currentStep++;
   }
 };
+
+const props = defineProps<{
+  selectedChain: string[];
+}>();
 
 let caSdkAuth: CA | null = null;
 const user = useUserStore();
@@ -125,35 +128,8 @@ const allLoader = ref<{
   stepsLoader: false,
 });
 
-const getTokenAndChainDetails = (assets: Asset[]) => {
-  const tokenSet = new Set<string>();
-  const chainMap = new Map<number, ChainDetails>();
-
-  assets.forEach((asset) => {
-    tokenSet.add(asset.symbol);
-
-    asset.breakdown.forEach((breakdown) => {
-      if (!chainMap.has(breakdown.chain.id)) {
-        chainMap.set(Number(breakdown.chain.id), breakdown.chain);
-      }
-    });
-  });
-
-  return {
-    token: Array.from(tokenSet),
-    chain: Array.from(chainMap.values()),
-  };
-};
-
-const chainList = computed(() => getTokenAndChainDetails(user.assets).chain);
-
-const selectedChain = computed(() => {
-  return chainList.value.find(
-    (c) => c.id.toString() === selectedOptions.value.chain[0]
-  );
-});
-
 const selectedToken = computed(() => {
+  selectedOptions.value.amount = null;
   return availableTokens.value.find((token) => {
     return token.breakdown.find(
       (b) => b.contractAddress.toString() === selectedOptions.value.token[0]
@@ -188,12 +164,21 @@ const availableTokens = computed(() => {
     });
 });
 
+const filteredBalance = computed(() => {
+  if (selectedToken.value && props.selectedChain) {
+    return selectedToken.value?.breakdown.filter(
+      (entry) => entry.chain.id === Number(props.selectedChain?.[0])
+    );
+  }
+});
+
 const handleMax = async () => {
-  if (selectedToken.value) {
+  if (filteredBalance?.value) {
     selectedOptions.value.amount = new Decimal(
-      selectedToken.value?.balance || 0
+      filteredBalance?.value?.[0]?.balance || 0
     )
       .minus(reduceFeeData())
+      .toDecimalPlaces(6)
       .toString();
 
     await nextTick();
@@ -400,10 +385,11 @@ const handleAmountInput = (event: Event) => {
 
   const amount = new Decimal(input);
 
-  if (selectedToken.value) {
-    const maxAllowed = new Decimal(selectedToken.value.balance || 0).minus(
-      reduceFeeData()
-    );
+  if (filteredBalance.value) {
+    const maxAllowed = new Decimal(
+      filteredBalance?.value?.[0]?.balance || 0
+    ).minus(reduceFeeData());
+
     if (amount.greaterThan(maxAllowed)) {
       selectedOptions.value.amount = maxAllowed.lessThan(0)
         ? "0"
@@ -468,6 +454,14 @@ watch(
   { immediate: true }
 );
 
+watch(
+  () => props.selectedChain,
+  (newValue) => {
+    selectedOptions.value.chain = newValue;
+  },
+  { immediate: true }
+);
+
 onMounted(async () => {
   try {
     caSdkAuth = await getCA();
@@ -507,7 +501,7 @@ onUnmounted(() => {
           ? "Spend Allowance"
           : intentData.open === true
           ? "Send Transaction"
-          : "Send Unified Balance"
+          : "Send"
       }}
     </h2>
     <div v-if="stepState.currentStep === 1">
@@ -527,74 +521,6 @@ onUnmounted(() => {
 
         <Field.Root>
           <Select.Root
-            v-model="selectedOptions.chain"
-            class="w-full flex flex-col gap-1 relative z-40 isolate"
-            :items="chainList"
-          >
-            <Select.Label
-              class="font-inter text-sm font-normal text-blueGray-800 placeholder:text-blueGray-600"
-              >Destination Chain</Select.Label
-            >
-            <Select.Control class="outline-none field">
-              <Select.Trigger
-                class="flex rounded-md items-center w-full font-inter text-base font-medium text-blueGray-800 shadow-sm bg-white-100 text-start h-10 px-4 py-2 border border-background-400 placeholder:text-blueGray-600"
-                :disabled="!selectedOptions.to"
-              >
-                <div
-                  class="flex-grow flex items-center gap-2 font-medium text-base"
-                >
-                  <Avatar.Root>
-                    <Avatar.Image
-                      :src="getLogo(selectedChain?.logo)"
-                      class="w-5 h-5 rounded-full"
-                    />
-                  </Avatar.Root>
-                  <span>{{ selectedChain?.name || "Chain" }}</span>
-                </div>
-                <Select.Indicator>
-                  <ChevronDownIcon class="w-4 h-4 stroke-blueGray-800" />
-                </Select.Indicator>
-              </Select.Trigger>
-            </Select.Control>
-            <Select.Positioner class="w-full z-50">
-              <Select.Content
-                class="max-h-60 w-full rounded-lg text-sm bg-white-100"
-              >
-                <Select.ItemGroup>
-                  <Select.Item
-                    v-for="chain in chainList"
-                    :key="chain.id"
-                    :item="chain.id.toString()"
-                    class="px-4 py-3 w-full flex rounded-md justify-between hover:bg-blueGray-300"
-                  >
-                    <div class="flex items-center gap-2">
-                      <Avatar.Root>
-                        <Avatar.Fallback class="w-5 h-5 rounded-full">{{
-                          chain.name.split(" ")[0].substring(0, 2).toUpperCase()
-                        }}</Avatar.Fallback>
-                        <Avatar.Image
-                          :src="getLogo(chain.logo)"
-                          class="w-5 h-5 rounded-full"
-                        />
-                      </Avatar.Root>
-                      <span>{{ chain.name }}</span>
-                      <Select.ItemText class="hidden">{{
-                        chain.id
-                      }}</Select.ItemText>
-                    </div>
-                    <Select.ItemIndicator
-                      ><CheckIcon class="w-4 h-4 stroke-black-700"
-                    /></Select.ItemIndicator>
-                  </Select.Item>
-                </Select.ItemGroup>
-              </Select.Content>
-            </Select.Positioner>
-            <Select.HiddenSelect />
-          </Select.Root>
-        </Field.Root>
-
-        <Field.Root>
-          <Select.Root
             v-model="selectedOptions.token"
             class="w-full flex flex-col gap-1 relative z-10 isolate"
             :items="availableTokens"
@@ -606,7 +532,7 @@ onUnmounted(() => {
             <Select.Control class="outline-none field">
               <Select.Trigger
                 class="flex rounded-md items-center w-full font-inter text-base font-medium text-blueGray-800 shadow-sm bg-white-100 text-start h-10 px-4 py-2 border border-background-400 placeholder:text-blueGray-600"
-                :disabled="!selectedOptions.chain[0]"
+                :disabled="!selectedOptions.to"
               >
                 <div
                   class="flex-grow flex items-center gap-2 font-medium text-base"
@@ -680,13 +606,13 @@ onUnmounted(() => {
                     if (
                       selectedOptions.amount &&
                       new Decimal(selectedOptions.amount).greaterThan(
-                        new Decimal(selectedToken?.balance || 0)
+                        new Decimal(filteredBalance?.[0]?.balance || 0)
                           .minus(reduceFeeData())
                           .toNumber()
                       )
                     ) {
                       selectedOptions.amount = new Decimal(
-                        selectedToken?.balance || 0
+                        filteredBalance?.[0]?.balance || 0
                       )
                         .minus(reduceFeeData())
                         .toString();
@@ -712,21 +638,11 @@ onUnmounted(() => {
 
         <div class="flex items-center justify-start">
           Available:
-          {{ new Decimal(selectedToken?.balance || "0").toDecimalPlaces(6) }}
+          {{
+            new Decimal(filteredBalance?.[0]?.balance || "0").toDecimalPlaces(6)
+          }}
           {{ selectedToken?.symbol }}
         </div>
-      </div>
-
-      <div
-        class="flex items-center gap-2 bg-blue-500 rounded-xl p-2 mt-4 font-inter text-xs font-normal max-md:w-full"
-      >
-        <InfoIcon class="h-8 w-8 stroke-background-300 stroke-cap-round" />
-        <span class="text-background-300"
-          >You will need to provide allowances on the next screen to make your
-          transactions easier with Chain Abstraction. You can alternatively
-          choose a token on a specific chain if you don’t want to use Chain
-          Abstraction.</span
-        >
       </div>
     </div>
     <AppTransaction

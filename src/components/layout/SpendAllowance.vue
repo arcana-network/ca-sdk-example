@@ -1,87 +1,86 @@
 <script setup lang="ts">
-import { Checkbox } from '@ark-ui/vue'
-import { computed, ref } from 'vue'
+import { Checkbox } from "@ark-ui/vue";
+import { computed } from "vue";
 
-import InfoIcon from '@/assets/images/svg/InfoCircle.svg'
-import { AllowanceDataType } from '@/types/allowanceTypes'
+import InfoIcon from "@/assets/images/svg/InfoCircle.svg";
+import { AllowanceDataType } from "@/types/allowanceTypes";
 import {
   getChainDetails,
   getLogo,
   isMaxAllowance,
-} from '@/utils/commonFunction'
-import { symbolToLogo } from '@/utils/getLogoFromSymbol'
-import { getStatusMessage } from '@/utils/getTextFromSteps'
+} from "@/utils/commonFunction";
+import { symbolToLogo } from "@/utils/getLogoFromSymbol";
+import { getStatusMessage } from "@/utils/getTextFromSteps";
 
 const props = defineProps<{
-  allowanceDetails: AllowanceDataType
-  timer: string
-  submitLoader: boolean
-  txError: boolean
-  openIntentLoader: boolean
-  allowanceLoader: boolean
+  allowanceDetails: AllowanceDataType;
+  timer: string;
+  submitLoader: boolean;
+  txError: boolean;
+  openIntentLoader: boolean;
+  allowanceLoader: boolean;
   submitSteps: {
-    inProgress: boolean
-    completed: boolean
-    steps: { type: string; typeID: string; done: boolean; data: any }[]
-  }
-}>()
+    inProgress: boolean;
+    completed: boolean;
+    steps: { type: string; typeID: string; done: boolean; data: any }[];
+  };
+}>();
 
 const emit = defineEmits([
-  'startTimer',
-  'startSubmitLoader',
-  'intentDataOpen',
-  'closeModal',
-  'restAllowanceData',
-  'clearTime',
-  'allowanceLoaderOpen',
-])
+  "startTimer",
+  "startSubmitLoader",
+  "intentDataOpen",
+  "closeModal",
+  "restAllowanceData",
+  "clearTime",
+  "allowanceLoaderOpen",
+]);
 
 const submitAllowance = () => {
   if (props.allowanceDetails.allow) {
-    emit('allowanceLoaderOpen')
-    emit('intentDataOpen')
-    emit('startTimer')
-    const values = props.allowanceDetails.data.map(() => '1.15')
-    props.allowanceDetails.allow(values)
-    emit('startSubmitLoader')
+    emit("allowanceLoaderOpen");
+    emit("intentDataOpen");
+    emit("startTimer");
+    const values = props.allowanceDetails.data.map(() => "1.15");
+    props.allowanceDetails.allow(values);
+    emit("startSubmitLoader");
   }
-}
+};
 
 const rejectAllowance = () => {
   if (props.allowanceDetails.deny) {
-    props.allowanceDetails.deny()
-    emit('closeModal')
-    emit('restAllowanceData')
-    emit('clearTime')
+    props.allowanceDetails.deny();
+    emit("closeModal");
+    emit("restAllowanceData");
+    emit("clearTime");
   } else {
-    emit('closeModal')
-    emit('restAllowanceData')
-    emit('clearTime')
+    emit("closeModal");
+    emit("restAllowanceData");
+    emit("clearTime");
   }
-}
+};
 
 const handleButtonClick = () => {
   if (props.txError) {
-    rejectAllowance()
+    rejectAllowance();
   } else {
-    submitAllowance()
+    submitAllowance();
   }
-}
+};
 
 const allowanceSteps = computed(() => {
   return props.submitSteps.steps.filter((item) =>
-    item.type.startsWith('ALLOWANCE'),
-  )
-})
+    item.type.startsWith("ALLOWANCE")
+  );
+});
 </script>
 
 <template>
   <div class="flex flex-col items-center justify-center font-inter">
     <div v-if="!submitLoader" class="text-center">
-      <h1 class="font-nohemi text-2xl font-semibold text-blueGray-800">
-        Spend Allowance
-      </h1>
-      <p class="font-inter text-base font-normal text-blueGray-600 mt-2">
+      <p
+        class="font-inter text-base font-normal text-blueGray-600 mt-5 text-center"
+      >
         The Chain Abstraction protocol automates spending tokens from multiple
         chains, making future transactions simple.
       </p>
@@ -213,7 +212,7 @@ const allowanceSteps = computed(() => {
         v-for="allowance in props.allowanceDetails.data"
         v-else
         :key="allowance.chainID"
-        class="flex items-center justify-between bg-background-600 shadow-md rounded-lg p-4 border border-background-400"
+        class="flex items-center justify-between bg-orange-200 shadow-md rounded-lg p-4 border border-background-400"
       >
         <div class="flex items-center space-x-4">
           <div class="relative isolate">
@@ -248,7 +247,7 @@ const allowanceSteps = computed(() => {
         >
           {{
             isMaxAllowance(allowance.currentAllowance)
-              ? 'Unlimited'
+              ? "Unlimited"
               : allowance.currentAllowance
           }}
         </div>
@@ -270,7 +269,7 @@ const allowanceSteps = computed(() => {
       :disabled="!props.allowanceDetails.open && props.allowanceLoader"
       @click.stop="handleButtonClick"
     >
-      {{ props.txError ? 'Close' : 'Continue' }}
+      {{ props.txError ? "Close" : "Continue" }}
     </button>
   </div>
 </template>

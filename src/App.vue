@@ -8,12 +8,6 @@ import { useUserStore } from "./stores/user";
 import AppDashboard from "./pages/AppDashboard.vue";
 
 const user = useUserStore();
-const currentTab = ref<"transfer" | "bridge" | "refund">("transfer");
-
-const onSidebarClick = (tab: "transfer" | "bridge" | "refund") => {
-  console.log("got click?");
-  currentTab.value = tab;
-};
 
 const connected = ref(false);
 const connect = async () => {
@@ -39,12 +33,9 @@ onMounted(async () => {});
 </script>
 
 <template>
-  <div class="h-[calc(100vh-5.125rem)] bg-white">
+  <div class="h-[calc(100vh-5.125rem)] bg-white-100">
     <Header :disconnect="disconnect" />
-    <div
-      v-if="connected"
-      class="h-[calc(100vh-5.125rem)] flex justify-center px-16 py-6"
-    >
+    <div v-if="connected" class="flex justify-center px-16 py-6">
       <AppDashboard />
     </div>
     <div
