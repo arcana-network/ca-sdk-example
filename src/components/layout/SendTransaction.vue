@@ -60,12 +60,11 @@ getCoinbasePrices().then((data: any) => {
   rates.value = data;
 });
 
-const totalSpend = () => {
-  return (
-    Number(props.intentDetails.intent?.destination.amount) +
-    Number(props.intentDetails.intent?.fees.total)
-  );
-};
+const totalSpend = computed(() => {
+  const amount = Number(props.intentDetails.intent?.destination?.amount || 0);
+  const fees = Number(props.intentDetails.intent?.fees?.total || 0);
+  return amount + fees;
+});
 
 const submitIntentData = async () => {
   emit("clearTime");
@@ -571,7 +570,7 @@ const intentSteps = computed(() => {
                   <span
                     class="flex items-center gap-2 font-medium text-base text-blueGray-800"
                   >
-                    {{ new Decimal(totalSpend()).toDecimalPlaces(6) }}
+                    {{ new Decimal(totalSpend).toDecimalPlaces(6) }}
                     {{ props.intentDetails.intent?.token.symbol }}
                   </span>
                   <span
@@ -581,7 +580,7 @@ const intentSteps = computed(() => {
                     "
                     class="text-sm font-medium text-blueGray-600 font-inter"
                     >{{
-                      new Decimal(totalSpend())
+                      new Decimal(totalSpend)
                         .mul(
                           Decimal.div(
                             1,
@@ -657,7 +656,9 @@ const intentSteps = computed(() => {
                       <span class="text-base font-normal text-blueGray-700"
                         >Spend</span
                       >
-                      <AppTooltip message="Spend">
+                      <AppTooltip
+                        message="The amount you want to spend and sources that would enable the spend across multiple chains"
+                      >
                         <InfoIcon
                           class="h-4 w-4 stroke-blueGray-700 stroke-cap-round"
                         />
@@ -755,7 +756,9 @@ const intentSteps = computed(() => {
                       <span class="text-base font-normal text-blueGray-700"
                         >Total Fees</span
                       >
-                      <AppTooltip message="Total Fees">
+                      <AppTooltip
+                        message="The fees incurred in terms of gas costs for the chain abstracted transaction, solver fees and gas needed, if any, to complete the transactions"
+                      >
                         <InfoIcon
                           class="h-4 w-4 stroke-blueGray-700 stroke-cap-round"
                         />
@@ -880,7 +883,7 @@ const intentSteps = computed(() => {
                   <span
                     class="flex items-center gap-2 font-medium text-base text-blueGray-800"
                   >
-                    {{ totalSpend() }}
+                    {{ totalSpend }}
                     {{ props.intentDetails.intent?.token.symbol }}
                   </span>
                   <span
@@ -890,7 +893,7 @@ const intentSteps = computed(() => {
                     "
                     class="text-sm font-medium text-blueGray-600 font-inter"
                     >{{
-                      new Decimal(totalSpend())
+                      new Decimal(totalSpend)
                         .mul(
                           Decimal.div(
                             1,

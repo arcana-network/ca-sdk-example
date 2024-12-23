@@ -69,6 +69,14 @@ const selectedChain = computed(() => {
   );
 });
 
+const selectedChainName = computed(() => {
+  return chainList.value.find(
+    (c) => c.id.toString() === singleAssetChain.value.chain[0]
+  );
+});
+
+console.log(selectedChainName);
+
 const setBalancePolling = (ca: CA) => {
   setInterval(async () => {
     balances.value = await ca.getUnifiedBalances();
@@ -173,7 +181,7 @@ const backBasicBridgeSteps = () => {
 </script>
 
 <template>
-  <div class="flex gap-12 w-full">
+  <div class="flex gap-12 w-full items-start">
     <div
       class="w-full lg:w-1/2 bg-background-500 p-6 rounded-lg shadow-lg flex flex-col"
     >
@@ -183,7 +191,7 @@ const backBasicBridgeSteps = () => {
         </div>
         <Select.Root
           v-model="singleAssetChain.chain"
-          class="w-52 flex flex-col gap-1 relative z-40 isolate"
+          class="w-52 flex flex-col gap-1 relative z-50 isolate"
           :items="chainList"
         >
           <Select.Control class="outline-none field">
@@ -254,7 +262,7 @@ const backBasicBridgeSteps = () => {
             <div
               class="font-inter text-blueGray-900 text-sm font-semibold mb-2 text-center uppercase opacity-40"
             >
-              Single Chain, Fragmented Asset Balance
+              Single Chain, Fragmented Balance
             </div>
             <div
               class="font-inter text-3xl text-maroon-800 font-semibold text-center"
@@ -360,6 +368,7 @@ const backBasicBridgeSteps = () => {
 
       <AppBasicSend
         :selectedChain="singleAssetChain.chain"
+        :chainName="selectedChain?.name"
         @back-step="backBasicSendSteps"
         v-if="stepState.showBasicSendSteps"
       />
@@ -374,7 +383,7 @@ const backBasicBridgeSteps = () => {
     >
       <div class="flex justify-between items-center">
         <div class="font-nohemi text-blueGray-800 text-2xl font-semibold">
-          Chain Abstraction Enable Apps
+          Chain Abstraction Enabled App
         </div>
         <div
           class="text-rose-500 text-xs font-inter font-semibold flex items-center gap-1 px-4 py-2 rounded-full bg-rose-200"
@@ -394,7 +403,7 @@ const backBasicBridgeSteps = () => {
             <div
               class="font-inter text-maroon-800 text-sm font-semibold mb-2 text-center uppercase opacity-40"
             >
-              Multi-Chain, Unified Asset Balance
+              Multi-chain, Unified Balance
             </div>
             <div
               class="font-inter text-3xl text-maroon-800 font-semibold text-center"

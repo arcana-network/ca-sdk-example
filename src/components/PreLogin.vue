@@ -87,19 +87,20 @@ const connectWallet = async (p: EIP6963ProviderDetail) => {
 
 <template>
   <div
-    class="min-h-[400px] min-w-[400px] mx-auto max-w-lg flex flex-col justify-center items-center gap-2 bg-orange-500 border border-orange-500 rounded-3xl shadow p-10"
+    class="min-h-[500px] min-w-[600px] mx-auto max-w-lg flex flex-col justify-center items-center gap-2 bg-orange-500 border border-orange-500 rounded-3xl shadow p-10"
   >
-    <div class="font-nohemi font-normal text-5xl text-blueGray-800 text-center">
-      Welcome to Arcana SDK Demo App
+    <div class="font-nohemi font-normal text-6xl text-blueGray-800 text-center">
+      Welcome to Arcana SDK Demo
     </div>
     <div class="font-inter font-medium text-sm text-blueGray-600 text-center">
-      Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-      tempor incididunt ut labore et dolore magna aliqua. 
+      See how a simple integration of the Arcana Chain Abstraction SDK
+      transforms the UX to a multi-chain setting, using any wallet and just a
+      few clicks for users.
     </div>
 
     <Dialog.Root>
       <Dialog.Trigger class="button-secondary w-2/4 mt-4 max-md:w-full">
-        Connect
+        Connect Wallet
       </Dialog.Trigger>
       <Teleport to="body">
         <Dialog.Backdrop />
@@ -107,7 +108,7 @@ const connectWallet = async (p: EIP6963ProviderDetail) => {
           <Dialog.Positioner
             class="fixed inset-0 flex items-center justify-center z-50"
           >
-            <Dialog.Content class="card mt-5">
+            <Dialog.Content class="card mt-10">
               <div
                 class="flex flex-col justify-center align-center text-center"
                 v-if="loading"

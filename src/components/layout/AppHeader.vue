@@ -17,12 +17,23 @@ const user = useUserStore();
     <header
       class="flex bg-background-300 py-1.0625rem pr-2rem pl-2.02731rem justify-between items-start"
     >
-      <div class="">
-        <img src="@/assets/images/svg/ArcanaPayLogo.svg?url" alt="Logo" class="h-3rem" />
+      <div class="flex items-center gap-4">
+        <img
+          src="@/assets/images/png/ArcanaPayLogo.png?url"
+          alt="Logo"
+          class="h-3rem"
+        />
+        <!-- <div class="flex flex-col items-start justify-between gap-2">
+          <span>Arcana</span>
+          <span>CA SDK demo</span>
+        </div> -->
       </div>
 
       <div>
-        <div v-if="user.isWalletConnected" class="flex items-center justify-end gap-10">
+        <div
+          v-if="user.isWalletConnected"
+          class="flex items-center justify-end gap-10"
+        >
           <Menu.Root>
             <Menu.Trigger
               class="flex items-center border-none hover:bg-none focus:outline-none active:border-none"
@@ -35,6 +46,7 @@ const user = useUserStore();
                     class="h-12 w-12 rounded-6.25rem"
                   />
                 </Avatar.Root>
+
                 <div class="flex flex-col items-start justify-between gap-1">
                   <div class="flex items-center justify-between gap-2">
                     <span
@@ -66,7 +78,9 @@ const user = useUserStore();
                   class="flex justify-start items-center p-2 h-2.75rem rounded-0.75rem border border-background-400 bg-background-400 bg-opacity-50 cursor-pointer"
                   @click.stop="() => props.disconnect()"
                 >
-                  <span class="font-nohemi text-0.875rem font-medium text-blueGray-800">
+                  <span
+                    class="font-nohemi text-0.875rem font-medium text-blueGray-800"
+                  >
                     Disconnect Wallet</span
                   >
                 </MenuItem>
