@@ -64,10 +64,12 @@ const connectWallet = async (p: EIP6963ProviderDetail) => {
   loading.value = true;
   connectingMsg.value = `Connecting to ${p.info.name}`;
   console.log({ loading: loading.value });
+  console.log(p, "sksksksk");
   try {
     const accounts = (await p.provider.request({
       method: "eth_requestAccounts",
     })) as string[];
+    user.setProvider(p.provider);
     await initCA(p.provider);
     localStorage.setItem("xar-casdk-last-connected-wallet", p.info.rdns);
     props.connect();
@@ -105,7 +107,7 @@ const connectWallet = async (p: EIP6963ProviderDetail) => {
           <Dialog.Positioner
             class="fixed inset-0 flex items-center justify-center z-50"
           >
-            <Dialog.Content class="card">
+            <Dialog.Content class="card mt-5">
               <div
                 class="flex flex-col justify-center align-center text-center"
                 v-if="loading"

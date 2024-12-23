@@ -18,7 +18,7 @@ import { CA, ProgressStep } from "@arcana/ca-sdk";
 import { Avatar, Field, NumberInput, Select } from "@ark-ui/vue";
 import dayjs from "dayjs";
 import Decimal from "decimal.js";
-import { zeroAddress } from "viem";
+import { SwitchChainError, zeroAddress } from "viem";
 import {
   computed,
   nextTick,
@@ -29,6 +29,7 @@ import {
   watch,
 } from "vue";
 import AppTransaction from "../AppTransaction.vue";
+import { switchChain } from "@/utils/switchChain";
 
 type StepState = {
   currentStep: number;
@@ -301,6 +302,14 @@ const handleBridge = async () => {
     allowanceLoaderClose();
     clearInterval(timerInterval.value);
     userToast.createErrorToast(error);
+    if (
+      error instanceof SwitchChainError &&
+      error.message.includes("Unrecognized chain ID")
+    ) {
+      console.error("Chain not recognized. Try adding the chain first.");
+      // txErrorMsg.value = "Retry"
+      await switchChain(selectedOptions.value.chain[0] as string);
+    }
   } finally {
     allLoader.value.startTransaction = false;
     resetIntentData();

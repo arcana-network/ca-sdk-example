@@ -22,13 +22,14 @@ import { Asset, Chain as ChainDetails } from "@/types/balanceTypes";
 import Decimal from "decimal.js";
 import { Chain } from "@/types/chainTypes";
 import { MAINNET_CHAINS } from "@/utils/constants";
-import { zeroAddress } from "viem";
+import { SwitchChainError, zeroAddress } from "viem";
 import { clearAsyncInterval, setAsyncInterval } from "@/utils/async_interval";
 import dayjs from "dayjs";
 import { getCA } from "@/utils/getCA";
 import { Avatar, Field, NumberInput, Select } from "@ark-ui/vue";
 import { getLogo } from "@/utils/commonFunction";
 import AppTransaction from "../AppTransaction.vue";
+import { switchChain } from "@/utils/switchChain";
 
 type StepState = {
   currentStep: number;
@@ -313,6 +314,14 @@ const handleTransfer = async () => {
     allowanceLoaderClose();
     clearInterval(timerInterval.value);
     userToast.createErrorToast(error);
+    if (
+      error instanceof SwitchChainError &&
+      error.message.includes("Unrecognized chain ID")
+    ) {
+      console.error("Chain not recognized. Try adding the chain first.");
+      // txErrorMsg.value = "Retry"
+      await switchChain(selectedOptions.value.chain[0] as string);
+    }
   } finally {
     allLoader.value.startTransaction = false;
     clearInterval(timerInterval.value);
