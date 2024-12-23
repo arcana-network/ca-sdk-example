@@ -95,7 +95,7 @@ const intentModal = ref<{
   intent: Intent | null
   sourcesOpen: boolean
   feesBreakupOpen: boolean
-  intervalHandler: number
+  intervalHandler: number | null
   intentRefreshing: boolean
 }>({
   allow: () => { },
@@ -105,7 +105,7 @@ const intentModal = ref<{
   open: false,
   sourcesOpen: true,
   feesBreakupOpen: false,
-  intervalHandler: 0,
+  intervalHandler: null,
   intentRefreshing: false
 })
 
@@ -114,6 +114,11 @@ const intentModal = ref<{
 const eventListener = (data: any) => {
   switch (data.type) {
     case "EXPECTED_STEPS": {
+      const steps = data.data.map((s: ProgressStep) => ({ ...s, done: false }))
+      if (transferValue.value.loading) {
+        steps.push({ type: "UserTx", typeID: "UTX", done: false })
+        steps.push({ type: "UserTxMined", typeID: "UTXM", done: false })
+      }
       console.log("Expected steps", data.data)
       state.value.steps = data.data.map((s: ProgressStep) => ({ ...s, done: false }))
       state.value.inProgress = true
@@ -238,9 +243,9 @@ const resetState = () => {
 }
 
 const resetIntentModal = async () => {
-  if (intentModal.value.intervalHandler != 0) {
+  if (intentModal.value.intervalHandler != null) {
     clearAsyncInterval(intentModal.value.intervalHandler)
-    intentModal.value.intervalHandler = 0
+    intentModal.value.intervalHandler = null
   }
   intentModal.value.open = false
   intentModal.value.allow = () => { }
@@ -268,13 +273,18 @@ const handleTransfer = async () => {
   try {
     console.log({ transferValue: transferValue.value })
     if (ca) {
-      await ca.transfer()
+      const hash = await ca.transfer()
         .amount(Number(transferValue.value.amount))
         .chain(Number(transferValue.value.chain))
         .token(transferValue.value.token)
         .to(transferValue.value.to as `0x${string}`)
         .exec()
-
+      console.log({ hash })
+      // const publicClient = createPublicClient({
+      //   transport: http(""),
+      // });
+      // markStepDone("TRANSFER", hash)
+      // await publicClient.waitForTransactionReceipt({ hash });
       state.value.completed = true
     }
   } catch (e) {

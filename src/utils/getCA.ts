@@ -14,7 +14,7 @@ const getCA = async () => {
 
 const initCA = async (provider: EthereumProvider) => {
   ca = new CA(provider, {
-    network: "dev",
+    network: "testnet",
   });
   await ca.init();
 };
