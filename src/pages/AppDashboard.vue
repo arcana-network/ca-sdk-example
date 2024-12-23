@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
 import { Asset, Breakdown, Chain as ChainDetails } from "@/types/balanceTypes";
+import readable from "readable-numbers";
 import { formatNumber, getLogo } from "@/utils/commonFunction";
 import { getCA } from "@/utils/getCA";
 import { CA } from "@arcana/ca-sdk";
@@ -312,7 +313,11 @@ const backBasicBridgeSteps = () => {
                 >
                   <span class="text-base font-medium flex items-center gap-1"
                     >{{
-                      new Decimal(balance.balance).toDecimalPlaces(4).toNumber()
+                      readable(
+                        new Decimal(balance.balance)
+                          .toDecimalPlaces(4)
+                          .toNumber()
+                      )
                     }}
                     <span
                       class="inline-block align-middle max-w-6ch text-ellipsis overflow-x-hidden"
@@ -322,9 +327,11 @@ const backBasicBridgeSteps = () => {
                 </AppTooltip>
                 <span class="text-sm font-medium text-blueGray-600 font-inter">
                   {{
-                    new Decimal(balance.balanceInFiat)
-                      .toDecimalPlaces(4)
-                      .toNumber()
+                    readable(
+                      new Decimal(balance.balanceInFiat)
+                        .toDecimalPlaces(4)
+                        .toNumber()
+                    )
                   }}
                   USD
                 </span>
@@ -517,10 +524,12 @@ const backBasicBridgeSteps = () => {
                           class="flex items-center justify-center gap-2 font-inter text-base font-normal leading-5"
                         >
                           {{
-                            (new Decimal(asset.balance)
-                              .toDecimalPlaces(4)
-                              .toNumber(),
-                            2)
+                            readable(
+                              new Decimal(asset.balance)
+                                .toDecimalPlaces(4)
+                                .toNumber(),
+                              2
+                            )
                           }}
                           <span
                             class="inline-block align-middle max-w-6ch text-ellipsis overflow-hidden"
@@ -532,9 +541,11 @@ const backBasicBridgeSteps = () => {
                         class="text-sm font-medium text-blueGray-600 font-inter"
                       >
                         {{
-                          new Decimal(asset.balanceInFiat)
-                            .toDecimalPlaces(4)
-                            .toNumber()
+                          readable(
+                            new Decimal(asset.balanceInFiat)
+                              .toDecimalPlaces(4)
+                              .toNumber()
+                          )
                         }}
                         USD
                       </span>
@@ -584,9 +595,11 @@ const backBasicBridgeSteps = () => {
                               >
                                 <span class="text-xs flex items-center gap-1"
                                   >{{
-                                    new Decimal(token.balance)
-                                      .toDecimalPlaces(4)
-                                      .toNumber()
+                                    readable(
+                                      new Decimal(token.balance)
+                                        .toDecimalPlaces(4)
+                                        .toNumber()
+                                    )
                                   }}
                                   <span
                                     class="inline-block align-middle max-w-6ch text-ellipsis overflow-x-hidden"
