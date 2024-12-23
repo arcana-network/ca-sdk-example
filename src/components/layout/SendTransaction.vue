@@ -92,9 +92,13 @@ const closeModal = () => {
 };
 
 const intentSteps = computed(() => {
-  return props.submitSteps.steps.filter((item) =>
-    item.type.startsWith("INTENT")
-  );
+  return props.submitSteps.steps.filter((item) => {
+    if (!item.type.startsWith("INTENT")) {
+      return false;
+    }
+    const statusText = getTextFromStep(item.type);
+    return statusText !== "Unknown status. Please contact support.";
+  });
 });
 </script>
 

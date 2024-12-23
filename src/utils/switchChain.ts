@@ -1,6 +1,6 @@
 import { useUserStore } from "@/stores/user";
 import { Decimal } from "decimal.js";
-import chains from "./chainList";
+import { MAINNET_CHAINS } from "./constants";
 
 export async function switchChain(chainId: string) {
   const userStore = useUserStore();
@@ -13,7 +13,9 @@ export async function switchChain(chainId: string) {
     });
   } catch (e: any) {
     if (e.code === 4902) {
-      const chainDetails = chains[Number(chainId)];
+      const chainDetails = MAINNET_CHAINS.filter(
+        (item) => item.id === Number(chainId)
+      );
       try {
         if (!chainDetails) throw e;
         await userStore.provider.request({
@@ -21,14 +23,15 @@ export async function switchChain(chainId: string) {
           params: [
             {
               chainId: new Decimal(chainId).ceil().toHexadecimal(),
-              chainName: chainDetails.name,
+              chainName: chainDetails[0]?.name,
               nativeCurrency: {
-                symbol: chainDetails.currency,
-                decimals: 18,
+                symbol: chainDetails[0]?.nativeCurrency?.symbol,
+                decimals: chainDetails[0]?.nativeCurrency?.decimals,
               },
-              rpcUrls: [chainDetails.rpc_url],
-              blockExplorerUrls: [chainDetails.explorer],
-              iconUrls: [chainDetails.icon_url],
+              rpcUrls: chainDetails[0]?.rpcUrls?.default?.publicHttp,
+              blockExplorerUrls: [
+                chainDetails[0]?.blockExplorers?.default?.url,
+              ],
             },
           ],
         });

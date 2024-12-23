@@ -69,9 +69,13 @@ const handleButtonClick = () => {
 };
 
 const allowanceSteps = computed(() => {
-  return props.submitSteps.steps.filter((item) =>
-    item.type.startsWith("ALLOWANCE")
-  );
+  return props.submitSteps.steps.filter((item) => {
+    if (!item.type.startsWith("ALLOWANCE")) {
+      return false;
+    }
+    const statusText = getTextFromStep(item.type);
+    return statusText !== "Unknown status. Please contact support.";
+  });
 });
 </script>
 
