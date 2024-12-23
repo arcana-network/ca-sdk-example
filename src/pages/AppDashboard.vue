@@ -527,8 +527,7 @@ const backBasicBridgeSteps = () => {
                             readable(
                               new Decimal(asset.balance)
                                 .toDecimalPlaces(4)
-                                .toNumber(),
-                              2
+                                .toNumber()
                             )
                           }}
                           <span
