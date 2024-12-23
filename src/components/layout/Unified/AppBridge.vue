@@ -373,6 +373,13 @@ const handleAmountInput = (event: Event) => {
   }
 };
 
+const clearIntervalHandler = () => {
+  if (intentData.value.intervalHandler != 0) {
+    clearAsyncInterval(intentData.value.intervalHandler);
+    intentData.value.intervalHandler = 0;
+  }
+};
+
 const resetIntentData = () => {
   if (intentData.value.intervalHandler != 0) {
     clearAsyncInterval(intentData.value.intervalHandler);
@@ -723,6 +730,7 @@ onUnmounted(() => {
       @rest-allowance-data="resetAllowanceData"
       @allowance-loader-open="allowanceLoaderOpen"
       @next-step="goNext"
+      @clearIntentHandler="clearIntervalHandler"
     />
   </div>
 </template>
