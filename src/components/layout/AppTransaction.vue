@@ -42,6 +42,7 @@ const emit = defineEmits([
   "intentDataClose",
   "clearTime",
   "allowanceLoaderOpen",
+  "clearIntentHandler",
 ]);
 
 const handleContinue = () => {
@@ -100,6 +101,7 @@ const handleContinue = () => {
       @start-submit-loader="emit('startSubmitLoader')"
       @intentDataClose="emit('intentDataClose')"
       @clearTime="emit('clearTime')"
+      @clearIntentHandler="emit('clearIntentHandler')"
     />
   </div>
 </template>

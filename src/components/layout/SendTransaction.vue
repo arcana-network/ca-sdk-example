@@ -51,6 +51,7 @@ const emit = defineEmits([
   "startSubmitLoader",
   "intentDataClose",
   "clearTime",
+  "clearIntentHandler",
 ]);
 
 const rates = ref<Record<string, string>>({});
@@ -73,6 +74,7 @@ const submitIntentData = async () => {
     emit("startTimer");
     await props.intentDetails.allow();
     emit("startSubmitLoader");
+    emit("clearIntentHandler");
   }
 };
 
@@ -82,6 +84,7 @@ const rejectIntentData = () => {
     emit("closeModal");
     emit("restIntentData");
     emit("clearTime");
+    emit("clearIntentHandler");
   }
 };
 
@@ -89,6 +92,7 @@ const closeModal = () => {
   emit("closeModal");
   emit("restIntentData");
   emit("clearTime");
+  emit("clearIntentHandler");
 };
 
 const intentSteps = computed(() => {
