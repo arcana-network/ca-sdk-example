@@ -269,6 +269,10 @@ const allowanceLoaderClose = () => {
   allowanceLoader.value = false;
 };
 
+const isNativeToken = computed(() => {
+  return selectedOptions.value.token[0] === zeroAddress;
+});
+
 const handleTransfer = async () => {
   allLoader.value.startTransaction = true;
   allLoader.value.stepsLoader = false;
@@ -555,7 +559,6 @@ onUnmounted(() => {
             <Select.Control class="outline-none field">
               <Select.Trigger
                 class="flex rounded-md items-center w-full font-inter text-base font-medium text-blueGray-800 shadow-sm bg-white-100 text-start h-10 px-4 py-2 border border-background-400 placeholder:text-blueGray-600"
-                :disabled="!selectedOptions.to"
               >
                 <div
                   class="flex-grow flex items-center gap-2 font-medium text-base"
@@ -623,7 +626,6 @@ onUnmounted(() => {
             <Select.Control class="outline-none field">
               <Select.Trigger
                 class="flex rounded-md items-center w-full font-inter text-base font-medium text-blueGray-800 shadow-sm bg-white-100 text-start h-10 px-4 py-2 border border-background-400 placeholder:text-blueGray-600"
-                :disabled="!selectedOptions.chain[0]"
               >
                 <div
                   class="flex-grow flex items-center gap-2 font-medium text-base"
@@ -735,6 +737,7 @@ onUnmounted(() => {
       </div>
 
       <div
+        v-if="!isNativeToken && selectedOptions.token[0]"
         class="flex items-center gap-2 bg-blue-500 rounded-xl p-2 mt-4 font-inter text-xs font-normal max-md:w-full"
       >
         <InfoIcon class="h-8 w-8 stroke-background-300 stroke-cap-round" />

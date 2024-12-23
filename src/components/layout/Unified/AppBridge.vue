@@ -595,7 +595,6 @@ onUnmounted(() => {
             <Select.Control class="outline-none field">
               <Select.Trigger
                 class="flex rounded-md items-center w-full font-inter text-base font-medium text-blueGray-800 shadow-sm bg-white-100 text-start h-10 px-4 py-2 border border-background-400 placeholder:text-blueGray-600"
-                :disabled="!selectedOptions.chain[0]"
               >
                 <div
                   class="flex-grow flex items-center gap-2 font-medium text-base"

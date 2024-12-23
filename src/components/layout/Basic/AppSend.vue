@@ -65,6 +65,7 @@ const goNext = () => {
 
 const props = defineProps<{
   selectedChain: string[];
+  chainName: string | undefined;
 }>();
 
 let caSdkAuth: CA | null = null;
@@ -521,6 +522,14 @@ onUnmounted(() => {
           : "Send"
       }}
     </h2>
+    <div
+      v-if="props.chainName && intentData.open === true"
+      class="text-base font-nohemi font-normal text-blueGray-800 mt-5 text-center"
+    >
+      Looks like you are missing the funds on {{ props.chainName }} to complete
+      this transaction. Lets get you some from other chains
+    </div>
+
     <div v-if="stepState.currentStep === 1">
       <div
         class="mt-5 space-y-4 text-blueGray-800 font-inter font-normal text-sm max-md:w-full"
@@ -549,7 +558,6 @@ onUnmounted(() => {
             <Select.Control class="outline-none field">
               <Select.Trigger
                 class="flex rounded-md items-center w-full font-inter text-base font-medium text-blueGray-800 shadow-sm bg-white-100 text-start h-10 px-4 py-2 border border-background-400 placeholder:text-blueGray-600"
-                :disabled="!selectedOptions.to"
               >
                 <div
                   class="flex-grow flex items-center gap-2 font-medium text-base"
