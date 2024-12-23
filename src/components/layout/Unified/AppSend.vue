@@ -12,6 +12,7 @@ import ArrowRightIcon from "@/assets/images/svg/TransactionArrow.svg";
 import CheckIcon from "@/assets/images/svg/Check.svg";
 import ChevronDownIcon from "@/assets/images/svg/ChevronDown.svg";
 import InfoIcon from "@/assets/images/svg/InfoCircle.svg";
+import ArrowIcon from "@/assets/images/svg/ArrowUp.svg";
 import { useUserStore } from "@/stores/user";
 import { CA, ProgressStep } from "@arcana/ca-sdk";
 import { useTokenStore } from "@/stores/token";
