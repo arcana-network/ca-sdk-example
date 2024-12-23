@@ -1,24 +1,29 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { defineStore } from "pinia";
+import { ref } from "vue";
 
-import { Asset } from '@/types/balanceTypes'
+import { Asset } from "@/types/balanceTypes";
 
-export const useUserStore = defineStore('user', () => {
-  const isWalletConnected = ref<boolean>(false)
-  const walletAddress = ref<string>('')
-  const balanceInFiat = ref<number>(0)
-  const loading = ref<boolean>(true)
+export const useUserStore = defineStore("user", () => {
+  const isWalletConnected = ref<boolean>(false);
+  const walletAddress = ref<string>("");
+  const provider = ref<any>(null);
+  const balanceInFiat = ref<number>(0);
+  const loading = ref<boolean>(true);
 
-  const assets = ref<Asset[]>([])
+  const assets = ref<Asset[]>([]);
 
   const setAsset = (newAssets: Asset[]) => {
-    assets.value = newAssets
-    loading.value= false
-  }
+    assets.value = newAssets;
+    loading.value = false;
+  };
 
   const setLoading = (newLoading: boolean) => {
-    loading.value = newLoading
-  }
+    loading.value = newLoading;
+  };
+
+  const setProvider = (provider2: any) => {
+    provider.value = provider2;
+  };
 
   return {
     isWalletConnected,
@@ -27,6 +32,8 @@ export const useUserStore = defineStore('user', () => {
     assets,
     setAsset,
     loading,
-    setLoading
-  }
-})
+    setLoading,
+    provider,
+    setProvider,
+  };
+});
