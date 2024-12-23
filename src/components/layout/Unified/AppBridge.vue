@@ -6,6 +6,7 @@ import ArrowRightIcon from "@/assets/images/svg/TransactionArrow.svg";
 import CheckIcon from "@/assets/images/svg/Check.svg";
 import ChevronDownIcon from "@/assets/images/svg/ChevronDown.svg";
 import InfoIcon from "@/assets/images/svg/InfoCircle.svg";
+import ArrowIcon from "@/assets/images/svg/ArrowUp.svg";
 import { Asset, Chain as ChainDetails } from "@/types/balanceTypes";
 import { Chain } from "@/types/chainTypes";
 import { IntentDataType } from "@/types/intentTypes";
@@ -30,6 +31,7 @@ import {
 } from "vue";
 import AppTransaction from "../AppTransaction.vue";
 import { switchChain } from "@/utils/switchChain";
+import AppTooltip from "@/components/shared/AppTooltip.vue";
 
 type StepState = {
   currentStep: number;

@@ -1,27 +1,41 @@
-export const getTextFromStep = (status: string): string => {
+export const getTextFromStep = (status: string, done: boolean): string => {
   switch (status) {
     case "FAUCET_REQUEST":
-      return `Requesting Funds`;
+      return done ? "Funds Requested Successfully" : "Requesting Funds";
+
     case "FAUCET_RECEIVED":
-      return `Faucet Received`;
+      return done ? "Funds Received" : "Waiting for Funds";
+
     case "ALLOWANCE_USER_APPROVAL":
-      return `Allowance Verified`;
+      return done ? "Allowance Verified" : "Allowance Verifing";
+
     case "ALLOWANCE_APPROVAL_MINED":
-      return `Allowance Mined`;
+      return done ? "Allowance Mined" : "Allowance Mining";
+
     case "ALLOWANCE_ALL_DONE":
-      return "Allowances Approved";
+      return done ? "Allowance Approved" : "Allowance Approving";
+
     case "INTENT_ACCEPTED":
-      return "Verifying Request";
+      return done ? "Request Accepted" : "Accepting Request";
+
     case "INTENT_HASH_SIGNED":
-      return "Collecting on Source Chains";
+      return done ? "Request Verified" : "Verifing Request";
+
     case "INTENT_SUBMITTED":
-      return "Supplying Liquidity";
+      return done
+        ? "Collected on Source Chains"
+        : "Collecting on Source Chains";
+
     case "INTENT_COLLECTION":
-      return "Submitting Transaction";
+      return done ? "Liquidity Supplied" : "Supplying Liquidity";
+    // return done ? "Submitted Transaction" : "Submitting Transaction";
+
     case "INTENT_MINED":
-      return "Transaction Mined";
+      return done ? "Transaction Mined" : "Transaction Mining";
+
     case "INTENT_FULFILLED":
-      return "Transaction Success";
+      return done ? "Transaction Success" : "Completing Transaction";
+
     default:
       return "Unknown status. Please contact support.";
   }

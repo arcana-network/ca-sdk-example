@@ -100,8 +100,11 @@ const intentSteps = computed(() => {
     if (!item.type.startsWith("INTENT")) {
       return false;
     }
-    const statusText = getTextFromStep(item.type);
-    return statusText !== "Unknown status. Please contact support.";
+    const statusText = getTextFromStep(item.type, item.done);
+    return (
+      statusText !== "Unknown status. Please contact support." &&
+      statusText !== "Request Accepted"
+    );
   });
 });
 </script>
@@ -234,7 +237,7 @@ const intentSteps = computed(() => {
               INTENT
             </div>
             <div
-              v-if="index === 3"
+              v-if="index === 2"
               class="flex justify-start font-inter text-base font-bold text-blueGray-600"
             >
               TRANSACTION
@@ -250,9 +253,10 @@ const intentSteps = computed(() => {
               <Checkbox.Label
                 :class="{
                   'text-start font-nohemi font-semibold text-base transition-all': true,
-                  'opacity-40': index !== 0 && !step.done,
+                  'opacity-40':
+                    index !== 0 && !step.done && !intentSteps[index - 1]?.done,
                 }"
-                >{{ getTextFromStep(step.type) }}
+                >{{ getTextFromStep(step.type, step.done) }}
               </Checkbox.Label>
               <Checkbox.Control
                 :class="{

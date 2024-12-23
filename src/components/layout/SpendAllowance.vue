@@ -73,7 +73,7 @@ const allowanceSteps = computed(() => {
     if (!item.type.startsWith("ALLOWANCE")) {
       return false;
     }
-    const statusText = getTextFromStep(item.type);
+    const statusText = getTextFromStep(item.type, item.done);
     return statusText !== "Unknown status. Please contact support.";
   });
 });
@@ -181,9 +181,12 @@ const allowanceSteps = computed(() => {
               <Checkbox.Label
                 :class="{
                   'text-start font-nohemi font-semibold text-base transition-all': true,
-                  'opacity-40': index !== 0 && !step.done,
+                  'opacity-40':
+                    index !== 0 &&
+                    !step.done &&
+                    !allowanceSteps[index - 1]?.done,
                 }"
-                >{{ getTextFromStep(step.type) }}</Checkbox.Label
+                >{{ getTextFromStep(step.type, step.done) }}</Checkbox.Label
               >
               <Checkbox.Control
                 :class="{
