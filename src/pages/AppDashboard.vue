@@ -476,7 +476,7 @@ const backBasicBridgeSteps = () => {
                             <div
                               v-if="asset.breakdown.length > 3"
                               :class="{
-                                'absolute rounded-full border border-solid bg-blue-100 border-white-100 h-2.5 w-2.5 bottom-1.5 -right-1.5 flex items-center justify-center': true,
+                                'absolute rounded-full border border-solid bg-blue-100 border-white-100 h-2.5 w-2.5 bottom-1.5 -right-1.5 flex items-center justify-center bg-blue-500': true,
                               }"
                               :style="{
                                 zIndex: asset.breakdown.length,
