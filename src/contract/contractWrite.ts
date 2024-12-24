@@ -6,27 +6,24 @@ export const executeContractFunction = async ({
   abi,
   functionName,
   args = [],
-  value,
   account,
 }: {
   contractAddress: `0x${string}`;
   abi: any[];
   functionName: string;
   args: any[];
-  value: bigint;
   account: `0x${string}` | Account;
 }): Promise<string | undefined> => {
   try {
-    console.log(contractAddress, abi, functionName, args, value, account);
+    console.log(contractAddress, abi, functionName, args, account);
 
     const walletClient = walletClientEth;
     const txHash = await walletClient.writeContract({
       address: contractAddress,
-      abi: abi,
+      abi,
       functionName: functionName,
-      args: args,
-      value: BigInt(1),
-      account: account,
+      args,
+      account,
     });
 
     console.log(`Transaction successfully sent! Tx Hash: ${txHash}`);
