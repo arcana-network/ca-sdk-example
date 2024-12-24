@@ -205,14 +205,14 @@ const refundValue = ref({
 })
 
 const refundIntent = async () => {
-  refundValue.value.loading = true
-  try {
-    await ca?.refund(refundValue.value.hash as `0x${string}`)
-  } catch (e) {
-    console.error("Refund failed with error", e);
-  } finally {
-    refundValue.value.loading = false
-  }
+  // refundValue.value.loading = true
+  // try {
+  //   // await ca?.refund(refundValue.value.hash as `0x${string}`)
+  // } catch (e) {
+  //   console.error("Refund failed with error", e);
+  // } finally {
+  //   refundValue.value.loading = false
+  // }
 }
 
 const state = ref<{
