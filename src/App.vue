@@ -6,6 +6,7 @@ import { onMounted, ref } from "vue";
 import { getCA } from "./utils/getCA";
 import { useUserStore } from "./stores/user";
 import AppDashboard from "./pages/AppDashboard.vue";
+import DashBoardBackground from "@/assets/images/svg/DashboardBack.svg";
 
 const user = useUserStore();
 
@@ -34,13 +35,16 @@ onMounted(async () => {});
 
 <template>
   <div class="h-[calc(100vh-5.125rem)] bg-white-100">
+    <div v-if="!connected" class="absolute top-5 right-0 z-0">
+      <DashBoardBackground class="h-[97vh]" />
+    </div>
     <Header :disconnect="disconnect" />
     <div v-if="connected" class="flex justify-center px-16 py-6">
       <AppDashboard />
     </div>
     <div
       v-else
-      class="h-[calc(100vh-5.125rem)] flex flex-col justify-center align-center"
+      class="h-[calc(100vh-5.125rem)] flex flex-col justify-center align-center z-10 relative"
     >
       <PreLogin :connect="connect"></PreLogin>
     </div>
