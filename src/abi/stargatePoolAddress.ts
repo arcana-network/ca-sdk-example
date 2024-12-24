@@ -1,26 +1,43 @@
-export const stargatePoolAddress = {
-  Ethereum: {
-    StargatePoolNative: import.meta.env.VITE_STARGATE_POOL_ETH_NATIVE_CONTRACT,
-    StargatePoolUSDC: import.meta.env.VITE_STARGATE_POOL_ETH_USDC_CONTRACT,
-    StargatePoolUSDT: import.meta.env.VITE_STARGATE_POOL_ETH_USDT_CONTRACT,
-    StargatePoolmETH: import.meta.env.VITE_STARGATE_POOL_ETH_M_NATIVE_CONTRACT,
+export const stargatePoolAddress: any = {
+  1: {
+    ETH: "0x77b2043768d28E9C9aB44E1aBfC95944bcE57931",
+    USDC: "0xc026395860Db2d07ee33e05fE50ed7bD583189C7",
+    USDT: "0x933597a323Eb81cAe705C5bC29985172fd5A3973",
   },
-  Optimism: {
-    StargatePoolNative: import.meta.env.VITE_STARGATE_POOL_OP_NATIVE_CONTRACT,
-    StargatePoolUSDC: import.meta.env.VITE_STARGATE_POOL_OP_USDC_CONTRACT,
-    StargatePoolUSDT: import.meta.env.VITE_STARGATE_POOL_OP_USDT_CONTRACT,
+  10: {
+    ETH: "0xe8CDF27AcD73a434D661C84887215F7598e7d0d3",
+    USDC: "0xcE8CcA271Ebc0533920C83d39F417ED6A0abB7D0",
+    USDT: "0x19cFCE47eD54a88614648DC3f19A5980097007dD",
   },
-  Arbitrum: {
-    StargatePoolNative: import.meta.env.VITE_STARGATE_POOL_ARB_NATIVE_CONTRACT,
-    StargatePoolUSDC: import.meta.env.VITE_STARGATE_POOL_ARB_USDC_CONTRACT,
-    StargatePoolUSDT: import.meta.env.VITE_STARGATE_POOL_ARB_USDT_CONTRACT,
+  42161: {
+    ETH: "0xA45B5130f36CDcA45667738e2a258AB09f4A5f7F",
+    USDC: "0xe8CDF27AcD73a434D661C84887215F7598e7d0d3",
+    USDT: "0xcE8CcA271Ebc0533920C83d39F417ED6A0abB7D0",
   },
-  Polygon: {
-    StargatePoolUSDC: import.meta.env.VITE_STARGATE_POOL_POL_USDC_CONTRACT,
-    StargatePoolUSDT: import.meta.env.VITE_STARGATE_POOL_POL_USDT_CONTRACT,
+  137: {
+    USDC: "0x9Aa02D4Fae7F58b8E8f34c66E756cC734DAc7fe4",
+    USDT: "0xd47b03ee6d86Cf251ee7860FB2ACf9f91B9fD4d7",
   },
-  Base: {
-    StargatePoolNative: import.meta.env.VITE_STARGATE_POOL_BASE_NATIVE_CONTRACT,
-    StargatePoolUSDC: import.meta.env.VITE_STARGATE_POOL_BASE_USDT_CONTRACT,
+  8453: {
+    ETH: "0xdc181Bd607330aeeBEF6ea62e03e5e1Fb4B6F7C7",
+    USDC: "0x27a16dc786820B16E5c9028b75B99F6f604b5d26",
+  },
+};
+
+export const stargatePoolEndPointId: any = {
+  1: {
+    endpointID: 30101,
+  },
+  10: {
+    endpointID: 30111,
+  },
+  42161: {
+    endpointID: 30110,
+  },
+  137: {
+    endpointID: 30109,
+  },
+  8453: {
+    endpointID: 30184,
   },
 };
