@@ -107,7 +107,7 @@ const intentData = ref<IntentDataType>({
   deny: () => ({}),
   refresh: null,
   intent: null,
-  intervalHandler: 0,
+  intervalHandler: null,
   intentRefreshing: false,
 });
 const submitSteps = ref<{
@@ -364,16 +364,16 @@ const caSDKEventListener = (data: any) => {
 };
 
 const clearIntervalHandler = () => {
-  if (intentData.value.intervalHandler != 0) {
+  if (intentData.value.intervalHandler != null) {
     clearAsyncInterval(intentData.value.intervalHandler);
-    intentData.value.intervalHandler = 0;
+    intentData.value.intervalHandler = null;
   }
 };
 
 const resetIntentData = () => {
-  if (intentData.value.intervalHandler != 0) {
+  if (intentData.value.intervalHandler != null) {
     clearAsyncInterval(intentData.value.intervalHandler);
-    intentData.value.intervalHandler = 0;
+    intentData.value.intervalHandler = null;
   }
   intentData.value.open = false;
   intentData.value.allow = () => ({});

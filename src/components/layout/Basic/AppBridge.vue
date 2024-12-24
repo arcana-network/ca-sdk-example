@@ -233,19 +233,19 @@ const reduceFeeData = () => {
   return f.add(Decimal.mul(f, 0.05));
 };
 
-const getSymbolByContractAddress = (
-  assets: Asset[],
-  contractAddress: string
-): string => {
-  const matchedItem = assets?.filter((item) =>
-    item.breakdown.find(
-      (item) =>
-        item.contractAddress.toLowerCase() === contractAddress.toLowerCase()
-    )
-  );
+// const getSymbolByContractAddress = (
+//   assets: Asset[],
+//   contractAddress: string
+// ): string => {
+//   const matchedItem = assets?.filter((item) =>
+//     item.breakdown.find(
+//       (item) =>
+//         item.contractAddress.toLowerCase() === contractAddress.toLowerCase()
+//     )
+//   );
 
-  return matchedItem[0].symbol;
-};
+//   return matchedItem[0].symbol;
+// };
 
 const startTimer = () => {
   const submissionTime = Date.now();

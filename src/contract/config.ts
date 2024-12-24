@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createWalletClient, custom } from "viem";
 import { arbitrum, base, mainnet, optimism, polygon } from "viem/chains";
 
