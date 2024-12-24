@@ -22,6 +22,7 @@ import Decimal from "decimal.js";
 import {
   Address,
   pad,
+  parseUnits,
   SwitchChainError,
   toBytes,
   toHex,
@@ -40,8 +41,17 @@ import AppTransaction from "../AppTransaction.vue";
 import { switchChain } from "@/utils/switchChain";
 import AppTooltip from "@/components/shared/AppTooltip.vue";
 import { executeContractFunction } from "@/contract/contractWrite";
-import { stargatePoolAddress } from "@/abi/stargatePoolAddress";
+import {
+  stargatePoolAddress,
+  stargatePoolEndPointId,
+} from "@/abi/stargatePoolAddress";
 import { stargatePoolABI } from "@/abi/stargatePool.abi";
+import { erc20ABI } from "@/abi/erc20.abi";
+import { readContractFunction } from "@/contract/readContract";
+
+const props = defineProps<{
+  selectedChain: string[];
+}>();
 
 type StepState = {
   currentStep: number;
@@ -233,19 +243,19 @@ const reduceFeeData = () => {
   return f.add(Decimal.mul(f, 0.05));
 };
 
-// const getSymbolByContractAddress = (
-//   assets: Asset[],
-//   contractAddress: string
-// ): string => {
-//   const matchedItem = assets?.filter((item) =>
-//     item.breakdown.find(
-//       (item) =>
-//         item.contractAddress.toLowerCase() === contractAddress.toLowerCase()
-//     )
-//   );
+const getSymbolByContractAddress = (
+  assets: Asset[],
+  contractAddress: string
+): string => {
+  const matchedItem = assets?.filter((item) =>
+    item.breakdown.find(
+      (item) =>
+        item.contractAddress.toLowerCase() === contractAddress.toLowerCase()
+    )
+  );
 
-//   return matchedItem[0].symbol;
-// };
+  return matchedItem[0].symbol;
+};
 
 const startTimer = () => {
   const submissionTime = Date.now();
@@ -294,53 +304,96 @@ function toEthereumAddress(address: string): EthereumAddress {
   return address as EthereumAddress;
 }
 
+// const getEid = () => {};
+
 const handleBridge = async () => {
   allLoader.value.startTransaction = true;
   allLoader.value.stepsLoader = false;
   txError.value = false;
   resetSubmitSteps();
+  console.log(selectedOptions.value, props.selectedChain);
+  const { currentChainId } = user.provider.request({ method: "eth_chainId" });
+  if (currentChainId !== Number(selectedOptions?.value?.chain[0])) {
+    await switchChain(selectedOptions.value.chain[0] as string);
+  }
   try {
+    const token = getSymbolByContractAddress(
+      availableTokens.value,
+      selectedOptions.value.token[0]
+    );
+    const tokenDecimal = getChainById(Number(selectedOptions?.value?.chain[0]))
+      ?.nativeCurrency?.decimals;
     const address: Address = toEthereumAddress(user.walletAddress);
-    // const usdtInWei = parseUnits(String(selectedOptions.value.amount), 6);
+    const usdtInWei = parseUnits(
+      String(selectedOptions.value.amount),
+      tokenDecimal
+    );
     const recipientBytes32 = toHex(pad(toBytes(address), { size: 32 }));
     console.log(address, toBytes(address), recipientBytes32, "address");
 
-    const dstEid = 1;
+    const dstEid =
+      stargatePoolEndPointId[Number(selectedOptions?.value?.chain[0])]
+        ?.endpointID;
     const to = recipientBytes32;
-    const amountLD = BigInt(100_000);
+    const amountLD = BigInt(usdtInWei);
 
     const params: any = {
-      contractAddress: stargatePoolAddress.Polygon.StargatePoolUSDT,
+      contractAddress:
+        stargatePoolAddress[Number(props.selectedChain[0])]?.[token],
       abi: stargatePoolABI,
       functionName: "quoteOFT",
       args: [[dstEid, to, amountLD, amountLD, "0x0", "0x0", "0x0"]],
       account: address,
+      chain: Number(props.selectedChain[0]),
+      provider: user.provider,
     };
 
-    const txHash1 = await executeContractFunction(params);
+    const txHash1: any = await readContractFunction(params);
     console.log(txHash1, "hash 1");
 
     const params2: any = {
-      contractAddress: stargatePoolAddress.Polygon.StargatePoolUSDT,
+      contractAddress:
+        stargatePoolAddress[Number(props.selectedChain[0])]?.[token],
       abi: stargatePoolABI,
       functionName: "quoteSend",
-      args: [],
-      value: BigInt("1"),
+      args: [
+        [dstEid, to, amountLD, txHash1?.[2].amountSentLD, "0x0", "0x0", "0x0"],
+        false,
+      ],
       account: address,
+      chain: Number(props.selectedChain[0]),
+      provider: user.provider,
     };
-    const txHash2 = await executeContractFunction(params2);
+    const txHash2 = await readContractFunction(params2);
     console.log(txHash2, "hash 2");
 
-    // if (caSdkAuth) {
-    //   await caSdkAuth
-    //     .bridge()
-    //     .amount(Number(selectedOptions.value.amount))
-    //     .chain(Number(selectedOptions.value.chain[0]))
-    //     .token(token)
-    //     .exec();
+    const params3: any = {
+      contractAddress: selectedOptions.value.token[0],
+      abi: erc20ABI,
+      functionName: "approve",
+      args: [
+        stargatePoolAddress[Number(props.selectedChain[0])]?.[token],
+        amountLD,
+      ],
+      account: address,
+      chain: Number(props.selectedChain[0]),
+      provider: user.provider,
+    };
+    const txHash3 = await executeContractFunction(params3);
+    console.log(txHash3, "hash 3");
 
-    //   submitSteps.value.completed = true;
-    // }
+    const params4: any = {
+      contractAddress:
+        stargatePoolAddress[Number(props.selectedChain[0])]?.[token],
+      abi: stargatePoolABI,
+      functionName: "sendToken",
+      args: [[dstEid, to, amountLD, amountLD, "0x0", "0x0", "0x0"], [txHash2]],
+      account: address,
+      chain: Number(props.selectedChain[0]),
+      provider: user.provider,
+    };
+    const txHash4 = await executeContractFunction(params4);
+    console.log(txHash4, "hash 4");
   } catch (error) {
     resetSubmitSteps();
     console.log("Transfer Failed:", error);

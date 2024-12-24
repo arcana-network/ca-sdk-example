@@ -22,7 +22,7 @@ import { Asset } from "@/types/balanceTypes";
 import Decimal from "decimal.js";
 import { Chain } from "@/types/chainTypes";
 import { MAINNET_CHAINS } from "@/utils/constants";
-import { SwitchChainError, zeroAddress } from "viem";
+import { Address, parseUnits, SwitchChainError, zeroAddress } from "viem";
 import { clearAsyncInterval, setAsyncInterval } from "@/utils/async_interval";
 import dayjs from "dayjs";
 import { getCA } from "@/utils/getCA";
@@ -30,6 +30,7 @@ import { Avatar, Field, NumberInput, Select } from "@ark-ui/vue";
 import { getLogo } from "@/utils/commonFunction";
 import AppTransaction from "../AppTransaction.vue";
 import { switchChain } from "@/utils/switchChain";
+import { sendContractFunction } from "@/contract/sendTx";
 
 type StepState = {
   currentStep: number;
@@ -210,20 +211,6 @@ const reduceFeeData = () => {
   return f.add(Decimal.mul(f, 0.05));
 };
 
-const getSymbolByContractAddress = (
-  assets: Asset[],
-  contractAddress: string
-): string => {
-  const matchedItem = assets?.filter((item) =>
-    item.breakdown.find(
-      (item) =>
-        item.contractAddress.toLowerCase() === contractAddress.toLowerCase()
-    )
-  );
-
-  return matchedItem[0].symbol;
-};
-
 const startTimer = () => {
   const submissionTime = Date.now();
 
@@ -255,6 +242,15 @@ const allowanceLoaderClose = () => {
   allowanceLoader.value = false;
 };
 
+type EthereumAddress = `0x${string}`;
+
+function toEthereumAddress(address: string): EthereumAddress {
+  if (!address.startsWith("0x") || address.length !== 42) {
+    throw new Error("Invalid Ethereum address format.");
+  }
+  return address as EthereumAddress;
+}
+
 const handleTransfer = async () => {
   allLoader.value.startTransaction = true;
   allLoader.value.stepsLoader = false;
@@ -263,33 +259,35 @@ const handleTransfer = async () => {
   txHash.value = "";
   resetSubmitSteps();
   try {
-    const token = getSymbolByContractAddress(
-      availableTokens.value,
-      selectedOptions.value.token[0]
+    const chainDecimal = getChainById(Number(selectedOptions?.value?.chain[0]))
+      ?.nativeCurrency?.decimals;
+    const address: Address = toEthereumAddress(user.walletAddress);
+    const usdtInWei = parseUnits(
+      String(selectedOptions.value.amount),
+      chainDecimal
     );
+    const to: Address = toEthereumAddress(user.walletAddress);
+    const value = BigInt(usdtInWei);
 
-    if (caSdkAuth) {
-      const result = await caSdkAuth
-        .transfer()
-        .amount(Number(selectedOptions.value.amount))
-        .chain(Number(selectedOptions.value.chain[0]))
-        .token(token)
-        .to(`0x${selectedOptions.value.to.slice(2)}`)
-        .exec();
+    const params = {
+      account: address,
+      to: to,
+      value,
+      chain: Number(selectedOptions?.value?.chain[0]),
+      provider: user.provider,
+    };
+    const result = await sendContractFunction(params);
 
-      if (result) {
-        console.log(
-          result,
-          Number(selectedOptions.value.chain[0]).toString(),
-          "result"
-        );
-        txHash.value = result as string;
-        chainExplorerToken.value = Number(
-          selectedOptions.value.chain[0]
-        ).toString();
-      }
-
-      submitSteps.value.completed = true;
+    if (result) {
+      console.log(
+        result,
+        Number(selectedOptions.value.chain[0]).toString(),
+        "result"
+      );
+      txHash.value = result as string;
+      chainExplorerToken.value = Number(
+        selectedOptions.value.chain[0]
+      ).toString();
     }
   } catch (error) {
     resetSubmitSteps();

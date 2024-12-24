@@ -374,6 +374,7 @@ const backBasicBridgeSteps = () => {
       />
       <AppBasicBridge
         @back-step="backBasicBridgeSteps"
+        :selectedChain="singleAssetChain.chain"
         v-if="stepState.showBasicBridgeSteps"
       />
     </div>
