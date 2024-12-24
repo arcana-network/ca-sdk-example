@@ -353,7 +353,7 @@ const handleBridge = async () => {
       abi: stargatePoolABI,
       functionName: "quoteSend",
       args: [
-        [dstEid, to, amountLD, txHash1?.[0]?.minAmountLD, "0x0", "0x0", "0x0"],
+        [dstEid, to, amountLD, txHash1?.[2].amountSentLD, "0x0", "0x0", "0x0"],
         false,
       ],
       account: address,
