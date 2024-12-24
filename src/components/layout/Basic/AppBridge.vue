@@ -19,7 +19,14 @@ import { CA, ProgressStep } from "@arcana/ca-sdk";
 import { Avatar, Field, NumberInput, Select } from "@ark-ui/vue";
 import dayjs from "dayjs";
 import Decimal from "decimal.js";
-import { SwitchChainError, zeroAddress } from "viem";
+import {
+  Address,
+  pad,
+  parseUnits,
+  SwitchChainError,
+  toBytes,
+  zeroAddress,
+} from "viem";
 import {
   computed,
   nextTick,
@@ -32,6 +39,9 @@ import {
 import AppTransaction from "../AppTransaction.vue";
 import { switchChain } from "@/utils/switchChain";
 import AppTooltip from "@/components/shared/AppTooltip.vue";
+import { executeContractFunction } from "@/contract/contractWrite";
+import { stargatePoolAddress } from "@/abi/stargatePoolAddress";
+import { stargatePoolABI } from "@/abi/stargatePool.abi";
 
 type StepState = {
   currentStep: number;
@@ -275,27 +285,62 @@ const allowanceLoaderClose = () => {
   allowanceLoader.value = false;
 };
 
+type EthereumAddress = `0x${string}`;
+
+function toEthereumAddress(address: string): EthereumAddress {
+  if (!address.startsWith("0x") || address.length !== 42) {
+    throw new Error("Invalid Ethereum address format.");
+  }
+  return address as EthereumAddress;
+}
+
 const handleBridge = async () => {
   allLoader.value.startTransaction = true;
   allLoader.value.stepsLoader = false;
   txError.value = false;
   resetSubmitSteps();
   try {
-    const token = getSymbolByContractAddress(
-      availableTokens.value,
-      selectedOptions.value.token[0]
-    );
+    const address: Address = toEthereumAddress(user.walletAddress);
+    // const usdtInWei = parseUnits(String(selectedOptions.value.amount), 6);
+    const recipientBytes32 = pad(toBytes(address), { size: 32 });
 
-    if (caSdkAuth) {
-      await caSdkAuth
-        .bridge()
-        .amount(Number(selectedOptions.value.amount))
-        .chain(Number(selectedOptions.value.chain[0]))
-        .token(token)
-        .exec();
+    const params: any = {
+      contractAddress: stargatePoolAddress.Polygon.StargatePoolUSDT,
+      abi: stargatePoolABI,
+      functionName: "quoteOFT",
+      args: [
+        // Number(selectedOptions.value.chain[0]),
+        recipientBytes32,
+        // BigInt(usdtInWei),
+      ],
+      value: BigInt("1"),
+      account: address,
+    };
 
-      submitSteps.value.completed = true;
-    }
+    const txHash1 = await executeContractFunction(params);
+    console.log(txHash1, "hash 1");
+
+    const params2: any = {
+      contractAddress: stargatePoolAddress.Polygon.StargatePoolUSDT,
+      abi: stargatePoolABI,
+      functionName: "quoteSend",
+      args: [],
+      value: BigInt("1"),
+      account: address,
+    };
+    const txHash2 = await executeContractFunction(params2);
+    console.log(txHash2, "hash 2");
+
+    // if (caSdkAuth) {
+    //   await caSdkAuth
+    //     .bridge()
+    //     .amount(Number(selectedOptions.value.amount))
+    //     .chain(Number(selectedOptions.value.chain[0]))
+    //     .token(token)
+    //     .exec();
+
+    //   submitSteps.value.completed = true;
+    // }
   } catch (error) {
     resetSubmitSteps();
     console.log("Transfer Failed:", error);
