@@ -9,7 +9,7 @@
 }
 
 body {
-  font-family: 'Noto Serif', serif, Ariel, Helvetica, sans-serif;
+  font-family: "Noto Serif", serif, Ariel, Helvetica, sans-serif;
   background: #ffffff;
 }
 
@@ -31,7 +31,7 @@ button {
 
 input,
 select {
-  @apply h-10 px-4 py-2 rounded-md font-inter text-base font-medium text-blueGray-800;
+  @apply h-14 px-4 py-1 rounded-md font-inter text-base font-medium text-blueGray-800;
 }
 
 a {
@@ -43,45 +43,45 @@ a {
   @apply h-10 px-4 py-2 rounded-md font-inter text-base font-medium text-blueGray-800;
 } */
 
-[data-scope='tooltip'][data-part='content'] {
+[data-scope="tooltip"][data-part="content"] {
   @apply bg-background-400 text-blueGray-800 px-2 py-1 rounded shadow;
 }
 
-[data-scope='radio-group'][data-part='item-control'] {
+[data-scope="radio-group"][data-part="item-control"] {
   @apply relative;
 }
 
-[data-scope='radio-group'][data-part='item-control']::after {
+[data-scope="radio-group"][data-part="item-control"]::after {
   @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-200;
-  content: '';
+  content: "";
   height: calc(100% - 4px);
   width: calc(100% - 4px);
   background-color: transparent;
 }
 
-[data-scope='radio-group'][data-part='item-control'][data-state='checked']::after {
+[data-scope="radio-group"][data-part="item-control"][data-state="checked"]::after {
   background-color: currentColor;
 }
 
 :where(
-    [data-scope='tooltip'],
-    [data-scope='popover'],
-    [data-scope='select'],
-    [data-scope='combobox'],
-    [data-scope='menu'],
-    [data-scope='hover-card']
-  )[data-part='content'][data-state='open'] {
+    [data-scope="tooltip"],
+    [data-scope="popover"],
+    [data-scope="select"],
+    [data-scope="combobox"],
+    [data-scope="menu"],
+    [data-scope="hover-card"]
+  )[data-part="content"][data-state="open"] {
   animation: tooltipFadeIn 300ms ease-out;
 }
 
 :where(
-    [data-scope='tooltip'],
-    [data-scope='popover'],
-    [data-scope='select'],
-    [data-scope='combobox'],
-    [data-scope='menu'],
-    [data-scope='hover-card']
-  )[data-part='content'][data-state='closed'] {
+    [data-scope="tooltip"],
+    [data-scope="popover"],
+    [data-scope="select"],
+    [data-scope="combobox"],
+    [data-scope="menu"],
+    [data-scope="hover-card"]
+  )[data-part="content"][data-state="closed"] {
   animation: tooltipFadeOut 300ms ease-in;
 }
 
@@ -107,11 +107,11 @@ a {
   }
 }
 
-[data-scope='accordion'][data-part='item-content'][data-state='open'] {
+[data-scope="accordion"][data-part="item-content"][data-state="open"] {
   animation: accordionSlideDown 300ms ease-in-out;
 }
 
-[data-scope='accordion'][data-part='item-content'][data-state='closed'] {
+[data-scope="accordion"][data-part="item-content"][data-state="closed"] {
   animation: accordionSlideUp 300ms ease-in-out;
   overflow: hidden;
 }
@@ -138,18 +138,18 @@ a {
   }
 }
 
-[data-scope='combobox'][data-part='trigger'],
-[data-scope='select'][data-part='indicator'],
-[data-scope='accordion'][data-part='item-indicator'],
-[data-scope='menu'][data-part='indicator'] {
+[data-scope="combobox"][data-part="trigger"],
+[data-scope="select"][data-part="indicator"],
+[data-scope="accordion"][data-part="item-indicator"],
+[data-scope="menu"][data-part="indicator"] {
   @apply transition-all duration-300;
 }
 
 :where(
-    [data-scope='combobox'][data-part='trigger'],
-    [data-scope='select'][data-part='indicator'],
-    [data-scope='accordion'][data-part='item-indicator'],
-    [data-scope='menu'][data-part='indicator']
-  )[data-state='open'] {
+    [data-scope="combobox"][data-part="trigger"],
+    [data-scope="select"][data-part="indicator"],
+    [data-scope="accordion"][data-part="item-indicator"],
+    [data-scope="menu"][data-part="indicator"]
+  )[data-state="open"] {
   @apply -rotate-180;
 }
