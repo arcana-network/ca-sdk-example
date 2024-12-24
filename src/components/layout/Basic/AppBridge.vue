@@ -337,7 +337,8 @@ const handleBridge = async () => {
     const to = recipientBytes32;
     const amountLD = BigInt(usdtInWei);
 
-    const p: any = new BrowserProvider(window["ethereum"]);
+    //@ts-ignore
+    const p = new BrowserProvider(window["ethereum"]);
     const s = await p.getSigner();
     const pool = new Contract(
       stargatePoolAddress[Number(props.selectedChain[0])]?.[token],
@@ -361,10 +362,11 @@ const handleBridge = async () => {
     };
 
     const oftQuote: any = await pool.quoteOFT(sp);
-
+    debugger;
     sp.minAmountLD = oftQuote[2][1];
 
     const sendQuote: any = await pool.quoteSend(sp, false);
+    debugger;
 
     await tokenContract.approve(await pool.getAddress(), sp.amountLD);
     const tx = await pool.sendToken.populateTransaction(
@@ -373,9 +375,7 @@ const handleBridge = async () => {
       await s.getAddress()
     );
     tx.value = sendQuote[0];
-
     await s.sendTransaction(tx);
-
     txSuccess.value = true;
   } catch (error) {
     resetSubmitSteps();
