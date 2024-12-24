@@ -49,6 +49,10 @@ import { stargatePoolABI } from "@/abi/stargatePool.abi";
 import { erc20ABI } from "@/abi/erc20.abi";
 import { readContractFunction } from "@/contract/readContract";
 
+const props = defineProps<{
+  selectedChain: string[];
+}>();
+
 type StepState = {
   currentStep: number;
   totalSteps: number;
@@ -307,7 +311,7 @@ const handleBridge = async () => {
   allLoader.value.stepsLoader = false;
   txError.value = false;
   resetSubmitSteps();
-  console.log(selectedOptions.value, user.assets);
+  console.log(selectedOptions.value, props.selectedChain);
   const { currentChainId } = user.provider.request({ method: "eth_chainId" });
   if (currentChainId !== Number(selectedOptions?.value?.chain[0])) {
     await switchChain(selectedOptions.value.chain[0] as string);
@@ -317,12 +321,12 @@ const handleBridge = async () => {
       availableTokens.value,
       selectedOptions.value.token[0]
     );
-    const chainDecimal = getChainById(Number(selectedOptions?.value?.chain[0]))
+    const tokenDecimal = getChainById(Number(selectedOptions?.value?.chain[0]))
       ?.nativeCurrency?.decimals;
     const address: Address = toEthereumAddress(user.walletAddress);
     const usdtInWei = parseUnits(
       String(selectedOptions.value.amount),
-      chainDecimal
+      tokenDecimal
     );
     const recipientBytes32 = toHex(pad(toBytes(address), { size: 32 }));
     console.log(address, toBytes(address), recipientBytes32, "address");
@@ -335,12 +339,12 @@ const handleBridge = async () => {
 
     const params: any = {
       contractAddress:
-        stargatePoolAddress[Number(selectedOptions?.value?.chain[0])]?.[token],
+        stargatePoolAddress[Number(props.selectedChain[0])]?.[token],
       abi: stargatePoolABI,
       functionName: "quoteOFT",
       args: [[dstEid, to, amountLD, amountLD, "0x0", "0x0", "0x0"]],
       account: address,
-      chain: Number(selectedOptions?.value?.chain[0]),
+      chain: Number(props.selectedChain[0]),
       provider: user.provider,
     };
 
@@ -349,7 +353,7 @@ const handleBridge = async () => {
 
     const params2: any = {
       contractAddress:
-        stargatePoolAddress[Number(selectedOptions?.value?.chain[0])]?.[token],
+        stargatePoolAddress[Number(props.selectedChain[0])]?.[token],
       abi: stargatePoolABI,
       functionName: "quoteSend",
       args: [
@@ -357,7 +361,7 @@ const handleBridge = async () => {
         false,
       ],
       account: address,
-      chain: Number(selectedOptions?.value?.chain[0]),
+      chain: Number(props.selectedChain[0]),
       provider: user.provider,
     };
     const txHash2 = await readContractFunction(params2);
@@ -368,11 +372,11 @@ const handleBridge = async () => {
       abi: erc20ABI,
       functionName: "approve",
       args: [
-        stargatePoolAddress[Number(selectedOptions?.value?.chain[0])]?.[token],
+        stargatePoolAddress[Number(props.selectedChain[0])]?.[token],
         amountLD,
       ],
       account: address,
-      chain: Number(selectedOptions?.value?.chain[0]),
+      chain: Number(props.selectedChain[0]),
       provider: user.provider,
     };
     const txHash3 = await executeContractFunction(params3);
@@ -380,26 +384,16 @@ const handleBridge = async () => {
 
     const params4: any = {
       contractAddress:
-        stargatePoolAddress[Number(selectedOptions?.value?.chain[0])]?.[token],
+        stargatePoolAddress[Number(props.selectedChain[0])]?.[token],
       abi: stargatePoolABI,
       functionName: "sendToken",
       args: [[dstEid, to, amountLD, amountLD, "0x0", "0x0", "0x0"], [txHash2]],
       account: address,
-      chain: Number(selectedOptions?.value?.chain[0]),
+      chain: Number(props.selectedChain[0]),
       provider: user.provider,
     };
     const txHash4 = await executeContractFunction(params4);
     console.log(txHash4, "hash 4");
-    // if (caSdkAuth) {
-    //   await caSdkAuth
-    //     .bridge()
-    //     .amount(Number(selectedOptions.value.amount))
-    //     .chain(Number(selectedOptions.value.chain[0]))
-    //     .token(token)
-    //     .exec();
-
-    //   submitSteps.value.completed = true;
-    // }
   } catch (error) {
     resetSubmitSteps();
     console.log("Transfer Failed:", error);
