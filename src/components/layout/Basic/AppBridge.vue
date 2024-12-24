@@ -22,9 +22,9 @@ import Decimal from "decimal.js";
 import {
   Address,
   pad,
-  parseUnits,
   SwitchChainError,
   toBytes,
+  toHex,
   zeroAddress,
 } from "viem";
 import {
@@ -302,18 +302,18 @@ const handleBridge = async () => {
   try {
     const address: Address = toEthereumAddress(user.walletAddress);
     // const usdtInWei = parseUnits(String(selectedOptions.value.amount), 6);
-    const recipientBytes32 = pad(toBytes(address), { size: 32 });
+    const recipientBytes32 = toHex(pad(toBytes(address), { size: 32 }));
+    console.log(address, toBytes(address), recipientBytes32, "address");
+
+    const dstEid = 1;
+    const to = recipientBytes32;
+    const amountLD = BigInt(100_000);
 
     const params: any = {
       contractAddress: stargatePoolAddress.Polygon.StargatePoolUSDT,
       abi: stargatePoolABI,
       functionName: "quoteOFT",
-      args: [
-        // Number(selectedOptions.value.chain[0]),
-        recipientBytes32,
-        // BigInt(usdtInWei),
-      ],
-      value: BigInt("1"),
+      args: [[dstEid, to, amountLD, amountLD, "0x0", "0x0", "0x0"]],
       account: address,
     };
 
