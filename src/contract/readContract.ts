@@ -35,6 +35,12 @@ export const readContractFunction = async ({
       transport: custom(provider),
     });
 
+    // const testClient = createTestClient({
+    //   chain: chainName,
+    //   mode: "anvil",
+    //   transport: custom(provider),
+    // });
+    // await testClient.setLoggingEnabled(true);
     const txResult: any = await walletClient.readContract({
       address: contractAddress,
       abi,

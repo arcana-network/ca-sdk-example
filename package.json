@@ -14,6 +14,7 @@
     "@primevue/themes": "^4.1.1",
     "@vueuse/core": "^11.2.0",
     "decimal.js": "^10.4.3",
+    "ethers": "^6.13.4",
     "primevue": "^4.1.1",
     "viem": "^2.21.38",
     "vite-plugin-node-polyfills": "^0.22.0",
