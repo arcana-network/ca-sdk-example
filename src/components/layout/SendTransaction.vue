@@ -140,13 +140,17 @@ const intentSteps = computed(() => {
           class="h-32 relative"
           @contextmenu.prevent="void 0"
         />
-        {{
-          props.txError
-            ? "Failed!"
-            : props.txHash
-            ? "Transaction Successfull"
-            : "Loading..."
-        }}
+        <span
+          class="text-2xl font-nohemi font-medium text-blueGray-800 tabular-nums"
+        >
+          {{
+            props.txError
+              ? "Transaction Failed!"
+              : props.txHash
+              ? "Transaction Successfull"
+              : "Loading..."
+          }}</span
+        >
         <div
           v-if="props.txHash && props.chainExplorerToken"
           class="flex items-center justify-evenly transition-all w-full"

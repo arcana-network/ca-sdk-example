@@ -513,13 +513,13 @@ onUnmounted(() => {
   <div class="relative">
     <button
       @click="handleBack"
-      class="absolute top-2 left-2 bg-orange-200 border border-orange-800 p-4 rounded-full"
+      class="absolute top-6 left-2 bg-orange-200 border border-orange-800 p-4 rounded-full"
     >
       <ArrowRightIcon class="h-4 w-4 stroke-blueGray-800 rotate-180" />
     </button>
 
     <h2
-      class="text-xl font-nohemi font-semibold text-blueGray-800 mt-5 text-center"
+      class="text-xl font-nohemi font-semibold text-blueGray-800 mt-9 text-center"
     >
       {{
         allLoader.stepsLoader === true
@@ -533,7 +533,7 @@ onUnmounted(() => {
     </h2>
     <div v-if="stepState.currentStep === 1">
       <div
-        class="mt-5 space-y-4 text-blueGray-800 font-inter font-normal text-sm max-md:w-full"
+        class="mt-6 space-y-4 text-blueGray-800 font-inter font-normal text-sm max-md:w-full"
       >
         <Field.Root>
           <Field.Label class="font-inter text-sm font-normal text-blueGray-800"
@@ -541,7 +541,7 @@ onUnmounted(() => {
           >
           <Field.Input
             v-model="selectedOptions.to"
-            class="w-full shadow-sm border border-background-400 placeholder:text-blueGray-600"
+            class="w-full shadow-sm border mt-1 border-background-400 placeholder:text-blueGray-600"
             placeholder="0xb794f5ea0ba39494ce839613fffba74279579268"
           />
         </Field.Root>
@@ -558,7 +558,7 @@ onUnmounted(() => {
             >
             <Select.Control class="outline-none field">
               <Select.Trigger
-                class="flex rounded-md items-center w-full font-inter text-base font-medium text-blueGray-800 shadow-sm bg-white-100 text-start h-10 px-4 py-2 border border-background-400 placeholder:text-blueGray-600"
+                class="flex rounded-md items-center w-full font-inter text-base font-medium text-blueGray-800 shadow-sm bg-white-100 text-start h-14 px-4 py-2 border border-background-400 placeholder:text-blueGray-600"
               >
                 <div
                   class="flex-grow flex items-center gap-2 font-medium text-base"
@@ -625,7 +625,7 @@ onUnmounted(() => {
             >
             <Select.Control class="outline-none field">
               <Select.Trigger
-                class="flex rounded-md items-center w-full font-inter text-base font-medium text-blueGray-800 shadow-sm bg-white-100 text-start h-10 px-4 py-2 border border-background-400 placeholder:text-blueGray-600"
+                class="flex rounded-md items-center w-full font-inter text-base font-medium text-blueGray-800 shadow-sm bg-white-100 text-start h-14 px-4 py-2 border border-background-400 placeholder:text-blueGray-600"
               >
                 <div
                   class="flex-grow flex items-center gap-2 font-medium text-base"
@@ -690,7 +690,7 @@ onUnmounted(() => {
             <div class="relative flex items-center">
               <NumberInput.Input
                 :value="selectedOptions.amount"
-                class="w-full shadow-sm border border-background-400 placeholder:text-blueGray-600"
+                class="w-full shadow-sm border border-background-400 placeholder:text-blueGray-600 mt-1"
                 placeholder="0"
                 :min="0"
                 @input="handleAmountInput"

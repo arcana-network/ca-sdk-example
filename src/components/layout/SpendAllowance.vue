@@ -96,6 +96,15 @@ const allowanceSteps = computed(() => {
         class="flex flex-col items-center justify-center text-center align-middle text-ellipsis overflow-hidden text-base font-inter font-normal leading-4 text-blueGray-800"
       >
         <video
+          v-if="props.txError"
+          src="@/assets/videos/new_error.webm"
+          autoplay
+          muted
+          class="h-32 relative animate-fadeIn"
+          @contextmenu.prevent="void 0"
+        />
+        <video
+          v-else-if="!props.txError"
           src="@/assets/videos/new_loader.webm"
           autoplay
           loop
@@ -103,7 +112,11 @@ const allowanceSteps = computed(() => {
           class="h-32 relative"
           @contextmenu.prevent="void 0"
         />
-        Loading...
+        <span
+          class="text-2xl font-nohemi font-medium text-blueGray-800 tabular-nums"
+        >
+          {{ props.txError ? "Transaction Failed!" : "Loading..." }}
+        </span>
       </div>
       <div v-else-if="submitLoader === true" class="h-full w-full relative">
         <div
