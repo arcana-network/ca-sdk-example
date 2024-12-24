@@ -40,14 +40,13 @@ import {
 import AppTransaction from "../AppTransaction.vue";
 import { switchChain } from "@/utils/switchChain";
 import AppTooltip from "@/components/shared/AppTooltip.vue";
-import { executeContractFunction } from "@/contract/contractWrite";
 import {
   stargatePoolAddress,
   stargatePoolEndPointId,
 } from "@/abi/stargatePoolAddress";
 import { stargatePoolABI } from "@/abi/stargatePool.abi";
 import { erc20ABI } from "@/abi/erc20.abi";
-import { readContractFunction } from "@/contract/readContract";
+import { BrowserProvider, Contract } from "ethers";
 
 const props = defineProps<{
   selectedChain: string[];
@@ -94,6 +93,7 @@ const timerInterval = ref<any>();
 const openIntentLoader = ref<boolean>(false);
 const allowanceLoader = ref<boolean>(false);
 const txError = ref<boolean>(false);
+const txSuccess = ref<boolean>(false);
 const selectedOptions = ref<{
   token: string[];
   chain: string[];
@@ -175,7 +175,12 @@ const getTokenAndChainDetails = (assets: Asset[]) => {
   };
 };
 
-const chainList = computed(() => getTokenAndChainDetails(user.assets).chain);
+const chainList = computed(() => {
+  const allChains = getTokenAndChainDetails(user.assets).chain;
+  return allChains.filter(
+    (chain) => chain?.id !== Number(props.selectedChain[0])
+  );
+});
 
 const selectedChain = computed(() => {
   return chainList.value.find(
@@ -304,32 +309,27 @@ function toEthereumAddress(address: string): EthereumAddress {
   return address as EthereumAddress;
 }
 
-// const getEid = () => {};
-
 const handleBridge = async () => {
   allLoader.value.startTransaction = true;
   allLoader.value.stepsLoader = false;
   txError.value = false;
+  txSuccess.value = false;
   resetSubmitSteps();
-  console.log(selectedOptions.value, props.selectedChain);
+
   const { currentChainId } = user.provider.request({ method: "eth_chainId" });
   if (currentChainId !== Number(selectedOptions?.value?.chain[0])) {
-    await switchChain(selectedOptions.value.chain[0] as string);
+    await switchChain(props.selectedChain[0] as string);
   }
+
   try {
     const token = getSymbolByContractAddress(
       availableTokens.value,
       selectedOptions.value.token[0]
     );
-    const tokenDecimal = getChainById(Number(selectedOptions?.value?.chain[0]))
-      ?.nativeCurrency?.decimals;
+
     const address: Address = toEthereumAddress(user.walletAddress);
-    const usdtInWei = parseUnits(
-      String(selectedOptions.value.amount),
-      tokenDecimal
-    );
+    const usdtInWei = parseUnits(String(selectedOptions.value.amount), 6);
     const recipientBytes32 = toHex(pad(toBytes(address), { size: 32 }));
-    console.log(address, toBytes(address), recipientBytes32, "address");
 
     const dstEid =
       stargatePoolEndPointId[Number(selectedOptions?.value?.chain[0])]
@@ -337,63 +337,46 @@ const handleBridge = async () => {
     const to = recipientBytes32;
     const amountLD = BigInt(usdtInWei);
 
-    const params: any = {
-      contractAddress:
-        stargatePoolAddress[Number(props.selectedChain[0])]?.[token],
-      abi: stargatePoolABI,
-      functionName: "quoteOFT",
-      args: [[dstEid, to, amountLD, amountLD, "0x0", "0x0", "0x0"]],
-      account: address,
-      chain: Number(props.selectedChain[0]),
-      provider: user.provider,
+    const p: any = new BrowserProvider(window["ethereum"]);
+    const s = await p.getSigner();
+    const pool = new Contract(
+      stargatePoolAddress[Number(props.selectedChain[0])]?.[token],
+      stargatePoolABI,
+      s
+    );
+    const tokenContract = new Contract(
+      selectedOptions.value.token[0],
+      erc20ABI,
+      s
+    );
+
+    const sp = {
+      dstEid: dstEid,
+      to: to,
+      amountLD,
+      minAmountLD: amountLD,
+      extraOptions: "0x",
+      composeMsg: "0x",
+      oftCmd: "0x",
     };
 
-    const txHash1: any = await readContractFunction(params);
-    console.log(txHash1, "hash 1");
+    const oftQuote: any = await pool.quoteOFT(sp);
 
-    const params2: any = {
-      contractAddress:
-        stargatePoolAddress[Number(props.selectedChain[0])]?.[token],
-      abi: stargatePoolABI,
-      functionName: "quoteSend",
-      args: [
-        [dstEid, to, amountLD, txHash1?.[2].amountSentLD, "0x0", "0x0", "0x0"],
-        false,
-      ],
-      account: address,
-      chain: Number(props.selectedChain[0]),
-      provider: user.provider,
-    };
-    const txHash2 = await readContractFunction(params2);
-    console.log(txHash2, "hash 2");
+    sp.minAmountLD = oftQuote[2][1];
 
-    const params3: any = {
-      contractAddress: selectedOptions.value.token[0],
-      abi: erc20ABI,
-      functionName: "approve",
-      args: [
-        stargatePoolAddress[Number(props.selectedChain[0])]?.[token],
-        amountLD,
-      ],
-      account: address,
-      chain: Number(props.selectedChain[0]),
-      provider: user.provider,
-    };
-    const txHash3 = await executeContractFunction(params3);
-    console.log(txHash3, "hash 3");
+    const sendQuote: any = await pool.quoteSend(sp, false);
 
-    const params4: any = {
-      contractAddress:
-        stargatePoolAddress[Number(props.selectedChain[0])]?.[token],
-      abi: stargatePoolABI,
-      functionName: "sendToken",
-      args: [[dstEid, to, amountLD, amountLD, "0x0", "0x0", "0x0"], [txHash2]],
-      account: address,
-      chain: Number(props.selectedChain[0]),
-      provider: user.provider,
-    };
-    const txHash4 = await executeContractFunction(params4);
-    console.log(txHash4, "hash 4");
+    await tokenContract.approve(await pool.getAddress(), sp.amountLD);
+    const tx = await pool.sendToken.populateTransaction(
+      sp,
+      Array.from(sendQuote),
+      await s.getAddress()
+    );
+    tx.value = sendQuote[0];
+
+    await s.sendTransaction(tx);
+
+    txSuccess.value = true;
   } catch (error) {
     resetSubmitSteps();
     console.log("Transfer Failed:", error);
@@ -823,6 +806,7 @@ onUnmounted(() => {
       :interection="allLoader.startTransaction"
       :submit-loader="allLoader.stepsLoader"
       :tx-error="txError"
+      :txSuccess="txSuccess"
       :allowanceLoader="allowanceLoader"
       :stepState="stepState"
       type="Receive"
