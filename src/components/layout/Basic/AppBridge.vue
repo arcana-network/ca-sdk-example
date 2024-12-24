@@ -333,8 +333,8 @@ const handleBridge = async () => {
     const amountLD = BigInt(usdtInWei);
 
     //@ts-ignore
-    const p = new BrowserProvider(window["ethereum"]);
-    const s = await p.getSigner();
+    const p: any = new BrowserProvider(window["ethereum"]);
+    const s: any = await p.getSigner();
     const pool = new Contract(
       stargatePoolAddress[Number(props.selectedChain[0])]?.[token],
       stargatePoolABI,
@@ -366,9 +366,13 @@ const handleBridge = async () => {
     const tx = await pool.sendToken.populateTransaction(
       sp,
       Array.from(sendQuote),
-      await s.getAddress()
+      await s.getAddress(),
+      {
+        gasLimit: 1500000,
+      }
     );
     tx.value = sendQuote[0];
+
     await s.sendTransaction(tx);
     txSuccess.value = true;
   } catch (error) {
