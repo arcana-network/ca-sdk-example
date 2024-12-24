@@ -6,7 +6,7 @@ type IntentDataType = {
   deny: () => void;
   refresh: (() => Promise<Intent>) | null;
   intent: Intent | null;
-  intervalHandler: number;
+  intervalHandler: number | null;
   intentRefreshing: boolean;
 };
 

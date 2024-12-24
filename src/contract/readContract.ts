@@ -1,5 +1,5 @@
 import { arbitrum, base, mainnet, optimism, polygon } from "viem/chains";
-import { Account, createPublicClient, createWalletClient, custom } from "viem";
+import { Account, createPublicClient, custom } from "viem";
 
 export const readContractFunction = async ({
   contractAddress,
