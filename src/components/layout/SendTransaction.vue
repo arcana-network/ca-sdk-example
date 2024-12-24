@@ -60,10 +60,10 @@ getCoinbasePrices().then((data: any) => {
   rates.value = data;
 });
 
-const totalSpend = computed(() => {
-  const amount = Number(props.intentDetails.intent?.destination?.amount || 0);
-  const fees = Number(props.intentDetails.intent?.fees?.total || 0);
-  return amount + fees;
+const amount = computed(() => {
+  return new Decimal(props.intentDetails.intent?.sourcesTotal || 0).minus(
+    props.intentDetails.intent?.fees?.total || 0
+  );
 });
 
 const submitIntentData = async () => {
@@ -574,7 +574,11 @@ const intentSteps = computed(() => {
                   <span
                     class="flex items-center gap-2 font-medium text-base text-blueGray-800"
                   >
-                    {{ new Decimal(totalSpend).toDecimalPlaces(6) }}
+                    {{
+                      new Decimal(
+                        props.intentDetails.intent?.sourcesTotal || 0
+                      ).toDecimalPlaces(6)
+                    }}
                     {{ props.intentDetails.intent?.token.symbol }}
                   </span>
                   <span
@@ -584,7 +588,7 @@ const intentSteps = computed(() => {
                     "
                     class="text-sm font-medium text-blueGray-600 font-inter"
                     >{{
-                      new Decimal(totalSpend)
+                      new Decimal(props.intentDetails.intent?.sourcesTotal || 0)
                         .mul(
                           Decimal.div(
                             1,
@@ -670,23 +674,22 @@ const intentSteps = computed(() => {
                     </div>
                     <div class="flex flex-col items-end">
                       <span class="font-medium text-base text-blueGray-800"
-                        >{{ props.intentDetails.intent?.destination.amount }}
+                        >{{ amount }}
                         {{ props.intentDetails.intent?.token.symbol }}</span
                       >
                       <span
                         v-if="
-                          props.intentDetails.intent?.destination.amount &&
-                          rates[props.intentDetails.intent?.token.symbol]
+                          amount &&
+                          props.intentDetails.intent &&
+                          rates[props.intentDetails.intent.token.symbol]
                         "
                         class="text-sm font-medium text-blueGray-600 font-inter"
                         >{{
-                          new Decimal(
-                            props.intentDetails.intent?.destination.amount
-                          )
+                          new Decimal(amount)
                             .mul(
                               Decimal.div(
                                 1,
-                                rates[props.intentDetails.intent?.token.symbol]
+                                rates[props.intentDetails.intent.token.symbol]
                               )
                             )
                             .toDecimalPlaces(2)
@@ -887,7 +890,7 @@ const intentSteps = computed(() => {
                   <span
                     class="flex items-center gap-2 font-medium text-base text-blueGray-800"
                   >
-                    {{ totalSpend }}
+                    {{ props.intentDetails.intent?.sourcesTotal || 0 }}
                     {{ props.intentDetails.intent?.token.symbol }}
                   </span>
                   <span
@@ -897,7 +900,7 @@ const intentSteps = computed(() => {
                     "
                     class="text-sm font-medium text-blueGray-600 font-inter"
                     >{{
-                      new Decimal(totalSpend)
+                      new Decimal(props.intentDetails.intent?.sourcesTotal || 0)
                         .mul(
                           Decimal.div(
                             1,
