@@ -316,11 +316,6 @@ const handleBridge = async () => {
   txSuccess.value = false;
   resetSubmitSteps();
 
-  const { currentChainId } = user.provider.request({ method: "eth_chainId" });
-  if (currentChainId !== Number(selectedOptions?.value?.chain[0])) {
-    await switchChain(props.selectedChain[0] as string);
-  }
-
   try {
     const token = getSymbolByContractAddress(
       availableTokens.value,
@@ -362,11 +357,10 @@ const handleBridge = async () => {
     };
 
     const oftQuote: any = await pool.quoteOFT(sp);
-    debugger;
+
     sp.minAmountLD = oftQuote[2][1];
 
     const sendQuote: any = await pool.quoteSend(sp, false);
-    debugger;
 
     await tokenContract.approve(await pool.getAddress(), sp.amountLD);
     const tx = await pool.sendToken.populateTransaction(
