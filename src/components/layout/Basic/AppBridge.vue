@@ -343,11 +343,7 @@ const handleBridge = async () => {
       s
     );
     const isNative = (await pool.token()) === ZeroAddress;
-    const tokenContract = new Contract(
-      selectedOptions.value.token[0],
-      erc20ABI,
-      s
-    );
+    const tokenContract = new Contract(props.selectedChain[0], erc20ABI, s);
     const usdtInWei = parseUnits(
       String(selectedOptions.value.amount),
       isNative ? 18 : Number(await tokenContract.decimals())
