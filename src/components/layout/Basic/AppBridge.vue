@@ -95,7 +95,8 @@ const timerInterval = ref<any>();
 const openIntentLoader = ref<boolean>(false);
 const allowanceLoader = ref<boolean>(false);
 const txError = ref<boolean>(false);
-const txSuccess = ref<boolean>(false);
+const txHash = ref<string>("");
+const chainExplorerToken = ref<string>("");
 const selectedOptions = ref<{
   token: string[];
   chain: string[];
@@ -331,7 +332,8 @@ const handleBridge = async () => {
   allLoader.value.startTransaction = true;
   allLoader.value.stepsLoader = false;
   txError.value = false;
-  txSuccess.value = false;
+  txHash.value = "";
+  chainExplorerToken.value = "";
   resetSubmitSteps();
   const { currentChainId } = user.provider.request({ method: "eth_chainId" });
   console.log(currentChainId, Number(props.selectedChain[0]), "chain");
@@ -427,13 +429,21 @@ const handleBridge = async () => {
       (tx.value as bigint) += sp.amountLD;
     }
 
-    await s.sendTransaction(tx);
-    txSuccess.value = true;
+    const rt = await s.sendTransaction(tx);
+    const th = await rt.wait(4);
+    console.log(th.hash);
+
+    if (th?.hash) {
+      txHash.value = th?.hash as string;
+      chainExplorerToken.value = Number(props.selectedChain[0]).toString();
+    }
   } catch (error) {
     resetSubmitSteps();
     console.log("Transfer Failed:", error);
     allLoader.value.startTransaction = false;
     txError.value = true;
+    txHash.value = "";
+    chainExplorerToken.value = "";
     allowanceLoaderClose();
     clearInterval(timerInterval.value);
     userToast.createErrorToast(error);
@@ -858,7 +868,8 @@ onUnmounted(() => {
       :interection="allLoader.startTransaction"
       :submit-loader="allLoader.stepsLoader"
       :tx-error="txError"
-      :txSuccess="txSuccess"
+      :txHash="txHash"
+      :chainExplorerToken="chainExplorerToken"
       :allowanceLoader="allowanceLoader"
       :stepState="stepState"
       type="Receive"

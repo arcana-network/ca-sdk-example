@@ -337,14 +337,17 @@ const handleTransfer = async () => {
       );
       params.from = address;
       const result = await s.sendTransaction(params);
+      console.log(result);
+      const rt = await result.wait(4);
+      console.log(rt);
 
-      if (result) {
+      if (rt?.hash) {
         console.log(
           result,
           Number(selectedOptions.value.chain[0]).toString(),
           "result"
         );
-        txHash.value = result as string;
+        txHash.value = rt?.hash as string;
         chainExplorerToken.value = Number(
           selectedOptions.value.chain[0]
         ).toString();
@@ -364,6 +367,7 @@ const handleTransfer = async () => {
         provider: user.provider,
       };
       const result = await sendContractFunction(params);
+      console.log(result);
 
       if (result) {
         console.log(

@@ -14,7 +14,6 @@ const props = defineProps<{
   openIntentLoader: boolean;
   submitLoader: boolean;
   txError: boolean;
-  txSuccess?: boolean;
   timer: string;
   type: "Send" | "Receive";
   txHash?: string;
@@ -93,7 +92,6 @@ const handleContinue = () => {
       :type="props.type"
       :submit-loader="props.submitLoader"
       :tx-error="props.txError"
-      :txSuccess="props.txSuccess"
       :tx-hash="props.txHash"
       :open-intent-loader="props.openIntentLoader"
       :chain-explorer-token="props.chainExplorerToken"
