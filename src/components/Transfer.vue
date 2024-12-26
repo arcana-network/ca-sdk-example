@@ -114,11 +114,6 @@ const intentModal = ref<{
 const eventListener = (data: any) => {
   switch (data.type) {
     case "EXPECTED_STEPS": {
-      const steps = data.data.map((s: ProgressStep) => ({ ...s, done: false }))
-      if (transferValue.value.loading) {
-        steps.push({ type: "UserTx", typeID: "UTX", done: false })
-        steps.push({ type: "UserTxMined", typeID: "UTXM", done: false })
-      }
       console.log("Expected steps", data.data)
       state.value.steps = data.data.map((s: ProgressStep) => ({ ...s, done: false }))
       state.value.inProgress = true
