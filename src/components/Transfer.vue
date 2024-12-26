@@ -162,11 +162,11 @@ onMounted(async () => {
       intentModal.value.intervalHandler =
         setAsyncInterval(async () => {
           if (intentModal.value.refresh) {
-            console.log("intentRefreshStarted")
+            console.time("intentRefresh")
             intentModal.value.intentRefreshing = true
             intentModal.value.intent = await intentModal.value.refresh!()
             intentModal.value.intentRefreshing = false
-            console.log("intentRefreshEnded")
+            console.timeEnd("intentRefresh")
           }
         }, 5000)
     }, 5000)
