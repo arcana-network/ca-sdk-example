@@ -19,14 +19,10 @@ const user = useUserStore();
     >
       <div class="flex items-center gap-4">
         <img
-          src="@/assets/images/png/ArcanaPayLogo.png?url"
+          src="@/assets/images/svg/ArcanaPayLogo.svg?url"
           alt="Logo"
           class="h-3rem"
         />
-        <!-- <div class="flex flex-col items-start justify-between gap-2">
-          <span>Arcana</span>
-          <span>CA SDK demo</span>
-        </div> -->
       </div>
 
       <div>
