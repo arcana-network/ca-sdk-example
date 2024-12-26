@@ -220,9 +220,9 @@ const availableTokens = computed(() => {
 });
 
 const filteredBalance = computed(() => {
-  if (selectedToken.value && selectedOptions.value) {
+  if (selectedToken.value && props.selectedChain[0]) {
     return selectedToken.value?.breakdown.filter(
-      (entry) => entry.chain.id === Number(selectedOptions.value.chain[0])
+      (entry) => entry.chain.id === Number(props.selectedChain[0])
     );
   }
 });
