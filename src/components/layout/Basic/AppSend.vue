@@ -48,26 +48,6 @@ const stepState = reactive<StepState>({
   totalSteps: 4,
 });
 
-const goBack = () => {
-  if (stepState.currentStep > 1) {
-    stepState.currentStep--;
-  }
-};
-
-const handleBack = () => {
-  if (stepState.currentStep > 1) {
-    goBack();
-  } else {
-    emit("backStep");
-  }
-};
-
-const goNext = () => {
-  if (stepState.currentStep < stepState.totalSteps) {
-    stepState.currentStep++;
-  }
-};
-
 const props = defineProps<{
   selectedChain: string[];
   chainName: string | undefined;
@@ -244,6 +224,27 @@ const allowanceLoaderOpen = () => {
 
 const allowanceLoaderClose = () => {
   allowanceLoader.value = false;
+};
+
+const goBack = () => {
+  if (stepState.currentStep > 1) {
+    stepState.currentStep--;
+  }
+};
+
+const handleBack = () => {
+  selectedOptions.value.chain = props.selectedChain;
+  if (stepState.currentStep > 1) {
+    goBack();
+  } else {
+    emit("backStep");
+  }
+};
+
+const goNext = () => {
+  if (stepState.currentStep < stepState.totalSteps) {
+    stepState.currentStep++;
+  }
 };
 
 type EthereumAddress = `0x${string}`;
@@ -560,6 +561,8 @@ watch(
 watch(
   () => props.selectedChain,
   (newValue) => {
+    console.log(newValue, "newValue");
+
     selectedOptions.value.chain = newValue;
   },
   { immediate: true }

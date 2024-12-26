@@ -9,6 +9,14 @@ const props = defineProps<{
   disconnect: () => void;
 }>();
 
+const links = {
+  howItWorks:
+    "https://blog.arcana.network/introducing-arcana-chain-abstraction-sdk",
+  scheduleDemo:
+    "https://calendly.com/arcana-network/arcana-demo-walkthrough?month=2024-04",
+  docs: "https://docs.arcana.network",
+};
+
 const user = useUserStore();
 </script>
 
@@ -25,7 +33,35 @@ const user = useUserStore();
         />
       </div>
 
-      <div>
+      <div class="flex items-center gap-8">
+        <div class="flex justify-end gap-8 items-center text-white font-inter">
+          <a
+            :href="links.howItWorks"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="font-medium text-base text-blueGray-700 no-underline active:no-underline hover:no-underline"
+          >
+            How it Works
+          </a>
+
+          <a
+            :href="links.scheduleDemo"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="font-medium text-base text-blueGray-700 no-underline active:no-underline hover:no-underline"
+          >
+            Schedule a Demo
+          </a>
+
+          <a
+            :href="links.docs"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="font-medium text-base text-blueGray-700 no-underline active:no-underline hover:no-underline"
+          >
+            Docs
+          </a>
+        </div>
         <div
           v-if="user.isWalletConnected"
           class="flex items-center justify-end gap-10"

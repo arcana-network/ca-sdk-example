@@ -49,6 +49,5 @@ onMounted(async () => {});
     >
       <PreLogin :connect="connect"></PreLogin>
     </div>
-    <Footer />
   </div>
 </template>
