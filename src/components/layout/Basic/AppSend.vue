@@ -31,6 +31,10 @@ import { getLogo } from "@/utils/commonFunction";
 import AppTransaction from "../AppTransaction.vue";
 import { switchChain } from "@/utils/switchChain";
 import { sendContractFunction } from "@/contract/sendTx";
+import { BrowserProvider, ZeroAddress } from "ethers";
+import { Contract } from "ethers";
+import { erc20ABI } from "@/abi/erc20.abi";
+import { Addressable } from "ethers";
 
 type StepState = {
   currentStep: number;
@@ -251,6 +255,40 @@ function toEthereumAddress(address: string): EthereumAddress {
   return address as EthereumAddress;
 }
 
+const getContractAddress = (
+  chainId: number,
+  assetSymbol: string
+): string | Addressable => {
+  for (const asset of user.assets) {
+    if (asset.symbol === assetSymbol) {
+      for (const breakdown of asset.breakdown) {
+        if (breakdown.chain.id === chainId) {
+          return breakdown.contractAddress;
+        }
+      }
+    }
+  }
+  return "";
+};
+
+const tokenDecimal = (symbol: string) => {
+  return user.assets.filter((item) => item.symbol === symbol);
+};
+
+const getSymbolByContractAddress = (
+  assets: Asset[],
+  contractAddress: string
+): string => {
+  const matchedItem = assets?.filter((item) =>
+    item.breakdown.find(
+      (item) =>
+        item.contractAddress.toLowerCase() === contractAddress.toLowerCase()
+    )
+  );
+
+  return matchedItem[0].symbol;
+};
+
 const handleTransfer = async () => {
   allLoader.value.startTransaction = true;
   allLoader.value.stepsLoader = false;
@@ -263,35 +301,80 @@ const handleTransfer = async () => {
     await switchChain(selectedOptions?.value?.chain[0] as string);
   }
   try {
-    const chainDecimal = getChainById(Number(selectedOptions?.value?.chain[0]))
-      ?.nativeCurrency?.decimals;
-    const address: Address = toEthereumAddress(user.walletAddress);
-    const usdtInWei = parseUnits(
-      String(selectedOptions.value.amount),
-      chainDecimal
+    const token = getSymbolByContractAddress(
+      availableTokens.value,
+      selectedOptions.value.token[0]
     );
+    const chainDecimal = tokenDecimal(token);
+    const address: Address = toEthereumAddress(user.walletAddress);
+
     const to: Address = toEthereumAddress(selectedOptions?.value?.to);
-    const value = BigInt(usdtInWei);
 
-    const params = {
-      account: address,
-      to: to,
-      value,
-      chain: Number(selectedOptions?.value?.chain[0]),
-      provider: user.provider,
-    };
-    const result = await sendContractFunction(params);
+    const isNative = selectedOptions?.value?.token[0] === ZeroAddress;
 
-    if (result) {
-      console.log(
-        result,
-        Number(selectedOptions.value.chain[0]).toString(),
-        "result"
+    if (!isNative) {
+      //@ts-ignore
+      const p: any = new BrowserProvider(window["ethereum"]);
+
+      const s: any = await p.getSigner();
+      const cAddress = getContractAddress(
+        Number(props.selectedChain[0]),
+        token
       );
-      txHash.value = result as string;
-      chainExplorerToken.value = Number(
-        selectedOptions.value.chain[0]
-      ).toString();
+      const tokenContract = new Contract(cAddress, erc20ABI, s);
+      const tokenDecimals = Number(await tokenContract.decimals());
+
+      const usdtInWei = parseUnits(
+        String(selectedOptions.value.amount),
+        tokenDecimals
+      );
+      const value = BigInt(usdtInWei);
+
+      const params = await tokenContract.transfer.populateTransaction(
+        to,
+        value
+      );
+      params.from = address;
+      const result = await s.sendTransaction(params);
+
+      if (result) {
+        console.log(
+          result,
+          Number(selectedOptions.value.chain[0]).toString(),
+          "result"
+        );
+        txHash.value = result as string;
+        chainExplorerToken.value = Number(
+          selectedOptions.value.chain[0]
+        ).toString();
+      }
+    } else {
+      const usdtInWei = parseUnits(
+        String(selectedOptions.value.amount),
+        chainDecimal[0]?.decimals
+      );
+      const value = BigInt(usdtInWei);
+
+      const params = {
+        account: address,
+        to: to,
+        value,
+        chain: Number(selectedOptions?.value?.chain[0]),
+        provider: user.provider,
+      };
+      const result = await sendContractFunction(params);
+
+      if (result) {
+        console.log(
+          result,
+          Number(selectedOptions.value.chain[0]).toString(),
+          "result"
+        );
+        txHash.value = result as string;
+        chainExplorerToken.value = Number(
+          selectedOptions.value.chain[0]
+        ).toString();
+      }
     }
   } catch (error) {
     resetSubmitSteps();
