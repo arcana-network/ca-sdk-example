@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Header from "@/components/layout/AppHeader.vue";
+import Footer from "@/components/layout/AppFooter.vue";
 import PreLogin from "./components/PreLogin.vue";
 import "./style.css";
 import { onMounted, ref } from "vue";
@@ -48,5 +49,6 @@ onMounted(async () => {});
     >
       <PreLogin :connect="connect"></PreLogin>
     </div>
+    <Footer />
   </div>
 </template>
