@@ -45,7 +45,7 @@ onMounted(async () => {});
     </div>
     <div
       v-else
-      class="h-[calc(100vh-5.125rem)] flex flex-col justify-center align-center z-10 relative"
+      class="h-[calc(100vh-8.125rem)] flex flex-col justify-center align-center z-10 relative"
     >
       <PreLogin :connect="connect"></PreLogin>
     </div>

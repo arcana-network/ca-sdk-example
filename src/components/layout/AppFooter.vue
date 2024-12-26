@@ -9,7 +9,7 @@ const links = {
 
 <template>
   <footer
-    class="flex justify-end gap-4 items-center text-white py-6 px-16 font-inter"
+    class="relative flex justify-end gap-4 items-center text-white h-10 px-16 pt-4 z-10 font-inter"
   >
     <a
       :href="links.howItWorks"
