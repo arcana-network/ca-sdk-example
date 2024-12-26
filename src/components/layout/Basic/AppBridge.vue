@@ -313,7 +313,7 @@ function toEthereumAddress(address: string): EthereumAddress {
 const getContractAddress = (
   chainId: number,
   assetSymbol: string
-): string | undefined => {
+): string | Addressable => {
   for (const asset of user.assets) {
     if (asset.symbol === assetSymbol) {
       for (const breakdown of asset.breakdown) {
@@ -323,7 +323,7 @@ const getContractAddress = (
       }
     }
   }
-  return undefined;
+  return "";
 };
 
 const handleBridge = async () => {
