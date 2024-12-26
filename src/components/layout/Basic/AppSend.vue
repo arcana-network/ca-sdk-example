@@ -270,7 +270,7 @@ const handleTransfer = async () => {
       String(selectedOptions.value.amount),
       chainDecimal
     );
-    const to: Address = toEthereumAddress(user.walletAddress);
+    const to: Address = toEthereumAddress(selectedOptions?.value?.to);
     const value = BigInt(usdtInWei);
 
     const params = {
