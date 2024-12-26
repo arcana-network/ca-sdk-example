@@ -317,6 +317,7 @@ const handleBridge = async () => {
   txSuccess.value = false;
   resetSubmitSteps();
   const { currentChainId } = user.provider.request({ method: "eth_chainId" });
+  console.log(currentChainId, Number(props.selectedChain[0]), "chain");
   if (currentChainId !== Number(props.selectedChain[0])) {
     await switchChain(props.selectedChain[0] as string);
   }
@@ -328,6 +329,7 @@ const handleBridge = async () => {
 
     const address: Address = toEthereumAddress(user.walletAddress);
     const recipientBytes32 = toHex(pad(toBytes(address), { size: 32 }));
+    console.log(address, recipientBytes32, "address");
 
     const dstEid =
       stargatePoolEndPointId[Number(selectedOptions?.value?.chain[0])]
@@ -343,12 +345,25 @@ const handleBridge = async () => {
       stargatePoolABI,
       s
     );
+    console.log(
+      p,
+      s,
+      pool,
+      stargatePoolAddress[Number(props.selectedChain[0])]?.[token],
+      props.selectedChain[0],
+      await pool.token(),
+      "newuruuiii"
+    );
     const isNative = (await pool.token()) === ZeroAddress;
+    console.log(await pool.token(), ZeroAddress);
+
     const tokenContract = new Contract(props.selectedChain[0], erc20ABI, s);
+    console.log(tokenContract, props.selectedChain[0]);
     const usdtInWei = parseUnits(
       String(selectedOptions.value.amount),
       isNative ? 18 : Number(await tokenContract.decimals())
     );
+    console.log(await tokenContract.decimals(), usdtInWei);
     const amountLD = BigInt(usdtInWei);
     console.log(
       p,
