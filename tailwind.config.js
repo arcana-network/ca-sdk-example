@@ -24,7 +24,7 @@ export default {
           600: "#E5E5E5",
           700: "#DADADA",
           800: "#CCCCCC",
-          900: "#989898",
+          900: "#F9EAF1",
         },
         black: {
           100: "#E0E0E0",
