@@ -310,6 +310,22 @@ function toEthereumAddress(address: string): EthereumAddress {
   return address as EthereumAddress;
 }
 
+const getContractAddress = (
+  chainId: number,
+  assetSymbol: string
+): string | undefined => {
+  for (const asset of user.assets) {
+    if (asset.symbol === assetSymbol) {
+      for (const breakdown of asset.breakdown) {
+        if (breakdown.chain.id === chainId) {
+          return breakdown.contractAddress;
+        }
+      }
+    }
+  }
+  return undefined;
+};
+
 const handleBridge = async () => {
   allLoader.value.startTransaction = true;
   allLoader.value.stepsLoader = false;
@@ -356,9 +372,9 @@ const handleBridge = async () => {
     );
     const isNative = (await pool.token()) === ZeroAddress;
     console.log(await pool.token(), ZeroAddress);
-
-    const tokenContract = new Contract(props.selectedChain[0], erc20ABI, s);
-    console.log(tokenContract, props.selectedChain[0]);
+    const cAddress = getContractAddress(Number(props.selectedChain[0]), token);
+    const tokenContract = new Contract(cAddress, erc20ABI, s);
+    console.log(tokenContract, cAddress);
     const usdtInWei = parseUnits(
       String(selectedOptions.value.amount),
       isNative ? 18 : Number(await tokenContract.decimals())
