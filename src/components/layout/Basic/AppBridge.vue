@@ -369,7 +369,7 @@ const handleBridge = async () => {
       stargatePoolAddress[Number(props.selectedChain[0])]?.[token],
       props.selectedChain[0],
       await pool.token(),
-      "newuruuiii"
+      "kkkkkkkkk"
     );
     const isNative = (await pool.token()) === ZeroAddress;
     console.log(await pool.token(), ZeroAddress);
@@ -380,20 +380,17 @@ const handleBridge = async () => {
       String(selectedOptions.value.amount),
       isNative ? 18 : Number(await tokenContract.decimals())
     );
-    console.log(await tokenContract.decimals(), usdtInWei);
+
     const amountLD = BigInt(usdtInWei);
     console.log(
       p,
       s,
       pool,
       isNative,
-      tokenContract,
       usdtInWei,
       amountLD,
       stargatePoolAddress[Number(props.selectedChain[0])]?.[token],
       props.selectedChain[0],
-      await pool.token(),
-      await tokenContract.decimals(),
       "newuruuiii"
     );
 
