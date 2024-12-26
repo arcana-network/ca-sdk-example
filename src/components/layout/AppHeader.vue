@@ -23,7 +23,7 @@ const user = useUserStore();
 <template>
   <div class="h-5.125rem">
     <header
-      class="flex bg-background-300 py-1.0625rem pr-2rem pl-2.02731rem justify-between items-start"
+      class="flex bg-background-300 py-1.0625rem pr-2rem pl-2.02731rem justify-between items-center"
     >
       <div class="flex items-center gap-4">
         <img

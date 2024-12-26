@@ -1,5 +1,5 @@
 import { arbitrum, base, mainnet, optimism, polygon } from "viem/chains";
-import { Account, createWalletClient, custom } from "viem";
+import { Account, createPublicClient, createWalletClient, custom } from "viem";
 
 export const sendContractFunction = async ({
   account,
@@ -31,13 +31,24 @@ export const sendContractFunction = async ({
       transport: custom(provider),
     });
 
+    const publicClient = createPublicClient({
+      chain: chainName,
+      transport: custom(provider),
+    });
+
     const txResult: any = await walletClient.sendTransaction({
       account,
       to: to,
       value: value,
     });
 
-    console.log(`Transaction successfully sent! Tx Hash: ${txResult}`);
+    const transaction = await publicClient.waitForTransactionReceipt({
+      hash: txResult,
+    });
+
+    console.log(
+      `Transaction successfully sent! Tx Hash: ${txResult},${transaction}`
+    );
     return txResult;
   } catch (error: any) {
     console.error("Error executing contract function:", error);

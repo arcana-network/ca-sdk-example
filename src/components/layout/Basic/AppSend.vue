@@ -633,7 +633,7 @@ onUnmounted(() => {
           <Field.Input
             v-model="selectedOptions.to"
             class="w-full shadow-sm mt-1 border border-background-400 placeholder:text-blueGray-600"
-            placeholder="0xb794f5ea0ba39494ce839613fffba74279579268"
+            placeholder="Enter Wallet Address"
           />
         </Field.Root>
 

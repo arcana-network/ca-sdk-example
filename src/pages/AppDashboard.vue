@@ -7,7 +7,7 @@ import { getCA } from "@/utils/getCA";
 import { CA } from "@arcana/ca-sdk";
 import { Accordion, Avatar, Select } from "@ark-ui/vue";
 import Decimal from "decimal.js";
-import { computed, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import AppTooltip from "@/components/shared/AppTooltip.vue";
 import ChevronDownIcon from "@/assets/images/svg/ChevronDown.svg";
 import AppSend from "@/components/layout/Unified/AppSend.vue";
@@ -35,6 +35,12 @@ const singleAssetChain = ref<{
 }>({
   chain: ["1"],
 });
+
+const windowWidth = ref(window.innerWidth);
+
+const handleResize = () => {
+  windowWidth.value = window.innerWidth;
+};
 
 const getTokenAndChainDetails = (assets: Asset[]) => {
   const tokenSet = new Set<string>();
@@ -180,6 +186,14 @@ const backBasicSendSteps = () => {
 const backBasicBridgeSteps = () => {
   stepState.value.showBasicBridgeSteps = false;
 };
+
+onMounted(() => {
+  window.addEventListener("resize", handleResize);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", handleResize);
+});
 </script>
 
 <template>
@@ -274,7 +288,7 @@ const backBasicBridgeSteps = () => {
           </div>
 
           <div
-            class="border p-4 rounded-lg flex flex-col bg-background-700 border-background-400 font-inter"
+            class="border p-4 rounded-lg flex flex-col bg-background-700 border-background-400 font-inter h-18.125rem"
           >
             <div
               v-if="balanceLoader"
@@ -386,7 +400,11 @@ const backBasicBridgeSteps = () => {
     >
       <div class="flex justify-between items-center">
         <div class="font-nohemi text-blueGray-800 text-2xl font-semibold">
-          Chain Abstraction Enabled App
+          {{
+            windowWidth <= 1280
+              ? "CA Enabled App"
+              : "Chain Abstraction Enabled App"
+          }}
         </div>
         <div
           class="text-rose-500 text-xs font-inter font-semibold flex items-center gap-1 px-4 py-2 rounded-full bg-rose-200"
