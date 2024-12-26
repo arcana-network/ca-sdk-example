@@ -19,7 +19,7 @@ const user = useUserStore();
     >
       <div class="flex items-center gap-4">
         <img
-          src="@/assets/images/svg/ArcanaPayLogo.svg?url"
+          src="@/assets/images/png/ArcanaPayLogo.png?url"
           alt="Logo"
           class="h-3rem"
         />
