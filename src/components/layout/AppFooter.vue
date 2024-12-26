@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 const links = {
-  howItWorks: "/how-it-works",
+  howItWorks:
+    "https://blog.arcana.network/introducing-arcana-chain-abstraction-sdk",
   scheduleDemo:
     "https://calendly.com/arcana-network/arcana-demo-walkthrough?month=2024-04",
   docs: "https://docs.arcana.network",
