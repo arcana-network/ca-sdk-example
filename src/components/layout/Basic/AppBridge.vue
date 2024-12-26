@@ -336,6 +336,7 @@ const handleBridge = async () => {
 
     //@ts-ignore
     const p: any = new BrowserProvider(window["ethereum"]);
+
     const s: any = await p.getSigner();
     const pool = new Contract(
       stargatePoolAddress[Number(props.selectedChain[0])]?.[token],
@@ -349,6 +350,20 @@ const handleBridge = async () => {
       isNative ? 18 : Number(await tokenContract.decimals())
     );
     const amountLD = BigInt(usdtInWei);
+    console.log(
+      p,
+      s,
+      pool,
+      isNative,
+      tokenContract,
+      usdtInWei,
+      amountLD,
+      stargatePoolAddress[Number(props.selectedChain[0])]?.[token],
+      props.selectedChain[0],
+      await pool.token(),
+      await tokenContract.decimals(),
+      "newuruuiii"
+    );
 
     const sp = {
       dstEid: dstEid,
