@@ -28,7 +28,6 @@ const props = defineProps<{
   timer: string;
   submitLoader: boolean;
   txError: boolean;
-  txSuccess?: boolean;
   openIntentLoader: boolean;
   type: "Send" | "Receive";
   txHash?: string;
@@ -125,7 +124,7 @@ const intentSteps = computed(() => {
           @contextmenu.prevent="void 0"
         />
         <video
-          v-else-if="props.txHash || props.txSuccess"
+          v-else-if="props.txHash"
           src="@/assets/videos/new_success.webm"
           autoplay
           muted
@@ -147,7 +146,7 @@ const intentSteps = computed(() => {
           {{
             props.txError
               ? "Transaction Failed!"
-              : props.txHash || props.txSuccess
+              : props.txHash
               ? "Transaction Successfull"
               : "Loading..."
           }}</span
