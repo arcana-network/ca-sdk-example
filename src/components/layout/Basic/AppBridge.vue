@@ -316,7 +316,10 @@ const handleBridge = async () => {
   txError.value = false;
   txSuccess.value = false;
   resetSubmitSteps();
-
+  const { currentChainId } = user.provider.request({ method: "eth_chainId" });
+  if (currentChainId !== Number(props.selectedChain[0])) {
+    await switchChain(props.selectedChain[0] as string);
+  }
   try {
     const token = getSymbolByContractAddress(
       availableTokens.value,
@@ -324,14 +327,12 @@ const handleBridge = async () => {
     );
 
     const address: Address = toEthereumAddress(user.walletAddress);
-    const usdtInWei = parseUnits(String(selectedOptions.value.amount), 6);
     const recipientBytes32 = toHex(pad(toBytes(address), { size: 32 }));
 
     const dstEid =
       stargatePoolEndPointId[Number(selectedOptions?.value?.chain[0])]
         ?.endpointID;
     const to = recipientBytes32;
-    const amountLD = BigInt(usdtInWei);
 
     //@ts-ignore
     const p: any = new BrowserProvider(window["ethereum"]);
@@ -341,12 +342,17 @@ const handleBridge = async () => {
       stargatePoolABI,
       s
     );
-    const isNative = await pool.token() === ZeroAddress
+    const isNative = (await pool.token()) === ZeroAddress;
     const tokenContract = new Contract(
       selectedOptions.value.token[0],
       erc20ABI,
       s
     );
+    const usdtInWei = parseUnits(
+      String(selectedOptions.value.amount),
+      isNative ? 18 : await tokenContract.decimals()
+    );
+    const amountLD = BigInt(usdtInWei);
 
     const sp = {
       dstEid: dstEid,
@@ -378,7 +384,7 @@ const handleBridge = async () => {
     tx.value = sendQuote[0];
 
     if (isNative) {
-      (tx.value as bigint) += sp.amountLD
+      (tx.value as bigint) += sp.amountLD;
     }
 
     await s.sendTransaction(tx);

@@ -563,7 +563,7 @@ const backBasicBridgeSteps = () => {
                   <Accordion.ItemContent>
                     <div class="pt-3">
                       <div
-                        class="bg-white-100 bg-opacity-75 py-4 px-2 rounded-lg"
+                        class="bg-background-400 bg-opacity-75 py-4 px-2 rounded-lg"
                       >
                         <div class="flex flex-col gap-4">
                           <div
