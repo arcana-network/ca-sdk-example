@@ -100,7 +100,7 @@ const allowanceSteps = computed(() => {
           src="@/assets/videos/new_error.webm"
           autoplay
           muted
-          class="h-32 relative animate-fadeIn"
+          class="h-24 relative animate-fadeIn"
           @contextmenu.prevent="void 0"
         />
         <video
@@ -109,7 +109,7 @@ const allowanceSteps = computed(() => {
           autoplay
           loop
           muted
-          class="h-32 relative"
+          class="h-24 relative"
           @contextmenu.prevent="void 0"
         />
         <span
@@ -134,7 +134,7 @@ const allowanceSteps = computed(() => {
                 autoplay
                 loop
                 muted
-                class="h-32 relative"
+                class="h-24 relative"
                 @contextmenu.prevent="void 0"
               />
               <span
@@ -150,7 +150,7 @@ const allowanceSteps = computed(() => {
                 src="@/assets/videos/new_error.webm"
                 autoplay
                 muted
-                class="h-32 relative animate-fadeIn"
+                class="h-24 relative animate-fadeIn"
                 @contextmenu.prevent="void 0"
               />
               <span
@@ -163,7 +163,7 @@ const allowanceSteps = computed(() => {
                 src="@/assets/videos/new_success.webm"
                 autoplay
                 muted
-                class="h-32 relative animate-fadeIn"
+                class="h-24 relative animate-fadeIn"
                 @contextmenu.prevent="void 0"
               />
               <span

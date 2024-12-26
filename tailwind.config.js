@@ -120,6 +120,7 @@ export default {
         "3.25rem": "3.25rem",
         "2.75rem": "2.75rem",
         "5.125rem": "5.125rem",
+        "18.125rem": "18.125rem",
       },
       minHeight: {
         "calc-100vh-minus-header": "calc(100vh - 5.125rem)",

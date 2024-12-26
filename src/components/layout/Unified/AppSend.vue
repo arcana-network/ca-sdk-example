@@ -135,8 +135,13 @@ const getTokenAndChainDetails = (assets: Asset[]) => {
     tokenSet.add(asset.symbol);
 
     asset.breakdown.forEach((breakdown) => {
+      const chainWithSymbol = {
+        ...breakdown.chain,
+        abstracted: asset.abstracted,
+      };
+
       if (!chainMap.has(breakdown.chain.id)) {
-        chainMap.set(Number(breakdown.chain.id), breakdown.chain);
+        chainMap.set(Number(breakdown.chain.id), chainWithSymbol);
       }
     });
   });
@@ -148,6 +153,7 @@ const getTokenAndChainDetails = (assets: Asset[]) => {
 };
 
 const chainList = computed(() => getTokenAndChainDetails(user.assets).chain);
+console.log(chainList);
 
 const selectedChain = computed(() => {
   return chainList.value.find(
@@ -542,7 +548,7 @@ onUnmounted(() => {
           <Field.Input
             v-model="selectedOptions.to"
             class="w-full shadow-sm border mt-1 border-background-400 placeholder:text-blueGray-600"
-            placeholder="0xb794f5ea0ba39494ce839613fffba74279579268"
+            placeholder="Enter Wallet Address"
           />
         </Field.Root>
 
@@ -570,6 +576,17 @@ onUnmounted(() => {
                     />
                   </Avatar.Root>
                   <span>{{ selectedChain?.name || "Chain" }}</span>
+                  <div
+                    v-if="selectedChain?.abstracted"
+                    class="text-rose-500 text-0.625rem font-inter font-normal flex items-center gap-1 p-1 rounded-full bg-rose-200"
+                  >
+                    Chain Abstracted
+                    <AppTooltip message="Chain Abstracted">
+                      <InfoIcon
+                        class="h-3 w-3 stroke-rose-500 stroke-cap-round"
+                      />
+                    </AppTooltip>
+                  </div>
                 </div>
                 <Select.Indicator>
                   <ChevronDownIcon class="w-4 h-4 stroke-blueGray-800" />
@@ -598,6 +615,17 @@ onUnmounted(() => {
                         />
                       </Avatar.Root>
                       <span>{{ chain.name }}</span>
+                      <div
+                        v-if="chain?.abstracted"
+                        class="text-rose-500 text-0.625rem font-inter font-normal flex items-center gap-1 p-1 rounded-full bg-rose-200"
+                      >
+                        Chain Abstracted
+                        <AppTooltip message="Chain Abstracted">
+                          <InfoIcon
+                            class="h-3 w-3 stroke-rose-500 stroke-cap-round"
+                          />
+                        </AppTooltip>
+                      </div>
                       <Select.ItemText class="hidden">{{
                         chain.id
                       }}</Select.ItemText>

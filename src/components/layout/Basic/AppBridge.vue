@@ -666,17 +666,6 @@ onUnmounted(() => {
                     />
                   </Avatar.Root>
                   <span>{{ selectedChain?.name || "Chain" }}</span>
-                  <div
-                    v-if="selectedChain?.abstracted"
-                    class="text-rose-500 text-0.625rem font-inter font-normal flex items-center gap-1 p-1 rounded-full bg-rose-200"
-                  >
-                    Chain Abstracted
-                    <AppTooltip message="Chain Abstracted">
-                      <InfoIcon
-                        class="h-3 w-3 stroke-rose-500 stroke-cap-round"
-                      />
-                    </AppTooltip>
-                  </div>
                 </div>
                 <Select.Indicator>
                   <ChevronDownIcon class="w-4 h-4 stroke-blueGray-800" />
@@ -705,17 +694,7 @@ onUnmounted(() => {
                         />
                       </Avatar.Root>
                       <span>{{ chain.name }}</span>
-                      <div
-                        v-if="chain?.abstracted"
-                        class="text-rose-500 text-0.625rem font-inter font-normal flex items-center gap-1 p-1 rounded-full bg-rose-200"
-                      >
-                        Chain Abstracted
-                        <AppTooltip message="Chain Abstracted">
-                          <InfoIcon
-                            class="h-3 w-3 stroke-rose-500 stroke-cap-round"
-                          />
-                        </AppTooltip>
-                      </div>
+
                       <Select.ItemText class="hidden">{{
                         chain.id
                       }}</Select.ItemText>
