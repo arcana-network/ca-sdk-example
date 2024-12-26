@@ -258,6 +258,10 @@ const handleTransfer = async () => {
   chainExplorerToken.value = "";
   txHash.value = "";
   resetSubmitSteps();
+  const { currentChainId } = user.provider.request({ method: "eth_chainId" });
+  if (currentChainId !== Number(selectedOptions?.value?.chain[0])) {
+    await switchChain(selectedOptions?.value?.chain[0] as string);
+  }
   try {
     const chainDecimal = getChainById(Number(selectedOptions?.value?.chain[0]))
       ?.nativeCurrency?.decimals;
