@@ -694,7 +694,7 @@ onUnmounted(() => {
                       <span>{{ token.symbol }}</span>
                     </div>
                     <Select.ItemIndicator
-                      ><CheckIcon class="w-4 h-4 stroke-black-700"
+                      ><CheckIcon class="w-5 h-5 stroke-black-700"
                     /></Select.ItemIndicator>
                   </Select.Item>
                 </Select.ItemGroup>
