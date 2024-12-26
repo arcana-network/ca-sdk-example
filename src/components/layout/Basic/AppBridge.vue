@@ -1,21 +1,6 @@
 <script lang="ts" setup>
-import { useTokenStore } from "@/stores/token";
-import { useUserStore } from "@/stores/user";
-import { AllowanceDataType } from "@/types/allowanceTypes";
-import ArrowRightIcon from "@/assets/images/svg/TransactionArrow.svg";
-import CheckIcon from "@/assets/images/svg/Check.svg";
-import ChevronDownIcon from "@/assets/images/svg/ChevronDown.svg";
-import ArrowIcon from "@/assets/images/svg/ArrowUp.svg";
-import InfoIcon from "@/assets/images/svg/InfoCircle.svg";
-import { Asset, Chain as ChainDetails } from "@/types/balanceTypes";
-import { Chain } from "@/types/chainTypes";
-import { IntentDataType } from "@/types/intentTypes";
-import { clearAsyncInterval, setAsyncInterval } from "@/utils/async_interval";
-import { getLogo } from "@/utils/commonFunction";
-import { MAINNET_CHAINS } from "@/utils/constants";
-import { getCA } from "@/utils/getCA";
-import { useErrorToast } from "@/utils/useErrorToast";
 import { CA, ProgressStep } from "@arcana/ca-sdk";
+import { BrowserProvider, Contract, ZeroAddress } from "ethers";
 import { Avatar, Field, NumberInput, Select } from "@ark-ui/vue";
 import dayjs from "dayjs";
 import Decimal from "decimal.js";
@@ -37,6 +22,23 @@ import {
   ref,
   watch,
 } from "vue";
+
+import { useTokenStore } from "@/stores/token";
+import { useUserStore } from "@/stores/user";
+import { AllowanceDataType } from "@/types/allowanceTypes";
+import ArrowRightIcon from "@/assets/images/svg/TransactionArrow.svg";
+import CheckIcon from "@/assets/images/svg/Check.svg";
+import ChevronDownIcon from "@/assets/images/svg/ChevronDown.svg";
+import ArrowIcon from "@/assets/images/svg/ArrowUp.svg";
+import InfoIcon from "@/assets/images/svg/InfoCircle.svg";
+import { Asset, Chain as ChainDetails } from "@/types/balanceTypes";
+import { Chain } from "@/types/chainTypes";
+import { IntentDataType } from "@/types/intentTypes";
+import { clearAsyncInterval, setAsyncInterval } from "@/utils/async_interval";
+import { getLogo } from "@/utils/commonFunction";
+import { MAINNET_CHAINS } from "@/utils/constants";
+import { getCA } from "@/utils/getCA";
+import { useErrorToast } from "@/utils/useErrorToast";
 import AppTransaction from "../AppTransaction.vue";
 import { switchChain } from "@/utils/switchChain";
 import AppTooltip from "@/components/shared/AppTooltip.vue";
@@ -46,7 +48,6 @@ import {
 } from "@/abi/stargatePoolAddress";
 import { stargatePoolABI } from "@/abi/stargatePool.abi";
 import { erc20ABI } from "@/abi/erc20.abi";
-import { BrowserProvider, Contract } from "ethers";
 
 const props = defineProps<{
   selectedChain: string[];
@@ -340,6 +341,7 @@ const handleBridge = async () => {
       stargatePoolABI,
       s
     );
+    const isNative = await pool.token() === ZeroAddress
     const tokenContract = new Contract(
       selectedOptions.value.token[0],
       erc20ABI,
@@ -362,7 +364,9 @@ const handleBridge = async () => {
 
     const sendQuote: any = await pool.quoteSend(sp, false);
 
-    await tokenContract.approve(await pool.getAddress(), sp.amountLD);
+    if (!isNative) {
+      await tokenContract.approve(await pool.getAddress(), sp.amountLD);
+    }
     const tx = await pool.sendToken.populateTransaction(
       sp,
       Array.from(sendQuote),
@@ -372,6 +376,10 @@ const handleBridge = async () => {
       }
     );
     tx.value = sendQuote[0];
+
+    if (isNative) {
+      (tx.value as bigint) += sp.amountLD
+    }
 
     await s.sendTransaction(tx);
     txSuccess.value = true;
