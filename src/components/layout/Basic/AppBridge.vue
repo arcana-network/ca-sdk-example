@@ -350,7 +350,7 @@ const handleBridge = async () => {
     );
     const usdtInWei = parseUnits(
       String(selectedOptions.value.amount),
-      isNative ? 18 : await tokenContract.decimals()
+      isNative ? 18 : Number(await tokenContract.decimals())
     );
     const amountLD = BigInt(usdtInWei);
 
