@@ -88,6 +88,8 @@ onMounted(async () => {
   const allBalance = await ca.getUnifiedBalances();
   balances.value = allBalance;
   user.setAsset(allBalance);
+  console.log(allBalance);
+
   balanceLoader.value = false;
   setBalancePolling(ca);
 });
