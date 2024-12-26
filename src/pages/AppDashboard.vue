@@ -197,7 +197,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="flex gap-12 w-full items-start">
+  <div class="flex gap-12 w-full items-start max-md:flex-col">
     <div
       class="w-full lg:w-1/2 bg-background-500 p-6 rounded-lg shadow-lg flex flex-col"
     >
@@ -289,6 +289,7 @@ onBeforeUnmount(() => {
 
           <div
             class="border p-4 rounded-lg flex flex-col bg-background-700 border-background-400 font-inter h-18.125rem"
+            :class="{ 'h-auto': balanceLoader }"
           >
             <div
               v-if="balanceLoader"
@@ -419,7 +420,7 @@ onBeforeUnmount(() => {
       >
         <div class="flex-1 flex flex-col gap-8 mt-6">
           <div
-            class="border p-4 rounded-lg flex flex-col bg-white-100 border-background-400"
+            class="border p-4 rounded-lg flex flex-col bg-white-900 border-background-400"
           >
             <div
               class="font-inter text-maroon-800 text-sm font-semibold mb-2 text-center uppercase opacity-40"
@@ -434,7 +435,7 @@ onBeforeUnmount(() => {
           </div>
 
           <div
-            class="border p-4 rounded-lg bg-white-100 border-background-400 font-inter"
+            class="border p-4 rounded-lg bg-white-900 border-background-400 font-inter"
           >
             <div
               v-if="balanceLoader"
