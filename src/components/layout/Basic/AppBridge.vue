@@ -48,6 +48,7 @@ import {
 } from "@/abi/stargatePoolAddress";
 import { stargatePoolABI } from "@/abi/stargatePool.abi";
 import { erc20ABI } from "@/abi/erc20.abi";
+import { Addressable } from "ethers";
 
 const props = defineProps<{
   selectedChain: string[];
