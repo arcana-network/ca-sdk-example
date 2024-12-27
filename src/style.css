@@ -7,10 +7,26 @@
 
 @font-face {
   font-family: "Nohemi";
-  src: url("@/assets/font/nohemi-font-family-1735188276-0/Nohemi-Regular-BF6438cc579d934.woff")
-    format("woff");
-  font-weight: normal;
-  font-style: normal;
+  src: url("@/assets/font/Nohemi-Regular.woff2") format("woff");
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Nohemi";
+  src: url("@/assets/font/Nohemi-Medium.woff2") format("woff");
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: "Nohemi";
+  src: url("@/assets/font/Nohemi-SemiBold.woff2") format("woff");
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: "Nohemi";
+  src: url("@/assets/font/Nohemi-Bold.woff2") format("woff");
+  font-weight: 700;
 }
 
 .font-nohemi {
