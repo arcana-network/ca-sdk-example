@@ -455,6 +455,7 @@ const handleBridge = async () => {
     }
   } finally {
     allLoader.value.startTransaction = false;
+    allLoader.value.stepsLoader = false;
     resetIntentData();
     clearTransferData();
     clearInterval(timerInterval.value);
