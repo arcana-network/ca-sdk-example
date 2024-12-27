@@ -335,6 +335,7 @@ const handleTransfer = async () => {
     }
   } finally {
     allLoader.value.startTransaction = false;
+    allLoader.value.stepsLoader = false;
     clearInterval(timerInterval.value);
     resetIntentData();
     clearTransferData();
