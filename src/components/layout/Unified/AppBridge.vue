@@ -305,7 +305,6 @@ const handleBridge = async () => {
     }
   } finally {
     allLoader.value.startTransaction = false;
-    allLoader.value.stepsLoader = false;
     resetIntentData();
     clearTransferData();
     clearInterval(timerInterval.value);
@@ -480,12 +479,12 @@ onUnmounted(() => {
       class="text-xl font-nohemi font-semibold text-blueGray-800 mt-9 text-center"
     >
       {{
-        allLoader.stepsLoader === true
+        allLoader.stepsLoader === true && intentData.open === true
           ? "Processing Transaction"
           : allowanceData.open === true
           ? "Spend Allowance"
           : intentData.open === true
-          ? "Send Transaction"
+          ? "Transaction Details"
           : "Bridge Unified Balance"
       }}
     </h2>

@@ -401,7 +401,6 @@ const handleTransfer = async () => {
     }
   } finally {
     allLoader.value.startTransaction = false;
-    allLoader.value.stepsLoader = false;
     clearInterval(timerInterval.value);
     resetIntentData();
     clearTransferData();
@@ -606,7 +605,7 @@ onUnmounted(() => {
       class="text-xl font-nohemi font-semibold text-blueGray-800 mt-9 text-center"
     >
       {{
-        allLoader.stepsLoader === true
+        allLoader.stepsLoader === true && intentData.open === true
           ? "Processing Transaction"
           : allowanceData.open === true
           ? "Spend Allowance"
