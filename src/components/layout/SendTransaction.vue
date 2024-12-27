@@ -112,7 +112,7 @@ const intentSteps = computed(() => {
   <div class="h-full w-full flex flex-col overflow-y-auto">
     <div class="w-full h-full p-2 pb-0 flex flex-col overflow-y-auto">
       <div
-        v-if="!props.intentDetails.open && !submitLoader"
+        v-if="!props.intentDetails.open && !props.submitLoader"
         class="flex flex-col items-center justify-center text-center align-middle text-ellipsis overflow-hidden text-base font-inter font-normal leading-4 text-blueGray-800"
       >
         <video
@@ -172,7 +172,7 @@ const intentSteps = computed(() => {
         </div>
       </div>
       <div
-        v-else-if="submitLoader === true && !props.openIntentLoader"
+        v-else-if="props.submitLoader === true && !props.openIntentLoader"
         class="h-full w-full relative"
       >
         <div
