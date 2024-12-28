@@ -311,7 +311,7 @@ onBeforeUnmount(() => {
               <div class="flex items-center h-14 space-x-4">
                 <div class="relative isolate">
                   <img
-                    :src="getLogo(balance.icon)"
+                    :src="balance.icon"
                     class="h-7 w-7 rounded-full bg-white-100"
                     alt="Logo"
                   />
@@ -468,7 +468,7 @@ onBeforeUnmount(() => {
                         <div class="flex items-center gap-4">
                           <div class="relative isolate">
                             <img
-                              :src="getLogo(asset.icon)"
+                              :src="asset.icon"
                               class="h-7 w-7 rounded-full bg-white-100"
                               alt="Logo"
                             />
@@ -595,7 +595,7 @@ onBeforeUnmount(() => {
                             <span class="flex items-center gap-3">
                               <div class="relative isolate">
                                 <img
-                                  :src="getLogo(asset.icon)"
+                                  :src="asset.icon"
                                   class="relative z-10 h-5 w-5 rounded-full bg-white-100"
                                   alt="Logo"
                                 />
