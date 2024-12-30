@@ -734,7 +734,7 @@ onUnmounted(() => {
                 >
                   <Avatar.Root>
                     <Avatar.Image
-                      :src="getLogo(selectedToken?.icon)"
+                      :src="selectedToken?.icon"
                       class="w-5 h-5 rounded-full"
                     />
                   </Avatar.Root>
@@ -765,7 +765,7 @@ onUnmounted(() => {
                             .toUpperCase()
                         }}</Avatar.Fallback>
                         <Avatar.Image
-                          :src="getLogo(token.icon)"
+                          :src="token.icon"
                           class="w-5 h-5 rounded-full"
                         />
                       </Avatar.Root>
