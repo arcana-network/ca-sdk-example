@@ -27,7 +27,6 @@ import { clearAsyncInterval, setAsyncInterval } from "@/utils/async_interval";
 import dayjs from "dayjs";
 import { getCA } from "@/utils/getCA";
 import { Avatar, Field, NumberInput, Select } from "@ark-ui/vue";
-import { getLogo } from "@/utils/commonFunction";
 import AppTransaction from "../AppTransaction.vue";
 import { switchChain } from "@/utils/switchChain";
 import { sendContractFunction } from "@/contract/sendTx";
