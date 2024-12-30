@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@arcana/ca-sdk": "^0.0.1-beta.30",
+    "@arcana/ca-sdk": "^0.0.2-beta.1",
     "@ark-ui/vue": "^4.4.2",
     "@fontsource/inter": "^5.1.0",
     "@primevue/themes": "^4.1.1",
