@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
 import { initCA } from "../utils/getCA";
-import { EthereumProvider } from "../utils/typings";
+import { EthereumProvider } from "../types/ProviderTypes.ts";
 import { useUserStore } from "@/stores/user";
 import { Dialog } from "@ark-ui/vue";
 import FadeLoader from "vue-spinner/src/FadeLoader.vue";
