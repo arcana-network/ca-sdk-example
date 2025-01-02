@@ -28,7 +28,6 @@ export const getTextFromStep = (status: string, done: boolean): string => {
 
     case "INTENT_COLLECTION":
       return done ? "Liquidity Supplied" : "Supplying Liquidity";
-    // return done ? "Submitted Transaction" : "Submitting Transaction";
 
     case "INTENT_MINED":
       return done ? "Transaction Mined" : "Transaction Mining";
