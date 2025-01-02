@@ -1,5 +1,5 @@
 import { CA } from "@arcana/ca-sdk";
-import { EthereumProvider } from "./typings";
+import { EthereumProvider } from "../types/ProviderTypes";
 
 let ca: CA | null = null;
 
