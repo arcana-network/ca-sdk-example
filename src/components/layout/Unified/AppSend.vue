@@ -31,6 +31,7 @@ import { Avatar, Field, NumberInput, Select } from "@ark-ui/vue";
 import { getLogo } from "@/utils/commonFunction";
 import AppTransaction from "../AppTransaction.vue";
 import { switchChain } from "@/utils/switchChain";
+import { trackEvent } from "@/segment/segment";
 
 type StepState = {
   currentStep: number;
@@ -318,6 +319,11 @@ const handleTransfer = async () => {
   } catch (error) {
     resetSubmitSteps();
     console.log("Transfer Failed:", error);
+    trackEvent("Failed Send", {
+      environment: import.meta.env.VITE_ENVIOURMENT,
+      buttonName: "Failed Send",
+      timestamp: new Date().toISOString(),
+    });
     allLoader.value.startTransaction = false;
     txError.value = true;
     txHash.value = "";
@@ -330,7 +336,6 @@ const handleTransfer = async () => {
       error.message.includes("Unrecognized chain ID")
     ) {
       console.error("Chain not recognized. Try adding the chain first.");
-      // txErrorMsg.value = "Retry"
       await switchChain(selectedOptions.value.chain[0] as string);
     }
   } finally {
@@ -338,6 +343,11 @@ const handleTransfer = async () => {
     clearInterval(timerInterval.value);
     resetIntentData();
     clearTransferData();
+    trackEvent("Completed Send", {
+      environment: import.meta.env.VITE_ENVIOURMENT,
+      buttonName: "Completed Send",
+      timestamp: new Date().toISOString(),
+    });
   }
 };
 

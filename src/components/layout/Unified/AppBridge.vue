@@ -32,6 +32,7 @@ import {
 import AppTransaction from "../AppTransaction.vue";
 import { switchChain } from "@/utils/switchChain";
 import AppTooltip from "@/components/shared/AppTooltip.vue";
+import { trackEvent } from "@/segment/segment";
 
 type StepState = {
   currentStep: number;
@@ -290,6 +291,11 @@ const handleBridge = async () => {
   } catch (error) {
     resetSubmitSteps();
     console.log("Transfer Failed:", error);
+    trackEvent("Failed Bridge", {
+      environment: import.meta.env.VITE_ENVIOURMENT,
+      buttonName: "Failed Bridge",
+      timestamp: new Date().toISOString(),
+    });
     allLoader.value.startTransaction = false;
     txError.value = true;
     allowanceLoaderClose();
@@ -300,7 +306,6 @@ const handleBridge = async () => {
       error.message.includes("Unrecognized chain ID")
     ) {
       console.error("Chain not recognized. Try adding the chain first.");
-      // txErrorMsg.value = "Retry"
       await switchChain(selectedOptions.value.chain[0] as string);
     }
   } finally {
@@ -308,6 +313,11 @@ const handleBridge = async () => {
     resetIntentData();
     clearTransferData();
     clearInterval(timerInterval.value);
+    trackEvent("Completed Bridge", {
+      environment: import.meta.env.VITE_ENVIOURMENT,
+      buttonName: "Completed Bridge",
+      timestamp: new Date().toISOString(),
+    });
   }
 };
 
