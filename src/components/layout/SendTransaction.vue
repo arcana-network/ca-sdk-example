@@ -19,6 +19,7 @@ import {
 } from "@/utils/commonFunction";
 import { symbolToLogo } from "@/utils/getLogoFromSymbol";
 import { getTextFromStep } from "@/utils/getTextFromSteps";
+import { trackEvent } from "@/segment/segment";
 
 const props = defineProps<{
   allowanceDetails: AllowanceDataType;
@@ -74,6 +75,12 @@ const submitIntentData = async () => {
     await props.intentDetails.allow();
     emit("startSubmitLoader");
     emit("clearIntentHandler");
+    let name = props.type === "Send" ? "Init Send" : "Init Bridge";
+    trackEvent(name, {
+      environment: import.meta.env.VITE_ENVIOURMENT,
+      buttonName: name,
+      timestamp: new Date().toISOString(),
+    });
   }
 };
 
