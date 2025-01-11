@@ -803,8 +803,7 @@ onUnmounted(() => {
         !selectedOptions.amount ||
         !selectedOptions.chain[0] ||
         !selectedOptions.token[0] ||
-        !selectedOptions.to ||
-        false
+        !selectedOptions.to
       "
       :tx-hash="txHash"
       :chain-explorer-token="chainExplorerToken"
