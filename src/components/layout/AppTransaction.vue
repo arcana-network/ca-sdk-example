@@ -13,6 +13,7 @@ const props = defineProps<{
   interection: boolean;
   openIntentLoader: boolean;
   submitLoader: boolean;
+  disabbled: boolean;
   txError: boolean;
   timer: string;
   type: "Send" | "Receive";
@@ -56,6 +57,7 @@ const handleContinue = () => {
     class="button-secondary w-full mt-4 max-md:w-full"
     v-if="props.stepState.currentStep === 1"
     @click.stop="handleContinue"
+    :disabled="props.disabbled"
   >
     Continue
   </button>
