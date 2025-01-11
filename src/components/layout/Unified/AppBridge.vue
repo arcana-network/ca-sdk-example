@@ -731,7 +731,8 @@ onUnmounted(() => {
       :disabbled="
         !selectedOptions.amount ||
         !selectedOptions.chain[0] ||
-        !selectedOptions.token[0]
+        !selectedOptions.token[0] ||
+        false
       "
       :stepState="stepState"
       type="Receive"
