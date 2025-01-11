@@ -799,6 +799,12 @@ onUnmounted(() => {
       :interection="allLoader.startTransaction"
       :submit-loader="allLoader.stepsLoader"
       :tx-error="txError"
+      :disabbled="
+        !selectedOptions.amount ||
+        !selectedOptions.chain[0] ||
+        !selectedOptions.token[0] ||
+        !selectedOptions.to
+      "
       :tx-hash="txHash"
       :chain-explorer-token="chainExplorerToken"
       :allowanceLoader="allowanceLoader"

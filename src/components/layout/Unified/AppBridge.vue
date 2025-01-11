@@ -728,6 +728,11 @@ onUnmounted(() => {
       :submit-loader="allLoader.stepsLoader"
       :tx-error="txError"
       :allowanceLoader="allowanceLoader"
+      :disabbled="
+        !selectedOptions.amount ||
+        !selectedOptions.chain[0] ||
+        !selectedOptions.token[0]
+      "
       :stepState="stepState"
       type="Receive"
       @start-submit-loader="startSubmitLoader"
