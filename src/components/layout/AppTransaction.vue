@@ -13,7 +13,7 @@ const props = defineProps<{
   interection: boolean;
   openIntentLoader: boolean;
   submitLoader: boolean;
-  disabbled: boolean;
+  disabbled: boolean | any;
   txError: boolean;
   timer: string;
   type: "Send" | "Receive";
