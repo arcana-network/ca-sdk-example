@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Checkbox } from "@ark-ui/vue";
-import { computed } from "vue";
+import { computed, watch } from "vue";
 
 import InfoIcon from "@/assets/images/svg/InfoCircle.svg";
 import { AllowanceDataType } from "@/types/allowanceTypes";
@@ -11,6 +11,8 @@ import {
 } from "@/utils/commonFunction";
 import { symbolToLogo } from "@/utils/getLogoFromSymbol";
 import { getTextFromStep } from "@/utils/getTextFromSteps";
+import { trackEvent } from "@/segment/segment";
+import { useUserStore } from "@/stores/user";
 
 const props = defineProps<{
   allowanceDetails: AllowanceDataType;
@@ -19,6 +21,7 @@ const props = defineProps<{
   txError: boolean;
   openIntentLoader: boolean;
   allowanceLoader: boolean;
+  type: "Send" | "Receive";
   submitSteps: {
     inProgress: boolean;
     completed: boolean;
@@ -36,6 +39,8 @@ const emit = defineEmits([
   "allowanceLoaderOpen",
 ]);
 
+const user = useUserStore();
+
 const submitAllowance = () => {
   if (props.allowanceDetails.allow) {
     emit("allowanceLoaderOpen");
@@ -44,6 +49,15 @@ const submitAllowance = () => {
     const values = props.allowanceDetails.data.map(() => "1.15");
     props.allowanceDetails.allow(values);
     emit("startSubmitLoader");
+    let name =
+      props.type === "Send" ? "Init Allowance Send" : "Init Allowance Bridge";
+    trackEvent(name, {
+      appName: "SDK Demo App",
+      walletAddress: user.walletAddress,
+      environment: import.meta.env.VITE_ENVIOURMENT,
+      buttonName: name,
+      timestamp: new Date().toISOString(),
+    });
   }
 };
 
@@ -53,6 +67,17 @@ const rejectAllowance = () => {
     emit("closeModal");
     emit("restAllowanceData");
     emit("clearTime");
+    let name =
+      props.type === "Send"
+        ? "Reject Allowance Send"
+        : "Reject Allowance Bridge";
+    trackEvent(name, {
+      appName: "SDK Demo App",
+      walletAddress: user.walletAddress,
+      environment: import.meta.env.VITE_ENVIOURMENT,
+      buttonName: name,
+      timestamp: new Date().toISOString(),
+    });
   } else {
     emit("closeModal");
     emit("restAllowanceData");
@@ -77,6 +102,39 @@ const allowanceSteps = computed(() => {
     return statusText !== "Unknown status. Please contact support.";
   });
 });
+
+watch(
+  () => allowanceSteps.value,
+  (newSteps) => {
+    const allDone = newSteps.every((step) => step.done);
+    if (allDone) {
+      let name =
+        props.type === "Send"
+          ? "Success Allowance Send"
+          : "Success Allowance Bridge";
+      trackEvent(name, {
+        appName: "SDK Demo App",
+        walletAddress: user.walletAddress,
+        environment: import.meta.env.VITE_ENVIOURMENT,
+        buttonName: name,
+        timestamp: new Date().toISOString(),
+      });
+    } else {
+      let name =
+        props.type === "Send"
+          ? "Failed Allowance Send"
+          : "Failed Allowance Bridge";
+      trackEvent(name, {
+        appName: "SDK Demo App",
+        walletAddress: user.walletAddress,
+        environment: import.meta.env.VITE_ENVIOURMENT,
+        buttonName: name,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  },
+  { deep: true }
+);
 </script>
 
 <template>

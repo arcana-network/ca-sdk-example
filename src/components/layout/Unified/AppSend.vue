@@ -320,6 +320,8 @@ const handleTransfer = async () => {
     resetSubmitSteps();
     console.log("Transfer Failed:", error);
     trackEvent("Failed Send", {
+      appName: "SDK Demo App",
+      walletAddress: user.walletAddress,
       environment: import.meta.env.VITE_ENVIOURMENT,
       buttonName: "Failed Send",
       timestamp: new Date().toISOString(),
@@ -344,12 +346,23 @@ const handleTransfer = async () => {
     resetIntentData();
     clearTransferData();
     trackEvent("Completed Send", {
+      appName: "SDK Demo App",
+      walletAddress: user.walletAddress,
       environment: import.meta.env.VITE_ENVIOURMENT,
       buttonName: "Completed Send",
+      txHash: txHash.value ? txHash.value : "",
+      intentURL: intentURL.value ? intentURL.value : "",
       timestamp: new Date().toISOString(),
     });
   }
 };
+
+const intentURL = computed(() => {
+  const stepWithIntentURL = submitSteps.value.steps.find(
+    (step) => step?.data?.explorerURL
+  );
+  return stepWithIntentURL?.data?.explorerURL || "";
+});
 
 const caSDKEventListener = (data: any) => {
   switch (data.type) {

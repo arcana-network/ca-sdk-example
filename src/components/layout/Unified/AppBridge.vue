@@ -292,6 +292,8 @@ const handleBridge = async () => {
     resetSubmitSteps();
     console.log("Transfer Failed:", error);
     trackEvent("Failed Bridge", {
+      appName: "SDK Demo App",
+      walletAddress: user.walletAddress,
       environment: import.meta.env.VITE_ENVIOURMENT,
       buttonName: "Failed Bridge",
       timestamp: new Date().toISOString(),
@@ -314,12 +316,22 @@ const handleBridge = async () => {
     clearTransferData();
     clearInterval(timerInterval.value);
     trackEvent("Completed Bridge", {
+      appName: "SDK Demo App",
+      walletAddress: user.walletAddress,
       environment: import.meta.env.VITE_ENVIOURMENT,
       buttonName: "Completed Bridge",
+      intentURL: intentURL.value ? intentURL.value : "",
       timestamp: new Date().toISOString(),
     });
   }
 };
+
+const intentURL = computed(() => {
+  const stepWithIntentURL = submitSteps.value.steps.find(
+    (step) => step.data?.explorerURL
+  );
+  return stepWithIntentURL?.data?.explorerURL || "";
+});
 
 const caSDKEventListener = (data: any) => {
   switch (data.type) {
