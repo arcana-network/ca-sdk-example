@@ -20,6 +20,7 @@ import {
 import { symbolToLogo } from "@/utils/getLogoFromSymbol";
 import { getTextFromStep } from "@/utils/getTextFromSteps";
 import { trackEvent } from "@/segment/segment";
+import { useUserStore } from "@/stores/user";
 
 const props = defineProps<{
   allowanceDetails: AllowanceDataType;
@@ -55,6 +56,8 @@ const emit = defineEmits([
   "clearIntentHandler",
 ]);
 
+const user = useUserStore();
+
 const rates = ref<Record<string, string>>({});
 
 getCoinbasePrices().then((data: any) => {
@@ -75,8 +78,11 @@ const submitIntentData = async () => {
     await props.intentDetails.allow();
     emit("startSubmitLoader");
     emit("clearIntentHandler");
-    let name = props.type === "Send" ? "Init Send" : "Init Bridge";
+    let name =
+      props.type === "Send" ? "Init Intent Send" : "Init Intent Bridge";
     trackEvent(name, {
+      appName: "SDK Demo App",
+      walletAddress: user.walletAddress,
       environment: import.meta.env.VITE_ENVIOURMENT,
       buttonName: name,
       timestamp: new Date().toISOString(),
@@ -91,6 +97,15 @@ const rejectIntentData = () => {
     emit("restIntentData");
     emit("clearTime");
     emit("clearIntentHandler");
+    let name =
+      props.type === "Send" ? "Reject Intent Send" : "Reject Intent Bridge";
+    trackEvent(name, {
+      appName: "SDK Demo App",
+      walletAddress: user.walletAddress,
+      environment: import.meta.env.VITE_ENVIOURMENT,
+      buttonName: name,
+      timestamp: new Date().toISOString(),
+    });
   }
 };
 

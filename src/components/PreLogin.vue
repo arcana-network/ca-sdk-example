@@ -5,6 +5,7 @@ import { EthereumProvider } from "../types/ProviderTypes.ts";
 import { useUserStore } from "@/stores/user";
 import { Dialog } from "@ark-ui/vue";
 import FadeLoader from "vue-spinner/src/FadeLoader.vue";
+import { trackEvent } from "@/segment/segment.ts";
 
 const props = defineProps<{ connect: () => void }>();
 const providers = ref<Array<{ provider: any; info: EIP6963ProviderInfo }>>([]);
@@ -75,6 +76,14 @@ const connectWallet = async (p: EIP6963ProviderDetail) => {
     props.connect();
     user.isWalletConnected = true;
     user.walletAddress = accounts[0];
+    trackEvent("Wallet Login", {
+      appName: "SDK Demo App",
+      buttonName: "Wallet Login",
+      environment: import.meta.env.VITE_ENVIOURMENT,
+      walletAddress: accounts[0],
+      walletName: p.info.name,
+      timestamp: new Date().toISOString(),
+    });
     console.log("Connected. Account:", accounts[0]);
   } catch (error) {
     console.error("Failed to connect:", error);

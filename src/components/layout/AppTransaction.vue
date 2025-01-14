@@ -73,6 +73,7 @@ const handleContinue = () => {
       :submit-steps="props.submitSteps"
       :timer="props.timer"
       :submit-loader="props.submitLoader"
+      :type="props.type"
       :tx-error="props.txError"
       :open-intent-loader="props.openIntentLoader"
       :allowanceLoader="props.allowanceLoader"
