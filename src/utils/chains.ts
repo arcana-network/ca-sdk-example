@@ -19,6 +19,14 @@ const CHAINS = [
     chainID: 42161,
     chainName: "Arbitrum One",
   },
+  {
+    chainID: 59144,
+    chainName: "Linea",
+  },
+  {
+    chainID: 534352,
+    chainName: "Scroll",
+  },
 ];
 
 export { CHAINS };
