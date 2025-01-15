@@ -264,6 +264,67 @@ const MAINNET_CHAINS: Chain[] = [
       verifyingContract: "0x160059CE66Bf3e0E3D15A4dB3773a97644c7056c",
     },
   },
+  {
+    id: 534352,
+    name: "Scroll",
+    rpcUrls: {
+      default: {
+        publicHttp: [
+          "https://rpc.scroll.io",
+          "https://1rpc.io/scroll",
+          "https://rpc.ankr.com/scroll",
+          "https://scroll-mainnet.public.blastapi.io",
+          "https://scroll.blockpi.network/v1/rpc/public",
+          "https://scroll-rpc.publicnode.com",
+        ],
+      },
+    },
+    blockExplorers: {
+      default: {
+        name: "Scrollscan",
+        url: "https://scrollscan.com",
+      },
+    },
+    nativeCurrency: {
+      name: "Ether",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    custom: {
+      icon: "/images/logos/scroll.svg",
+      knownTokens: [],
+    },
+  },
+  {
+    id: 59144,
+    name: "Linea",
+    rpcUrls: {
+      default: {
+        publicHttp: [
+          "https://rpc.linea.build",
+          "https://1rpc.io/linea",
+          "https://linea-mainnet.public.blastapi.io",
+          "https://linea.blockpi.network/v1/rpc/public",
+          "https://linea-rpc.publicnode.com",
+        ],
+      },
+    },
+    blockExplorers: {
+      default: {
+        name: "Lineascan",
+        url: "https://lineascan.build",
+      },
+    },
+    nativeCurrency: {
+      name: "Ether",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    custom: {
+      icon: "/images/logos/linea.svg",
+      knownTokens: [],
+    },
+  },
 ];
 
 export { MAINNET_CHAINS, TOAST_TIME_OUT };
