@@ -1,4 +1,12 @@
-import { arbitrum, base, mainnet, optimism, polygon } from "viem/chains";
+import {
+  arbitrum,
+  base,
+  linea,
+  mainnet,
+  optimism,
+  polygon,
+  scroll,
+} from "viem/chains";
 import { Account, createPublicClient, createWalletClient, custom } from "viem";
 
 export const sendContractFunction = async ({
@@ -24,6 +32,10 @@ export const sendContractFunction = async ({
         ? arbitrum
         : chain === 137
         ? polygon
+        : chain === 534352
+        ? scroll
+        : chain === 59144
+        ? linea
         : base;
 
     const walletClient = createWalletClient({
@@ -41,10 +53,12 @@ export const sendContractFunction = async ({
       to: to,
       value: value,
     });
+    console.log(txResult);
 
     const transaction = await publicClient.waitForTransactionReceipt({
       hash: txResult,
     });
+    console.log(transaction);
 
     return transaction?.transactionHash;
   } catch (error: any) {

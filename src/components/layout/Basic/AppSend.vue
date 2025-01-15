@@ -322,7 +322,9 @@ const handleTransfer = async () => {
         token
       );
       const tokenContract = new Contract(cAddress, erc20ABI, s);
-      const tokenDecimals = Number(await tokenContract.decimals());
+      console.log(tokenContract);
+
+      const tokenDecimals = 6;
 
       const usdtInWei = parseUnits(
         String(selectedOptions.value.amount),
