@@ -347,15 +347,13 @@ const handleBridge = async () => {
     const address: Address = toEthereumAddress(user.walletAddress);
     const recipientBytes32 = toHex(pad(toBytes(address), { size: 32 }));
     console.log(address, recipientBytes32, "address");
-    console.log(selectedOptions?.value?.chain[0]);
 
     const dstEid =
       stargatePoolEndPointId[Number(selectedOptions?.value?.chain[0])]
         ?.endpointID;
     const to = recipientBytes32;
 
-    //@ts-ignore
-    const p: any = new BrowserProvider(window["ethereum"]);
+    const p: any = new BrowserProvider(user.provider);
 
     const s: any = await p.getSigner();
     const pool = new Contract(
@@ -379,7 +377,7 @@ const handleBridge = async () => {
     console.log(tokenContract, cAddress);
     const usdtInWei = parseUnits(
       String(selectedOptions.value.amount),
-      isNative ? 18 : 6
+      isNative ? 18 : Number(await tokenContract.decimals())
     );
 
     const amountLD = BigInt(usdtInWei);
@@ -404,9 +402,8 @@ const handleBridge = async () => {
       composeMsg: "0x",
       oftCmd: "0x",
     };
-    console.log(sp);
+
     const oftQuote: any = await pool.quoteOFT(sp);
-    console.log(oftQuote);
 
     sp.minAmountLD = oftQuote[2][1];
 

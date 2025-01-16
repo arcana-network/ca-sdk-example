@@ -313,8 +313,7 @@ const handleTransfer = async () => {
     const isNative = selectedOptions?.value?.token[0] === ZeroAddress;
 
     if (!isNative) {
-      //@ts-ignore
-      const p: any = new BrowserProvider(window["ethereum"]);
+      const p: any = new BrowserProvider(user.provider);
 
       const s: any = await p.getSigner();
       const cAddress = getContractAddress(
@@ -322,9 +321,7 @@ const handleTransfer = async () => {
         token
       );
       const tokenContract = new Contract(cAddress, erc20ABI, s);
-      console.log(tokenContract);
-
-      const tokenDecimals = 6;
+      const tokenDecimals = Number(await tokenContract.decimals());
 
       const usdtInWei = parseUnits(
         String(selectedOptions.value.amount),

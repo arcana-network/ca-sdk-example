@@ -53,12 +53,10 @@ export const sendContractFunction = async ({
       to: to,
       value: value,
     });
-    console.log(txResult);
 
     const transaction = await publicClient.waitForTransactionReceipt({
       hash: txResult,
     });
-    console.log(transaction);
 
     return transaction?.transactionHash;
   } catch (error: any) {
