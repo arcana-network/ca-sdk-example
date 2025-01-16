@@ -1,4 +1,12 @@
-import { arbitrum, base, mainnet, optimism, polygon } from "viem/chains";
+import {
+  arbitrum,
+  base,
+  linea,
+  mainnet,
+  optimism,
+  polygon,
+  scroll,
+} from "viem/chains";
 import { Account, createPublicClient, custom } from "viem";
 
 export const readContractFunction = async ({
@@ -28,6 +36,10 @@ export const readContractFunction = async ({
         ? arbitrum
         : chain === 137
         ? polygon
+        : chain === 534352
+        ? scroll
+        : chain === 59144
+        ? linea
         : base;
 
     const walletClient = createPublicClient({
@@ -35,12 +47,6 @@ export const readContractFunction = async ({
       transport: custom(provider),
     });
 
-    // const testClient = createTestClient({
-    //   chain: chainName,
-    //   mode: "anvil",
-    //   transport: custom(provider),
-    // });
-    // await testClient.setLoggingEnabled(true);
     const txResult: any = await walletClient.readContract({
       address: contractAddress,
       abi,

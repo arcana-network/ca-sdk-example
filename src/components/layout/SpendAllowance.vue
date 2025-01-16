@@ -295,7 +295,7 @@ watch(
         <div class="flex items-center space-x-4">
           <div class="relative isolate">
             <img
-              :src="getLogo(symbolToLogo[allowance.token.symbol])"
+              :src="symbolToLogo[allowance.token.symbol]"
               class="h-7 w-7 rounded-full bg-white-100"
               alt="Logo"
             />

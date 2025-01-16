@@ -313,8 +313,7 @@ const handleTransfer = async () => {
     const isNative = selectedOptions?.value?.token[0] === ZeroAddress;
 
     if (!isNative) {
-      //@ts-ignore
-      const p: any = new BrowserProvider(window["ethereum"]);
+      const p: any = new BrowserProvider(user.provider);
 
       const s: any = await p.getSigner();
       const cAddress = getContractAddress(
