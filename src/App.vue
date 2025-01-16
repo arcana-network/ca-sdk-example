@@ -2,8 +2,7 @@
 import Header from "@/components/layout/AppHeader.vue";
 import PreLogin from "./components/PreLogin.vue";
 import "./style.css";
-import { onMounted, ref } from "vue";
-import { getCA } from "./utils/getCA";
+import { ref } from "vue";
 import { useUserStore } from "./stores/user";
 import AppDashboard from "./pages/AppDashboard.vue";
 import DashBoardBackground from "@/assets/images/svg/DashboardBack.svg";
@@ -16,15 +15,6 @@ const connect = async () => {
 };
 const disconnect = async () => {
   localStorage.removeItem("xar-casdk-last-connected-wallet");
-  // const ca = await getCA();
-  // await ca.request({
-  //   method: "wallet_revokePermissions",
-  //   params: [
-  //     {
-  //       eth_accounts: {},
-  //     },
-  //   ],
-  // });
   connected.value = false;
   user.isWalletConnected = false;
   user.walletAddress = "";
