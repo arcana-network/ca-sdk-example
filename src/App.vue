@@ -16,21 +16,19 @@ const connect = async () => {
 };
 const disconnect = async () => {
   localStorage.removeItem("xar-casdk-last-connected-wallet");
-  const ca = await getCA();
-  await ca.request({
-    method: "wallet_revokePermissions",
-    params: [
-      {
-        eth_accounts: {},
-      },
-    ],
-  });
+  // const ca = await getCA();
+  // await ca.request({
+  //   method: "wallet_revokePermissions",
+  //   params: [
+  //     {
+  //       eth_accounts: {},
+  //     },
+  //   ],
+  // });
   connected.value = false;
   user.isWalletConnected = false;
   user.walletAddress = "";
 };
-
-onMounted(async () => {});
 </script>
 
 <template>
