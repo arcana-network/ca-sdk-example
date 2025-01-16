@@ -41,7 +41,7 @@ const user = useUserStore();
             :href="links.howItWorks"
             target="_blank"
             rel="noopener noreferrer"
-            class="font-medium text-base text-blueGray-700 no-underline active:no-underline hover:no-underline"
+            class="font-medium text-base text-blueGray-800 no-underline active:no-underline hover:no-underline"
           >
             How it Works
           </a>
@@ -50,7 +50,7 @@ const user = useUserStore();
             :href="links.scheduleDemo"
             target="_blank"
             rel="noopener noreferrer"
-            class="font-medium text-base text-blueGray-700 no-underline active:no-underline hover:no-underline"
+            class="font-medium text-base text-blueGray-800 no-underline active:no-underline hover:no-underline"
           >
             Schedule a Demo
           </a>
@@ -59,7 +59,7 @@ const user = useUserStore();
             :href="links.docs"
             target="_blank"
             rel="noopener noreferrer"
-            class="font-medium text-base text-blueGray-700 no-underline active:no-underline hover:no-underline"
+            class="font-medium text-base text-blueGray-800 no-underline active:no-underline hover:no-underline"
           >
             Docs
           </a>
