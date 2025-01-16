@@ -376,7 +376,9 @@ const intentSteps = computed(() => {
                           props.intentDetails.intent?.token.symbol &&
                           getLogo(
                             symbolToLogo[
-                              props.intentDetails.intent?.token.symbol
+                              String(
+                                props.intentDetails.intent?.token.symbol
+                              ).toUpperCase()
                             ]
                           )
                         "
@@ -392,7 +394,11 @@ const intentSteps = computed(() => {
                     <div class="flex items-center gap-1">
                       <span
                         class="inline-block align-middle text-ellipsis overflow-hidden text-base font-medium leading-5 text-blueGray-800"
-                        >{{ props.intentDetails.intent?.token?.symbol }}
+                        >{{
+                          String(
+                            props.intentDetails.intent?.token.symbol
+                          ).toUpperCase()
+                        }}
                       </span>
                       <div
                         class="inline-block align-middle text-ellipsis overflow-hidden text-xs font-normal leading-4 text-blueGray-600"
@@ -404,7 +410,11 @@ const intentSteps = computed(() => {
 
                   <div class="text-left text-xs font-medium text-blueGray-800">
                     {{ new Decimal(item.amount || 0).toDecimalPlaces(6) }}
-                    {{ props.intentDetails.intent?.token.symbol }}
+                    {{
+                      String(
+                        props.intentDetails.intent?.token.symbol
+                      ).toUpperCase()
+                    }}
                   </div>
                 </div>
               </div>
@@ -424,7 +434,11 @@ const intentSteps = computed(() => {
                       :src="
                         props.intentDetails.intent?.token.symbol &&
                         getLogo(
-                          symbolToLogo[props.intentDetails.intent?.token.symbol]
+                          symbolToLogo[
+                            String(
+                              props.intentDetails.intent?.token.symbol
+                            ).toUpperCase()
+                          ]
                         )
                       "
                       class="h-7 w-7 rounded-full bg-white-100"
@@ -443,7 +457,11 @@ const intentSteps = computed(() => {
                   <div class="flex items-center gap-1">
                     <span
                       class="inline-block align-middle text-ellipsis overflow-hidden text-base font-medium leading-5 text-blueGray-800"
-                      >{{ props.intentDetails.intent?.token?.symbol }}
+                      >{{
+                        String(
+                          props.intentDetails.intent?.token.symbol
+                        ).toUpperCase()
+                      }}
                     </span>
                     <div
                       class="inline-block align-middle text-ellipsis overflow-hidden text-xs font-normal leading-4 text-blueGray-600"
@@ -459,7 +477,11 @@ const intentSteps = computed(() => {
                       props.intentDetails.intent?.destination.amount || 0
                     ).toDecimalPlaces(6)
                   }}
-                  {{ props.intentDetails.intent?.token.symbol }}
+                  {{
+                    String(
+                      props.intentDetails.intent?.token.symbol
+                    ).toUpperCase()
+                  }}
                 </div>
               </div>
             </div>
@@ -481,15 +503,23 @@ const intentSteps = computed(() => {
                       <span class="font-medium text-sm"
                         >~{{
                           new Decimal(
-                            intentDetails.intent?.fees.total || 0
+                            props.intentDetails.intent?.fees.total || 0
                           ).toDecimalPlaces(6)
                         }}
-                        {{ intentDetails.intent?.token.symbol }}</span
+                        {{
+                          String(
+                            props.intentDetails.intent?.token.symbol
+                          ).toUpperCase()
+                        }}</span
                       >
                       <span
                         v-if="
                           props.intentDetails.intent?.destination.amount &&
-                          rates[props.intentDetails.intent?.token.symbol]
+                          rates[
+                            String(
+                              props.intentDetails.intent?.token.symbol
+                            ).toUpperCase()
+                          ]
                         "
                         class="text-sm font-medium text-blueGray-600 font-inter"
                         >{{
@@ -501,7 +531,11 @@ const intentSteps = computed(() => {
                             .mul(
                               Decimal.div(
                                 1,
-                                rates[props.intentDetails.intent?.token.symbol]
+                                rates[
+                                  String(
+                                    props.intentDetails.intent?.token.symbol
+                                  ).toUpperCase()
+                                ]
                               )
                             )
                             .toDecimalPlaces(2)
@@ -537,7 +571,11 @@ const intentSteps = computed(() => {
                                   props.intentDetails.intent?.fees.caGas || 0
                                 ).toDecimalPlaces(6)
                               }}
-                              {{ props.intentDetails.intent?.token.symbol }}
+                              {{
+                                String(
+                                  props.intentDetails.intent?.token.symbol
+                                ).toUpperCase()
+                              }}
                             </div>
                           </div>
                           <div class="flex items-center justify-between gap-2">
@@ -552,7 +590,11 @@ const intentSteps = computed(() => {
                                   props.intentDetails.intent?.fees.solver || 0
                                 ).toDecimalPlaces(6)
                               }}
-                              {{ props.intentDetails.intent?.token.symbol }}
+                              {{
+                                String(
+                                  props.intentDetails.intent?.token.symbol
+                                ).toUpperCase()
+                              }}
                             </div>
                           </div>
                           <div class="flex items-center justify-between gap-2">
@@ -567,7 +609,11 @@ const intentSteps = computed(() => {
                                   props.intentDetails.intent?.fees.protocol || 0
                                 ).toDecimalPlaces(6) || 0
                               }}
-                              {{ props.intentDetails.intent?.token.symbol }}
+                              {{
+                                String(
+                                  props.intentDetails.intent?.token.symbol
+                                ).toUpperCase()
+                              }}
                             </div>
                           </div>
                           <div class="flex items-center justify-between gap-2">
@@ -577,7 +623,12 @@ const intentSteps = computed(() => {
                             <div
                               class="text-left text-xs font-medium text-blueGray-800"
                             >
-                              0 {{ props.intentDetails.intent?.token.symbol }}
+                              0
+                              {{
+                                String(
+                                  props.intentDetails.intent?.token.symbol
+                                ).toUpperCase()
+                              }}
                             </div>
                           </div>
                         </div>
@@ -601,12 +652,20 @@ const intentSteps = computed(() => {
                         props.intentDetails.intent?.sourcesTotal || 0
                       ).toDecimalPlaces(6)
                     }}
-                    {{ props.intentDetails.intent?.token.symbol }}
+                    {{
+                      String(
+                        props.intentDetails.intent?.token.symbol
+                      ).toUpperCase()
+                    }}
                   </span>
                   <span
                     v-if="
                       props.intentDetails.intent?.destination.amount &&
-                      rates[props.intentDetails.intent?.token.symbol]
+                      rates[
+                        String(
+                          props.intentDetails.intent?.token.symbol
+                        ).toUpperCase()
+                      ]
                     "
                     class="text-sm font-medium text-blueGray-600 font-inter"
                     >{{
@@ -614,7 +673,11 @@ const intentSteps = computed(() => {
                         .mul(
                           Decimal.div(
                             1,
-                            rates[props.intentDetails.intent?.token.symbol]
+                            rates[
+                              String(
+                                props.intentDetails.intent?.token.symbol
+                              ).toUpperCase()
+                            ]
                           )
                         )
                         .toDecimalPlaces(2)
@@ -697,7 +760,11 @@ const intentSteps = computed(() => {
                     <div class="flex flex-col items-end">
                       <span class="font-medium text-base text-blueGray-800"
                         >{{ amount }}
-                        {{ props.intentDetails.intent?.token.symbol }}</span
+                        {{
+                          String(
+                            props.intentDetails.intent?.token.symbol
+                          ).toUpperCase()
+                        }}</span
                       >
                       <span
                         v-if="
@@ -755,7 +822,11 @@ const intentSteps = computed(() => {
                             {{
                               new Decimal(source.amount || 0).toDecimalPlaces(6)
                             }}
-                            {{ props.intentDetails.intent?.token.symbol }}
+                            {{
+                              String(
+                                props.intentDetails.intent?.token.symbol
+                              ).toUpperCase()
+                            }}
                           </div>
                         </div>
                         <div class="flex items-center justify-between gap-2">
@@ -765,7 +836,11 @@ const intentSteps = computed(() => {
 
                           <span class="text-xs font-semibold text-blueGray-800"
                             >{{ props.intentDetails.intent?.sourcesTotal }}
-                            {{ props.intentDetails.intent?.token.symbol }}</span
+                            {{
+                              String(
+                                props.intentDetails.intent?.token.symbol
+                              ).toUpperCase()
+                            }}</span
                           >
                         </div>
                         <div
@@ -805,7 +880,11 @@ const intentSteps = computed(() => {
                       <span
                         v-if="
                           props.intentDetails.intent?.destination.amount &&
-                          rates[props.intentDetails.intent?.token.symbol]
+                          rates[
+                            String(
+                              props.intentDetails.intent?.token.symbol
+                            ).toUpperCase()
+                          ]
                         "
                         class="text-sm font-medium text-blueGray-600 font-inter"
                         >{{
@@ -817,7 +896,11 @@ const intentSteps = computed(() => {
                             .mul(
                               Decimal.div(
                                 1,
-                                rates[props.intentDetails.intent?.token.symbol]
+                                rates[
+                                  String(
+                                    props.intentDetails.intent?.token.symbol
+                                  ).toUpperCase()
+                                ]
                               )
                             )
                             .toDecimalPlaces(2)
@@ -853,7 +936,11 @@ const intentSteps = computed(() => {
                                   props.intentDetails.intent?.fees.caGas || 0
                                 ).toDecimalPlaces(6)
                               }}
-                              {{ props.intentDetails.intent?.token.symbol }}
+                              {{
+                                String(
+                                  props.intentDetails.intent?.token.symbol
+                                ).toUpperCase()
+                              }}
                             </div>
                           </div>
                           <div class="flex items-center justify-between gap-2">
@@ -868,7 +955,11 @@ const intentSteps = computed(() => {
                                   props.intentDetails.intent?.fees.solver || 0
                                 ).toDecimalPlaces(6)
                               }}
-                              {{ props.intentDetails.intent?.token.symbol }}
+                              {{
+                                String(
+                                  props.intentDetails.intent?.token.symbol
+                                ).toUpperCase()
+                              }}
                             </div>
                           </div>
                           <div class="flex items-center justify-between gap-2">
@@ -883,7 +974,11 @@ const intentSteps = computed(() => {
                                   props.intentDetails.intent?.fees.protocol || 0
                                 ).toDecimalPlaces(6) || 0
                               }}
-                              {{ props.intentDetails.intent?.token.symbol }}
+                              {{
+                                String(
+                                  props.intentDetails.intent?.token.symbol
+                                ).toUpperCase()
+                              }}
                             </div>
                           </div>
                           <div class="flex items-center justify-between gap-2">
@@ -893,7 +988,12 @@ const intentSteps = computed(() => {
                             <div
                               class="text-left text-xs font-medium text-blueGray-800"
                             >
-                              0 {{ props.intentDetails.intent?.token.symbol }}
+                              0
+                              {{
+                                String(
+                                  props.intentDetails.intent?.token.symbol
+                                ).toUpperCase()
+                              }}
                             </div>
                           </div>
                         </div>
@@ -913,12 +1013,20 @@ const intentSteps = computed(() => {
                     class="flex items-center gap-2 font-medium text-base text-blueGray-800"
                   >
                     {{ props.intentDetails.intent?.sourcesTotal || 0 }}
-                    {{ props.intentDetails.intent?.token.symbol }}
+                    {{
+                      String(
+                        props.intentDetails.intent?.token.symbol
+                      ).toUpperCase()
+                    }}
                   </span>
                   <span
                     v-if="
                       props.intentDetails.intent?.destination.amount &&
-                      rates[props.intentDetails.intent?.token.symbol]
+                      rates[
+                        String(
+                          props.intentDetails.intent?.token.symbol
+                        ).toUpperCase()
+                      ]
                     "
                     class="text-sm font-medium text-blueGray-600 font-inter"
                     >{{
@@ -926,7 +1034,11 @@ const intentSteps = computed(() => {
                         .mul(
                           Decimal.div(
                             1,
-                            rates[props.intentDetails.intent?.token.symbol]
+                            rates[
+                              String(
+                                props.intentDetails.intent?.token.symbol
+                              ).toUpperCase()
+                            ]
                           )
                         )
                         .toDecimalPlaces(2)
