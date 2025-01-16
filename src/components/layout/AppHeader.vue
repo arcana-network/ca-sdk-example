@@ -35,7 +35,7 @@ const user = useUserStore();
 
       <div class="flex items-center gap-8 max-md:gap-2">
         <div
-          class="relative flex justify-end gap-8 items-center text-white font-inter z-10 max-md:gap-2"
+          class="relative flex justify-end gap-5 items-center text-white font-inter z-10 max-md:gap-2"
         >
           <a
             :href="links.howItWorks"
