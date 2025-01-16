@@ -353,8 +353,7 @@ const handleBridge = async () => {
         ?.endpointID;
     const to = recipientBytes32;
 
-    //@ts-ignore
-    const p: any = new BrowserProvider(window["ethereum"]);
+    const p: any = new BrowserProvider(user.provider);
 
     const s: any = await p.getSigner();
     const pool = new Contract(
@@ -679,7 +678,7 @@ onUnmounted(() => {
             </Select.Control>
             <Select.Positioner class="w-full z-50">
               <Select.Content
-                class="max-h-60 w-full rounded-lg text-sm bg-white-100"
+                class="max-h-80 w-full rounded-lg text-sm bg-white-100"
               >
                 <Select.ItemGroup>
                   <Select.Item

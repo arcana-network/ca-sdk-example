@@ -12,6 +12,7 @@ import ArrowRightIcon from "@/assets/images/svg/TransactionArrow.svg";
 import CheckIcon from "@/assets/images/svg/Check.svg";
 import ChevronDownIcon from "@/assets/images/svg/ChevronDown.svg";
 import InfoIcon from "@/assets/images/svg/InfoCircle.svg";
+import AppTooltip from "@/components/shared/AppTooltip.vue";
 import ArrowIcon from "@/assets/images/svg/ArrowUp.svg";
 import { useUserStore } from "@/stores/user";
 import { CA, ProgressStep } from "@arcana/ca-sdk";
@@ -618,7 +619,7 @@ onUnmounted(() => {
             </Select.Control>
             <Select.Positioner class="w-full z-50">
               <Select.Content
-                class="max-h-60 w-full rounded-lg text-sm bg-white-100"
+                class="max-h-80 w-full rounded-lg text-sm bg-white-100"
               >
                 <Select.ItemGroup>
                   <Select.Item

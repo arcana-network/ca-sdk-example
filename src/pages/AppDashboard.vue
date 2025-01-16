@@ -232,7 +232,7 @@ onBeforeUnmount(() => {
           </Select.Control>
           <Select.Positioner class="w-full z-50">
             <Select.Content
-              class="max-h-60 w-full rounded-lg text-sm bg-white-100 font-inter"
+              class="max-h-80 w-full rounded-lg text-sm bg-white-100 font-inter"
             >
               <Select.ItemGroup>
                 <Select.Item
