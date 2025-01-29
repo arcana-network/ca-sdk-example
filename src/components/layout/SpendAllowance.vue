@@ -102,6 +102,7 @@ const allowanceSteps = computed(() => {
     return statusText !== "Unknown status. Please contact support.";
   });
 });
+console.log(props.allowanceDetails.data);
 
 watch(
   () => allowanceSteps.value,
@@ -295,7 +296,7 @@ watch(
         <div class="flex items-center space-x-4">
           <div class="relative isolate">
             <img
-              :src="symbolToLogo[allowance.token.symbol]"
+              :src="getLogo(symbolToLogo[allowance?.token?.symbol])"
               class="h-7 w-7 rounded-full bg-white-100"
               alt="Logo"
             />
