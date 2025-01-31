@@ -409,7 +409,11 @@ const intentSteps = computed(() => {
                   </div>
 
                   <div class="text-left text-xs font-medium text-blueGray-800">
-                    {{ new Decimal(item.amount || 0).toDecimalPlaces(6) }}
+                    {{
+                      new Decimal(item.amount || 0)
+                        .toDecimalPlaces(16)
+                        .toFixed(10)
+                    }}
                     {{
                       String(
                         props.intentDetails.intent?.token.symbol
@@ -475,7 +479,9 @@ const intentSteps = computed(() => {
                   {{
                     new Decimal(
                       props.intentDetails.intent?.destination.amount || 0
-                    ).toDecimalPlaces(6)
+                    )
+                      .toDecimalPlaces(16)
+                      .toFixed(10)
                   }}
                   {{
                     String(
@@ -504,7 +510,9 @@ const intentSteps = computed(() => {
                         >~{{
                           new Decimal(
                             props.intentDetails.intent?.fees.total || 0
-                          ).toDecimalPlaces(6)
+                          )
+                            .toDecimalPlaces(16)
+                            .toFixed(10)
                         }}
                         {{
                           String(
@@ -524,9 +532,9 @@ const intentSteps = computed(() => {
                         class="text-sm font-medium text-blueGray-600 font-inter"
                         >{{
                           new Decimal(
-                            new Decimal(
-                              intentDetails.intent?.fees.total || 0
-                            ).toDecimalPlaces(6)
+                            new Decimal(intentDetails.intent?.fees.total || 0)
+                              .toDecimalPlaces(16)
+                              .toFixed(10)
                           )
                             .mul(
                               Decimal.div(
@@ -569,7 +577,9 @@ const intentSteps = computed(() => {
                               {{
                                 new Decimal(
                                   props.intentDetails.intent?.fees.caGas || 0
-                                ).toDecimalPlaces(6)
+                                )
+                                  .toDecimalPlaces(16)
+                                  .toFixed(10)
                               }}
                               {{
                                 String(
@@ -588,7 +598,9 @@ const intentSteps = computed(() => {
                               {{
                                 new Decimal(
                                   props.intentDetails.intent?.fees.solver || 0
-                                ).toDecimalPlaces(6)
+                                )
+                                  .toDecimalPlaces(16)
+                                  .toFixed(10)
                               }}
                               {{
                                 String(
@@ -607,7 +619,9 @@ const intentSteps = computed(() => {
                               {{
                                 new Decimal(
                                   props.intentDetails.intent?.fees.protocol || 0
-                                ).toDecimalPlaces(6) || 0
+                                )
+                                  .toDecimalPlaces(16)
+                                  .toFixed(10)
                               }}
                               {{
                                 String(
@@ -648,9 +662,9 @@ const intentSteps = computed(() => {
                     class="flex items-center gap-2 font-medium text-base text-blueGray-800"
                   >
                     {{
-                      new Decimal(
-                        props.intentDetails.intent?.sourcesTotal || 0
-                      ).toDecimalPlaces(6)
+                      new Decimal(props.intentDetails.intent?.sourcesTotal || 0)
+                        .toDecimalPlaces(16)
+                        .toFixed(10)
                     }}
                     {{
                       String(
@@ -820,7 +834,9 @@ const intentSteps = computed(() => {
 
                           <div class="text-xs font-semibold text-blueGray-800">
                             {{
-                              new Decimal(source.amount || 0).toDecimalPlaces(6)
+                              new Decimal(source.amount || 0)
+                                .toDecimalPlaces(16)
+                                .toFixed(10)
                             }}
                             {{
                               String(
@@ -871,9 +887,9 @@ const intentSteps = computed(() => {
                     <div class="flex flex-col items-end">
                       <span class="font-medium text-sm"
                         >~{{
-                          new Decimal(
-                            intentDetails.intent?.fees.total || 0
-                          ).toDecimalPlaces(6)
+                          new Decimal(intentDetails.intent?.fees.total || 0)
+                            .toDecimalPlaces(16)
+                            .toFixed(10)
                         }}
                         {{ intentDetails.intent?.token.symbol }}</span
                       >
@@ -889,9 +905,9 @@ const intentSteps = computed(() => {
                         class="text-sm font-medium text-blueGray-600 font-inter"
                         >{{
                           new Decimal(
-                            new Decimal(
-                              intentDetails.intent?.fees.total || 0
-                            ).toDecimalPlaces(6)
+                            new Decimal(intentDetails.intent?.fees.total || 0)
+                              .toDecimalPlaces(16)
+                              .toFixed(10)
                           )
                             .mul(
                               Decimal.div(
@@ -934,7 +950,9 @@ const intentSteps = computed(() => {
                               {{
                                 new Decimal(
                                   props.intentDetails.intent?.fees.caGas || 0
-                                ).toDecimalPlaces(6)
+                                )
+                                  .toDecimalPlaces(16)
+                                  .toFixed(10)
                               }}
                               {{
                                 String(
@@ -953,7 +971,9 @@ const intentSteps = computed(() => {
                               {{
                                 new Decimal(
                                   props.intentDetails.intent?.fees.solver || 0
-                                ).toDecimalPlaces(6)
+                                )
+                                  .toDecimalPlaces(16)
+                                  .toFixed(10)
                               }}
                               {{
                                 String(
@@ -972,7 +992,9 @@ const intentSteps = computed(() => {
                               {{
                                 new Decimal(
                                   props.intentDetails.intent?.fees.protocol || 0
-                                ).toDecimalPlaces(6) || 0
+                                )
+                                  .toDecimalPlaces(16)
+                                  .toFixed(10)
                               }}
                               {{
                                 String(
