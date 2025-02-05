@@ -18,6 +18,7 @@ const props = defineProps<{
   timer: string;
   type: "Send" | "Receive";
   txHash?: string;
+  txErrorMsg?: string;
   chainExplorerToken?: string;
   allowanceLoader?: boolean;
   stepState: {
@@ -77,6 +78,7 @@ const handleContinue = () => {
       :tx-error="props.txError"
       :open-intent-loader="props.openIntentLoader"
       :allowanceLoader="props.allowanceLoader"
+      :txErrorMsg="props.txErrorMsg"
       @intentDataOpen="emit('intentDataOpen')"
       @start-timer="emit('startTimer')"
       @start-submit-loader="emit('startSubmitLoader')"
@@ -98,6 +100,7 @@ const handleContinue = () => {
       :tx-hash="props.txHash"
       :open-intent-loader="props.openIntentLoader"
       :chain-explorer-token="props.chainExplorerToken"
+      :txErrorMsg="props.txErrorMsg"
       @rest-intent-data="emit('restIntentData')"
       @start-timer="emit('startTimer')"
       @close-modal="emit('closeModal')"

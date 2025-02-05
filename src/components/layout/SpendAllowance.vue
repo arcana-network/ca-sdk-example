@@ -22,6 +22,7 @@ const props = defineProps<{
   openIntentLoader: boolean;
   allowanceLoader: boolean;
   type: "Send" | "Receive";
+  txErrorMsg?: string;
   submitSteps: {
     inProgress: boolean;
     completed: boolean;

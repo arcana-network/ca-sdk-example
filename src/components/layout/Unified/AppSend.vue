@@ -76,6 +76,7 @@ const txError = ref<boolean>(false);
 const txHash = ref<string>("");
 const allowanceLoader = ref<boolean>(false);
 const chainExplorerToken = ref<string>("");
+const txErrorMsg = ref<string>("");
 const openIntentLoader = ref<boolean>(false);
 const selectedOptions = ref<{
   to: string;
@@ -287,6 +288,7 @@ const handleTransfer = async () => {
   txError.value = false;
   chainExplorerToken.value = "";
   txHash.value = "";
+  txErrorMsg.value = "";
   resetSubmitSteps();
   try {
     const token = getSymbolByContractAddress(
@@ -317,7 +319,7 @@ const handleTransfer = async () => {
 
       submitSteps.value.completed = true;
     }
-  } catch (error) {
+  } catch (error: any) {
     resetSubmitSteps();
     clearInterval(timerInterval.value);
     if (timerInterval.value) {
@@ -337,6 +339,9 @@ const handleTransfer = async () => {
     chainExplorerToken.value = "";
     allowanceLoaderClose();
     userToast.createErrorToast(error);
+    if (error?.message) {
+      txErrorMsg.value = error?.message;
+    }
     if (
       error instanceof SwitchChainError &&
       error.message.includes("Unrecognized chain ID")
@@ -829,6 +834,7 @@ onUnmounted(() => {
       :chain-explorer-token="chainExplorerToken"
       :allowanceLoader="allowanceLoader"
       :stepState="stepState"
+      :txErrorMsg="txErrorMsg"
       type="Send"
       @rest-intent-data="resetIntentData"
       @rest-allowance-data="resetAllowanceData"

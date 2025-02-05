@@ -75,6 +75,7 @@ const timerInterval = ref<any>();
 const openIntentLoader = ref<boolean>(false);
 const allowanceLoader = ref<boolean>(false);
 const txError = ref<boolean>(false);
+const txErrorMsg = ref<string>("");
 const selectedOptions = ref<{
   token: string[];
   chain: string[];
@@ -271,6 +272,7 @@ const handleBridge = async () => {
   allLoader.value.startTransaction = true;
   allLoader.value.stepsLoader = false;
   txError.value = false;
+  txErrorMsg.value = "";
   resetSubmitSteps();
   try {
     const token = getSymbolByContractAddress(
@@ -289,7 +291,7 @@ const handleBridge = async () => {
 
       submitSteps.value.completed = true;
     }
-  } catch (error) {
+  } catch (error: any) {
     resetSubmitSteps();
     clearInterval(timerInterval.value);
     if (timerInterval.value) {
@@ -307,6 +309,9 @@ const handleBridge = async () => {
     txError.value = true;
     allowanceLoaderClose();
     userToast.createErrorToast(error);
+    if (error?.message) {
+      txErrorMsg.value = error?.message;
+    }
     if (
       error instanceof SwitchChainError &&
       error.message.includes("Unrecognized chain ID")
@@ -753,6 +758,7 @@ onUnmounted(() => {
         !selectedOptions.token[0]
       "
       :stepState="stepState"
+      :txErrorMsg="txErrorMsg"
       type="Receive"
       @start-submit-loader="startSubmitLoader"
       @continue="handleBridge"
