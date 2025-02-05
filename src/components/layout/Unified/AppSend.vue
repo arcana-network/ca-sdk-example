@@ -319,6 +319,10 @@ const handleTransfer = async () => {
     }
   } catch (error) {
     resetSubmitSteps();
+    clearInterval(timerInterval.value);
+    if (timerInterval.value) {
+      clearTime();
+    }
     console.log("Transfer Failed:", error);
     trackEvent("Failed Send", {
       appName: "SDK Demo App",
@@ -332,7 +336,6 @@ const handleTransfer = async () => {
     txHash.value = "";
     chainExplorerToken.value = "";
     allowanceLoaderClose();
-    clearInterval(timerInterval.value);
     userToast.createErrorToast(error);
     if (
       error instanceof SwitchChainError &&
@@ -342,8 +345,11 @@ const handleTransfer = async () => {
       await switchChain(selectedOptions.value.chain[0] as string);
     }
   } finally {
-    allLoader.value.startTransaction = false;
     clearInterval(timerInterval.value);
+    if (timerInterval.value) {
+      clearTime();
+    }
+    allLoader.value.startTransaction = false;
     resetIntentData();
     clearTransferData();
     trackEvent("Completed Send", {

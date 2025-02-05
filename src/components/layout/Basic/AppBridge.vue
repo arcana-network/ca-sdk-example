@@ -436,13 +436,16 @@ const handleBridge = async () => {
     }
   } catch (error) {
     resetSubmitSteps();
+    clearInterval(timerInterval.value);
+    if (timerInterval.value) {
+      clearTime();
+    }
     console.log("Transfer Failed:", error);
     allLoader.value.startTransaction = false;
     txError.value = true;
     txHash.value = "";
     chainExplorerToken.value = "";
     allowanceLoaderClose();
-    clearInterval(timerInterval.value);
     userToast.createErrorToast(error);
     if (
       error instanceof SwitchChainError &&
@@ -457,6 +460,9 @@ const handleBridge = async () => {
     resetIntentData();
     clearTransferData();
     clearInterval(timerInterval.value);
+    if (timerInterval.value) {
+      clearTime();
+    }
   }
 };
 
