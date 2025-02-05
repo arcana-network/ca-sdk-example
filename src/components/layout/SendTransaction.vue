@@ -34,6 +34,7 @@ const props = defineProps<{
   type: "Send" | "Receive";
   txHash?: string;
   chainExplorerToken?: string;
+  txErrorMsg?: string;
   submitSteps: {
     inProgress: boolean;
     completed: boolean;
@@ -167,7 +168,16 @@ const intentSteps = computed(() => {
         >
           {{
             props.txError
-              ? "Transaction Failed!"
+              ? props.txErrorMsg
+                ? props.txErrorMsg
+                    .split(" ")
+                    .map(
+                      (word) =>
+                        word.charAt(0).toUpperCase() +
+                        word.slice(1).toLowerCase()
+                    )
+                    .join(" ") + "!"
+                : "Transaction Failed!"
               : props.txHash
               ? "Transaction Successfull"
               : "Loading..."
