@@ -7,7 +7,7 @@ export const getTextFromStep = (status: string, done: boolean): string => {
       return done ? "Funds Received" : "Waiting for Funds";
 
     case "ALLOWANCE_USER_APPROVAL":
-      return done ? "Allowance Verified" : "Allowance Verifing";
+      return done ? "Allowance Verified" : "Allowance Verifying";
 
     case "ALLOWANCE_APPROVAL_MINED":
       return done ? "Allowance Mined" : "Allowance Mining";
@@ -19,7 +19,7 @@ export const getTextFromStep = (status: string, done: boolean): string => {
       return done ? "Request Accepted" : "Accepting Request";
 
     case "INTENT_HASH_SIGNED":
-      return done ? "Request Verified" : "Verifing Request";
+      return done ? "Request Verified" : "Verifying Request";
 
     case "INTENT_SUBMITTED":
       return done

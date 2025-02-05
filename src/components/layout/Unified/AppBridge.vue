@@ -291,6 +291,10 @@ const handleBridge = async () => {
     }
   } catch (error) {
     resetSubmitSteps();
+    clearInterval(timerInterval.value);
+    if (timerInterval.value) {
+      clearTime();
+    }
     console.log("Transfer Failed:", error);
     trackEvent("Failed Bridge", {
       appName: "SDK Demo App",
@@ -302,7 +306,6 @@ const handleBridge = async () => {
     allLoader.value.startTransaction = false;
     txError.value = true;
     allowanceLoaderClose();
-    clearInterval(timerInterval.value);
     userToast.createErrorToast(error);
     if (
       error instanceof SwitchChainError &&
@@ -312,10 +315,13 @@ const handleBridge = async () => {
       await switchChain(selectedOptions.value.chain[0] as string);
     }
   } finally {
+    clearInterval(timerInterval.value);
+    if (timerInterval.value) {
+      clearTime();
+    }
     allLoader.value.startTransaction = false;
     resetIntentData();
     clearTransferData();
-    clearInterval(timerInterval.value);
     trackEvent("Completed Bridge", {
       appName: "SDK Demo App",
       walletAddress: user.walletAddress,
