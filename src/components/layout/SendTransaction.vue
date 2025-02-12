@@ -396,7 +396,7 @@ const intentSteps = computed(() => {
                         alt="Logo"
                       />
                       <img
-                        :src="getLogo(item.chainLogo)"
+                        :src="item.chainLogo"
                         class="absolute z-50 rounded-full border border-solid border-white-100 h-3.5 w-3.5 -bottom-1 -right-1"
                         alt="Logo"
                       />
@@ -459,11 +459,7 @@ const intentSteps = computed(() => {
                       alt="Logo"
                     />
                     <img
-                      :src="
-                        getLogo(
-                          props.intentDetails.intent?.destination.chainLogo
-                        )
-                      "
+                      :src="props.intentDetails.intent?.destination.chainLogo"
                       class="absolute z-50 rounded-full border border-solid border-white-100 h-3.5 w-3.5 -bottom-1 -right-1"
                       alt="Logo"
                     />
@@ -760,7 +756,7 @@ const intentSteps = computed(() => {
                 >
                   <img
                     v-if="intentDetails.intent?.destination.chainLogo"
-                    :src="getLogo(intentDetails.intent?.destination.chainLogo)"
+                    :src="intentDetails.intent?.destination.chainLogo"
                     class="h-6 w-6 rounded-full"
                   />
                   {{ props.intentDetails.intent?.destination.chainName }}</span
@@ -832,7 +828,7 @@ const intentSteps = computed(() => {
                         >
                           <div class="flex items-center gap-2">
                             <img
-                              :src="getLogo(source.chainLogo)"
+                              :src="source.chainLogo"
                               class="h-6 w-6 rounded-full border border-white-200 border-solid"
                               alt="Logo"
                             />
