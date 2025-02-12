@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@arcana/ca-sdk": "^0.0.3",
+    "@arcana/ca-sdk": "^0.0.4",
     "@ark-ui/vue": "^4.4.2",
     "@vueuse/core": "^11.2.0",
     "decimal.js": "^10.4.3",
