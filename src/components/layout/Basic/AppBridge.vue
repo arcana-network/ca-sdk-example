@@ -34,7 +34,6 @@ import { Asset, Chain as ChainDetails } from "@/types/balanceTypes";
 import { Chain } from "@/types/chainTypes";
 import { IntentDataType } from "@/types/intentTypes";
 import { clearAsyncInterval, setAsyncInterval } from "@/utils/async_interval";
-import { getLogo } from "@/utils/commonFunction";
 import { MAINNET_CHAINS } from "@/utils/constants";
 import { getCA } from "@/utils/getCA";
 import { useErrorToast } from "@/utils/useErrorToast";
@@ -671,7 +670,7 @@ onUnmounted(() => {
                 >
                   <Avatar.Root>
                     <Avatar.Image
-                      :src="getLogo(selectedChain?.logo)"
+                      :src="selectedChain?.logo"
                       class="w-5 h-5 rounded-full"
                     />
                   </Avatar.Root>
@@ -699,7 +698,7 @@ onUnmounted(() => {
                           chain.name.split(" ")[0].substring(0, 2).toUpperCase()
                         }}</Avatar.Fallback>
                         <Avatar.Image
-                          :src="getLogo(chain.logo)"
+                          :src="chain.logo"
                           class="w-5 h-5 rounded-full"
                         />
                       </Avatar.Root>
