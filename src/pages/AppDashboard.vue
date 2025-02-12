@@ -223,7 +223,6 @@ onBeforeUnmount(() => {
                   <Avatar.Image
                     :src="selectedChain?.logo"
                     class="w-5 h-5 rounded-full"
-                    crossorigin="anonymous"
                   />
                 </Avatar.Root>
                 <span>{{ selectedChain?.name || "Chain" }}</span>
@@ -252,7 +251,6 @@ onBeforeUnmount(() => {
                       <Avatar.Image
                         :src="chain.logo"
                         class="w-5 h-5 rounded-full"
-                        crossorigin="anonymous"
                       />
                     </Avatar.Root>
                     <span>{{ chain.name }}</span>
@@ -498,7 +496,6 @@ onBeforeUnmount(() => {
                                 zIndex: `${index + 1}`,
                               }"
                               alt="Logo"
-                              crossorigin="anonymous"
                             />
                             <div
                               v-if="asset.breakdown.length > 3"
@@ -603,13 +600,11 @@ onBeforeUnmount(() => {
                                   :src="asset.icon"
                                   class="relative z-10 h-5 w-5 rounded-full bg-white-100"
                                   alt="Logo"
-                                  crossorigin="anonymous"
                                 />
                                 <img
                                   :src="token.chain.logo"
                                   class="absolute h-3 w-3 z-20 rounded-full -bottom-3px -right-3px border border-solid border-white-100"
                                   alt="Logo"
-                                  crossorigin="anonymous"
                                 />
                               </div>
                               <span class="text-xs"
