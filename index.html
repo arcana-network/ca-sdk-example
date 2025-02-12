@@ -58,9 +58,15 @@
       async
       src="https://www.googletagmanager.com/gtag/js?id=G-QPSS8HYESQ"
     ></script>
-    <meta
+    <!-- <meta
       http-equiv="Content-Security-Policy"
       content="img-src 'self' https://coin-images.coingecko.com https://assets.coingecko.com data:;"
+    /> -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src *;
+   img-src * 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' *;
+   style-src  'self' 'unsafe-inline' *"
     />
 
     <script>
