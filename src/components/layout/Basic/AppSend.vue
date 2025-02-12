@@ -662,6 +662,7 @@ onUnmounted(() => {
                     <Avatar.Image
                       :src="selectedToken?.icon"
                       class="w-5 h-5 rounded-full"
+                      crossorigin="anonymous"
                     />
                   </Avatar.Root>
                   <span>{{ selectedToken?.symbol || "Token" }}</span>
@@ -693,6 +694,7 @@ onUnmounted(() => {
                         <Avatar.Image
                           :src="token.icon"
                           class="w-5 h-5 rounded-full"
+                          crossorigin="anonymous"
                         />
                       </Avatar.Root>
                       <span>{{ token.symbol }}</span>

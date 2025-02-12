@@ -672,6 +672,7 @@ onUnmounted(() => {
                     <Avatar.Image
                       :src="selectedChain?.logo"
                       class="w-5 h-5 rounded-full"
+                      crossorigin="anonymous"
                     />
                   </Avatar.Root>
                   <span>{{ selectedChain?.name || "Chain" }}</span>
@@ -700,6 +701,7 @@ onUnmounted(() => {
                         <Avatar.Image
                           :src="chain.logo"
                           class="w-5 h-5 rounded-full"
+                          crossorigin="anonymous"
                         />
                       </Avatar.Root>
                       <span>{{ chain.name }}</span>
@@ -740,6 +742,7 @@ onUnmounted(() => {
                     <Avatar.Image
                       :src="selectedToken?.icon"
                       class="w-5 h-5 rounded-full"
+                      crossorigin="anonymous"
                     />
                   </Avatar.Root>
                   <span>{{ selectedToken?.symbol || "Token" }}</span>
