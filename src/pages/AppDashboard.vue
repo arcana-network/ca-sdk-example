@@ -2,7 +2,7 @@
 import { useUserStore } from "@/stores/user";
 import { Asset, Breakdown, Chain as ChainDetails } from "@/types/balanceTypes";
 import readable from "readable-numbers";
-import { formatNumber, getLogo } from "@/utils/commonFunction";
+import { formatNumber } from "@/utils/commonFunction";
 import { getCA } from "@/utils/getCA";
 import { CA } from "@arcana/ca-sdk";
 import { Accordion, Avatar, Select } from "@ark-ui/vue";
@@ -221,7 +221,7 @@ onBeforeUnmount(() => {
               >
                 <Avatar.Root>
                   <Avatar.Image
-                    :src="getLogo(selectedChain?.logo)"
+                    :src="selectedChain?.logo"
                     class="w-5 h-5 rounded-full"
                   />
                 </Avatar.Root>
@@ -249,7 +249,7 @@ onBeforeUnmount(() => {
                         chain.name.split(" ")[0].substring(0, 2).toUpperCase()
                       }}</Avatar.Fallback>
                       <Avatar.Image
-                        :src="getLogo(chain.logo)"
+                        :src="chain.logo"
                         class="w-5 h-5 rounded-full"
                       />
                     </Avatar.Root>
@@ -318,7 +318,7 @@ onBeforeUnmount(() => {
                     alt="Logo"
                   />
                   <img
-                    :src="getLogo(balance.chainLogo)"
+                    :src="balance.chainLogo"
                     class="absolute z-50 rounded-full border border-solid border-white-100 h-3.5 w-3.5 -bottom-1 -right-1"
                     alt="Logo"
                   />
@@ -479,7 +479,7 @@ onBeforeUnmount(() => {
                                 asset.breakdown
                               )"
                               :key="b.chain.id"
-                              :src="getLogo(b.chain.logo)"
+                              :src="b.chain.logo"
                               :class="{
                                 'absolute rounded-full border border-solid border-white-100': true,
                                 'h-2.5 w-2.5': asset.breakdown.length > 1,
@@ -602,7 +602,7 @@ onBeforeUnmount(() => {
                                   alt="Logo"
                                 />
                                 <img
-                                  :src="getLogo(token.chain.logo)"
+                                  :src="token.chain.logo"
                                   class="absolute h-3 w-3 z-20 rounded-full -bottom-3px -right-3px border border-solid border-white-100"
                                   alt="Logo"
                                 />
