@@ -7,7 +7,7 @@ import { Dialog } from "@ark-ui/vue";
 import FadeLoader from "vue-spinner/src/FadeLoader.vue";
 import { trackEvent } from "@/segment/segment.ts";
 
-const props = defineProps<{ connect: () => void }>();
+const props = defineProps<{ connect: () => void; disconnect: () => void }>();
 const providers = ref<Array<{ provider: any; info: EIP6963ProviderInfo }>>([]);
 const loading = ref(true);
 const connectingMsg = ref("");
@@ -38,6 +38,7 @@ const onAnnouncement = (event: EIP6963AnnounceProviderEvent) => {
   const lastConnectedWallet = localStorage.getItem(
     "xar-casdk-last-connected-wallet"
   );
+
   if (!lastConnectedWallet) {
     loading.value = false;
     return;
@@ -48,11 +49,33 @@ const onAnnouncement = (event: EIP6963AnnounceProviderEvent) => {
   console.log({ providers: providers.value });
 };
 
+const accountWasChanged = async (accounts: string[]) => {
+  console.log("Account changed:", accounts);
+  if (accounts.length > 0) {
+    user.walletAddress = accounts[0];
+    // await initCA(user.provider);
+    // const ca = await getCA();
+    // const allBalance = await ca.getUnifiedBalances();
+    // user.setAsset(allBalance);
+  } else {
+    props.disconnect();
+  }
+};
+
 onMounted(() => {
   // @ts-ignore
   window.addEventListener("eip6963:announceProvider", onAnnouncement);
   window.dispatchEvent(new Event("eip6963:requestProvider"));
   // loading.value = false
+});
+
+onMounted(() => {
+  const interval = setInterval(() => {
+    if (user.provider) {
+      user.provider.on("accountsChanged", accountWasChanged);
+      clearInterval(interval);
+    }
+  }, 500);
 });
 
 onUnmounted(() => {
@@ -67,9 +90,28 @@ const connectWallet = async (p: EIP6963ProviderDetail) => {
   console.log({ loading: loading.value });
   console.log(p, "sksksksk");
   try {
-    const accounts = (await p.provider.request({
+    const permissions: any = await p.provider.request({
+      method: "wallet_getPermissions",
+    });
+
+    const hasAccountPermission = permissions?.some(
+      (perm: any) => perm.parentCapability === "eth_accounts"
+    );
+    console.log(permissions, hasAccountPermission, "permissions");
+
+    if (!hasAccountPermission) {
+      await p.provider.request({
+        method: "wallet_requestPermissions",
+        params: [{ eth_accounts: {} }],
+      });
+    }
+
+    const accounts: any = await p.provider.request({
       method: "eth_requestAccounts",
-    })) as string[];
+    });
+
+    console.log(accounts, "accounts");
+
     user.setProvider(p.provider);
     await initCA(p.provider);
     localStorage.setItem("xar-casdk-last-connected-wallet", p.info.rdns);

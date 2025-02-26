@@ -18,6 +18,14 @@ const disconnect = async () => {
   connected.value = false;
   user.isWalletConnected = false;
   user.walletAddress = "";
+  user.provider.request({
+    method: "wallet_revokePermissions",
+    params: [
+      {
+        eth_accounts: {},
+      },
+    ],
+  });
 };
 </script>
 
@@ -34,7 +42,7 @@ const disconnect = async () => {
       v-else
       class="h-[calc(100vh-8.125rem)] flex flex-col justify-center align-center z-10 relative"
     >
-      <PreLogin :connect="connect"></PreLogin>
+      <PreLogin :connect="connect" :disconnect="disconnect"></PreLogin>
     </div>
   </div>
 </template>
