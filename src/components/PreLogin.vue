@@ -90,20 +90,22 @@ const connectWallet = async (p: EIP6963ProviderDetail) => {
   console.log({ loading: loading.value });
   console.log(p, "sksksksk");
   try {
-    const permissions: any = await p.provider.request({
-      method: "wallet_getPermissions",
-    });
-
-    const hasAccountPermission = permissions?.some(
-      (perm: any) => perm.parentCapability === "eth_accounts"
-    );
-    console.log(permissions, hasAccountPermission, "permissions");
-
-    if (!hasAccountPermission) {
-      await p.provider.request({
-        method: "wallet_requestPermissions",
-        params: [{ eth_accounts: {} }],
+    if (p?.info?.name === "Metamask") {
+      const permissions: any = await p.provider.request({
+        method: "wallet_getPermissions",
       });
+
+      const hasAccountPermission = permissions?.some(
+        (perm: any) => perm.parentCapability === "eth_accounts"
+      );
+      console.log(permissions, hasAccountPermission, "permissions");
+
+      if (!hasAccountPermission) {
+        await p.provider.request({
+          method: "wallet_requestPermissions",
+          params: [{ eth_accounts: {} }],
+        });
+      }
     }
 
     const accounts: any = await p.provider.request({
