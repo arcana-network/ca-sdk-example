@@ -87,7 +87,7 @@ const setBalancePolling = (ca: CA) => {
   setInterval(async () => {
     const allBalance = await ca.getUnifiedBalances();
     balances.value = allBalance;
-    user.setAsset(allBalance);
+    // user.setAsset(allBalance);
   }, 2000);
 };
 
