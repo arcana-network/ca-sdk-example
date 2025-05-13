@@ -22,7 +22,6 @@ type Asset = {
   icon: string | undefined;
   breakdown: Breakdown[];
   abstracted: boolean | undefined;
-  local: boolean | undefined;
 };
 
 export type { Asset, Breakdown, Chain };

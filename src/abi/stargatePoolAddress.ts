@@ -29,6 +29,10 @@ export const stargatePoolAddress: any = {
   59144: {
     ETH: "0x81F6138153d473E8c5EcebD3DC8Cd4903506B075",
   },
+  43114: {
+    USDC: "0x5634c4a5FEd09819E3c46D86A965Dd9447d86e47",
+    USDT: "0x12dC9256Acc9895B076f6638D628382881e62CeE",
+  },
 };
 
 export const stargatePoolEndPointId: any = {
@@ -52,5 +56,8 @@ export const stargatePoolEndPointId: any = {
   },
   59144: {
     endpointID: 30183,
+  },
+  43114: {
+    endpointID: 30106,
   },
 };
