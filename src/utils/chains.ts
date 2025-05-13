@@ -20,6 +20,10 @@ const CHAINS = [
     chainName: "Arbitrum One",
   },
   {
+    chainID: 43114,
+    chainName: "Avalanche",
+  },  
+  {
     chainID: 59144,
     chainName: "Linea",
   },
