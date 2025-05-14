@@ -1,5 +1,6 @@
 import {
   arbitrum,
+  avalanche,
   base,
   linea,
   mainnet,
@@ -40,6 +41,8 @@ export const readContractFunction = async ({
         ? scroll
         : chain === 59144
         ? linea
+        : chain === 43114
+        ? avalanche
         : base;
 
     const walletClient = createPublicClient({
