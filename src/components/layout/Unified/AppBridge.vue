@@ -32,6 +32,7 @@ import AppTransaction from "../AppTransaction.vue";
 import { switchChain } from "@/utils/switchChain";
 import AppTooltip from "@/components/shared/AppTooltip.vue";
 import { trackEvent } from "@/segment/segment";
+import { devLogger } from "@/utils/devLogger";
 
 type StepState = {
   currentStep: number;
@@ -278,7 +279,6 @@ const handleBridge = async () => {
       availableTokens.value,
       selectedOptions.value.token[0]
     );
-    console.log(selectedOptions.value.chain[0]);
 
     if (caSdkAuth) {
       await caSdkAuth
@@ -296,7 +296,7 @@ const handleBridge = async () => {
     if (timerInterval.value) {
       clearTime();
     }
-    console.log("Transfer Failed:", error);
+    devLogger.log("Transfer Failed:", error);
     trackEvent("Failed Bridge", {
       appName: "SDK Demo App",
       walletAddress: user.walletAddress,
@@ -334,6 +334,10 @@ const handleBridge = async () => {
       intentURL: intentURL.value ? intentURL.value : "",
       timestamp: new Date().toISOString(),
     });
+    if (caSdkAuth) {
+      const allBalance = await caSdkAuth.getUnifiedBalances();
+      user.setAsset(allBalance);
+    }
   }
 };
 
@@ -347,7 +351,6 @@ const intentURL = computed(() => {
 const caSDKEventListener = (data: any) => {
   switch (data.type) {
     case "EXPECTED_STEPS": {
-      console.log("Expected steps", data.data);
       submitSteps.value.steps = data.data.map((s: ProgressStep) => ({
         ...s,
         done: false,
@@ -356,11 +359,10 @@ const caSDKEventListener = (data: any) => {
       break;
     }
     case "STEP_DONE": {
-      console.log("Step done", data.data);
       const v = submitSteps.value.steps.find((s) => {
         return s.typeID === data.data.typeID;
       });
-      console.log({ v });
+
       if (v) {
         v.done = true;
         if (data.data.data) {
@@ -445,7 +447,6 @@ const setupAllowanceHook = (caSdkAuth: CA) => {
 
 const setupIntentHook = (caSdkAuth: CA) => {
   caSdkAuth.setOnIntentHook(({ intent, allow, deny, refresh }: any) => {
-    console.log({ intent });
     resetAllowanceData();
     intentData.value.open = true;
     intentData.value.allow = allow;
@@ -455,11 +456,9 @@ const setupIntentHook = (caSdkAuth: CA) => {
     setTimeout(() => {
       intentData.value.intervalHandler = setAsyncInterval(async () => {
         if (intentData.value.refresh) {
-          console.log("intentRefreshStarted");
           intentData.value.intentRefreshing = true;
           intentData.value.intent = await intentData.value.refresh!();
           intentData.value.intentRefreshing = false;
-          console.log("intentRefreshEnded");
         }
       }, 5000);
     }, 5000);
@@ -497,8 +496,6 @@ onUnmounted(() => {
     caSdkAuth.removeCAEventListener(caSDKEventListener);
   }
 });
-
-console.log(chainList);
 </script>
 
 <template>
@@ -571,7 +568,7 @@ console.log(chainList);
             </Select.Control>
             <Select.Positioner class="w-full z-50">
               <Select.Content
-                class="max-h-80 w-full rounded-lg text-sm bg-white-100"
+                class="max-h-56 overflow-y-auto w-full rounded-lg text-sm bg-white-100"
               >
                 <Select.ItemGroup>
                   <Select.Item
@@ -649,7 +646,7 @@ console.log(chainList);
             </Select.Control>
             <Select.Positioner class="w-full z-50">
               <Select.Content
-                class="max-h-60 w-full rounded-lg text-sm bg-white-100"
+                class="max-h-56 overflow-y-auto w-full rounded-lg text-sm bg-white-100"
               >
                 <Select.ItemGroup>
                   <Select.Item

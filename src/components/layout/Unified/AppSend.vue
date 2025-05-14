@@ -32,6 +32,7 @@ import { Avatar, Field, NumberInput, Select } from "@ark-ui/vue";
 import AppTransaction from "../AppTransaction.vue";
 import { switchChain } from "@/utils/switchChain";
 import { trackEvent } from "@/segment/segment";
+import { devLogger } from "@/utils/devLogger";
 
 type StepState = {
   currentStep: number;
@@ -155,7 +156,6 @@ const getTokenAndChainDetails = (assets: Asset[]) => {
 };
 
 const chainList = computed(() => getTokenAndChainDetails(user.assets).chain);
-console.log(chainList);
 
 const selectedChain = computed(() => {
   return chainList.value.find(
@@ -305,11 +305,6 @@ const handleTransfer = async () => {
         .exec();
 
       if (result) {
-        console.log(
-          result,
-          Number(selectedOptions.value.chain[0]).toString(),
-          "result"
-        );
         txHash.value = result as string;
         chainExplorerToken.value = Number(
           selectedOptions.value.chain[0]
@@ -324,7 +319,7 @@ const handleTransfer = async () => {
     if (timerInterval.value) {
       clearTime();
     }
-    console.log("Transfer Failed:", error);
+    devLogger.log("Transfer Failed:", error);
     trackEvent("Failed Send", {
       appName: "SDK Demo App",
       walletAddress: user.walletAddress,
@@ -365,6 +360,10 @@ const handleTransfer = async () => {
       intentURL: intentURL.value ? intentURL.value : "",
       timestamp: new Date().toISOString(),
     });
+    if (caSdkAuth) {
+      const allBalance = await caSdkAuth.getUnifiedBalances();
+      user.setAsset(allBalance);
+    }
   }
 };
 
@@ -378,7 +377,6 @@ const intentURL = computed(() => {
 const caSDKEventListener = (data: any) => {
   switch (data.type) {
     case "EXPECTED_STEPS": {
-      console.log("Expected steps", data.data);
       submitSteps.value.steps = data.data.map((s: ProgressStep) => ({
         ...s,
         done: false,
@@ -387,11 +385,10 @@ const caSDKEventListener = (data: any) => {
       break;
     }
     case "STEP_DONE": {
-      console.log("Step done", data.data);
       const v = submitSteps.value.steps.find((s) => {
         return s.typeID === data.data.typeID;
       });
-      console.log({ v });
+
       if (v) {
         v.done = true;
         if (data.data.data) {
@@ -484,8 +481,6 @@ const resetAllowanceData = () => {
 
 const setupAllowanceHook = (caSdkAuth: CA) => {
   caSdkAuth.setOnAllowanceHook(async ({ allow, deny, sources }: any) => {
-    console.log({ sources });
-
     allowanceData.value.open = true;
     allowanceData.value.allow = allow;
     allowanceData.value.deny = deny;
@@ -495,7 +490,6 @@ const setupAllowanceHook = (caSdkAuth: CA) => {
 
 const setupIntentHook = (caSdkAuth: CA) => {
   caSdkAuth.setOnIntentHook(({ intent, allow, deny, refresh }: any) => {
-    console.log({ intent });
     resetAllowanceData();
     intentData.value.open = true;
     intentData.value.allow = allow;
@@ -505,11 +499,9 @@ const setupIntentHook = (caSdkAuth: CA) => {
     setTimeout(() => {
       intentData.value.intervalHandler = setAsyncInterval(async () => {
         if (intentData.value.refresh) {
-          console.log("intentRefreshStarted");
           intentData.value.intentRefreshing = true;
           intentData.value.intent = await intentData.value.refresh!();
           intentData.value.intentRefreshing = false;
-          console.log("intentRefreshEnded");
         }
       }, 5000);
     }, 5000);
@@ -629,7 +621,7 @@ onUnmounted(() => {
             </Select.Control>
             <Select.Positioner class="w-full z-50">
               <Select.Content
-                class="max-h-80 w-full rounded-lg text-sm bg-white-100"
+                class="max-h-56 overflow-y-auto w-full rounded-lg text-sm bg-white-100"
               >
                 <Select.ItemGroup>
                   <Select.Item
@@ -707,7 +699,7 @@ onUnmounted(() => {
             </Select.Control>
             <Select.Positioner class="w-full z-50">
               <Select.Content
-                class="max-h-60 w-full rounded-lg text-sm bg-white-100"
+                class="max-h-56 overflow-y-auto w-full rounded-lg text-sm bg-white-100"
               >
                 <Select.ItemGroup>
                   <Select.Item

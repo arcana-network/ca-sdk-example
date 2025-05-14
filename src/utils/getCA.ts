@@ -12,9 +12,7 @@ const getCA = async () => {
 };
 
 const initCA = async (provider: EthereumProvider) => {
-  ca = new CA({
-    network: "testnet",
-  });
+  ca = new CA();
   ca.setEVMProvider(provider);
   await ca.init();
 };

@@ -1,3 +1,4 @@
+import { devLogger } from "@/utils/devLogger";
 import { AnalyticsBrowser } from "@segment/analytics-next";
 
 let analytics: AnalyticsBrowser | null = null;
@@ -7,7 +8,7 @@ const initSegment = async () => {
     analytics = AnalyticsBrowser.load({
       writeKey: import.meta.env.VITE_WRITE_KEY,
     });
-    console.log("Segment initialized");
+    devLogger.log("Segment initialized");
   }
 };
 

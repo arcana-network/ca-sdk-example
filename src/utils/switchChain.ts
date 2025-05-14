@@ -5,8 +5,6 @@ import { MAINNET_CHAINS } from "./constants";
 export async function switchChain(chainId: string) {
   const userStore = useUserStore();
   try {
-    console.log(userStore.provider);
-
     await userStore.provider.request({
       method: "wallet_switchEthereumChain",
       params: [{ chainId: new Decimal(chainId).ceil().toHexadecimal() }],
