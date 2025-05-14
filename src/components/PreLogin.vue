@@ -6,6 +6,7 @@ import { useUserStore } from "@/stores/user";
 import { Dialog } from "@ark-ui/vue";
 import FadeLoader from "vue-spinner/src/FadeLoader.vue";
 import { trackEvent } from "@/segment/segment.ts";
+import { devLogger } from "@/utils/devLogger.ts";
 
 const props = defineProps<{ connect: () => void; disconnect: () => void }>();
 const providers = ref<Array<{ provider: any; info: EIP6963ProviderInfo }>>([]);
@@ -46,11 +47,9 @@ const onAnnouncement = (event: EIP6963AnnounceProviderEvent) => {
   if (event.detail.info.rdns === lastConnectedWallet) {
     connectWallet(event.detail);
   }
-  console.log({ providers: providers.value });
 };
 
 const accountWasChanged = async (accounts: string[]) => {
-  console.log("Account changed:", accounts);
   if (accounts.length > 0) {
     user.walletAddress = accounts[0];
     // await initCA(user.provider);
@@ -84,11 +83,9 @@ onUnmounted(() => {
 });
 
 const connectWallet = async (p: EIP6963ProviderDetail) => {
-  console.log(p.provider, loading);
   loading.value = true;
   connectingMsg.value = `Connecting to ${p.info.name}`;
-  console.log({ loading: loading.value });
-  console.log(p, "sksksksk");
+
   try {
     if (p?.info?.name === "Metamask") {
       const permissions: any = await p.provider.request({
@@ -98,7 +95,6 @@ const connectWallet = async (p: EIP6963ProviderDetail) => {
       const hasAccountPermission = permissions?.some(
         (perm: any) => perm.parentCapability === "eth_accounts"
       );
-      console.log(permissions, hasAccountPermission, "permissions");
 
       if (!hasAccountPermission) {
         await p.provider.request({
@@ -111,8 +107,6 @@ const connectWallet = async (p: EIP6963ProviderDetail) => {
     const accounts: any = await p.provider.request({
       method: "eth_requestAccounts",
     });
-
-    console.log(accounts, "accounts");
 
     user.setProvider(p.provider);
     await initCA(p.provider);
@@ -128,11 +122,9 @@ const connectWallet = async (p: EIP6963ProviderDetail) => {
       walletName: p.info.name,
       timestamp: new Date().toISOString(),
     });
-    console.log("Connected. Account:", accounts[0]);
   } catch (error) {
-    console.error("Failed to connect:", error);
+    devLogger.log("Failed to connect:", error);
   } finally {
-    console.log("reached finally");
     loading.value = false;
   }
 };

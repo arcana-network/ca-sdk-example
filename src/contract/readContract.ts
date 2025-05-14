@@ -58,7 +58,6 @@ export const readContractFunction = async ({
       account,
     });
 
-    console.log(`Transaction successfully sent! Tx Hash: ${txResult}`);
     return txResult;
   } catch (error: any) {
     console.error("Error executing contract function:", error);

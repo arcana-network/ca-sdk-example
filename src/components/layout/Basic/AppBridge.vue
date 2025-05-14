@@ -46,6 +46,7 @@ import {
 import { stargatePoolABI } from "@/abi/stargatePool.abi";
 import { erc20ABI } from "@/abi/erc20.abi";
 import { Addressable } from "ethers";
+import { devLogger } from "@/utils/devLogger";
 
 const props = defineProps<{
   selectedChain: string[];
@@ -333,7 +334,7 @@ const handleBridge = async () => {
   chainExplorerToken.value = "";
   resetSubmitSteps();
   const { currentChainId } = user.provider.request({ method: "eth_chainId" });
-  console.log(currentChainId, Number(props.selectedChain[0]), "chain");
+
   if (currentChainId !== Number(props.selectedChain[0])) {
     await switchChain(props.selectedChain[0] as string);
   }
@@ -345,7 +346,6 @@ const handleBridge = async () => {
 
     const address: Address = toEthereumAddress(user.walletAddress);
     const recipientBytes32 = toHex(pad(toBytes(address), { size: 32 }));
-    console.log(address, recipientBytes32, "address");
 
     const dstEid =
       stargatePoolEndPointId[Number(selectedOptions?.value?.chain[0])]
@@ -360,37 +360,18 @@ const handleBridge = async () => {
       stargatePoolABI,
       s
     );
-    console.log(
-      p,
-      s,
-      pool,
-      stargatePoolAddress[Number(props.selectedChain[0])]?.[token],
-      props.selectedChain[0],
-      await pool.token(),
-      "kkkkkkkkk"
-    );
+
     const isNative = (await pool.token()) === ZeroAddress;
-    console.log(await pool.token(), ZeroAddress);
+
     const cAddress = getContractAddress(Number(props.selectedChain[0]), token);
     const tokenContract = new Contract(cAddress, erc20ABI, s);
-    console.log(tokenContract, cAddress);
+
     const usdtInWei = parseUnits(
       String(selectedOptions.value.amount),
       isNative ? 18 : Number(await tokenContract.decimals())
     );
 
     const amountLD = BigInt(usdtInWei);
-    console.log(
-      p,
-      s,
-      pool,
-      isNative,
-      usdtInWei,
-      amountLD,
-      stargatePoolAddress[Number(props.selectedChain[0])]?.[token],
-      props.selectedChain[0],
-      "newuruuiii"
-    );
 
     const sp = {
       dstEid: dstEid,
@@ -427,7 +408,6 @@ const handleBridge = async () => {
 
     const rt = await s.sendTransaction(tx);
     const th = await rt.wait(4);
-    console.log(th.hash);
 
     if (th?.hash) {
       txHash.value = th?.hash as string;
@@ -439,7 +419,7 @@ const handleBridge = async () => {
     if (timerInterval.value) {
       clearTime();
     }
-    console.log("Transfer Failed:", error);
+    devLogger.log("Transfer Failed:", error);
     allLoader.value.startTransaction = false;
     txError.value = true;
     txHash.value = "";
@@ -451,7 +431,6 @@ const handleBridge = async () => {
       error.message.includes("Unrecognized chain ID")
     ) {
       console.error("Chain not recognized. Try adding the chain first.");
-      // txErrorMsg.value = "Retry"
       await switchChain(selectedOptions.value.chain[0] as string);
     }
   } finally {
@@ -472,7 +451,6 @@ const handleBridge = async () => {
 const caSDKEventListener = (data: any) => {
   switch (data.type) {
     case "EXPECTED_STEPS": {
-      console.log("Expected steps", data.data);
       submitSteps.value.steps = data.data.map((s: ProgressStep) => ({
         ...s,
         done: false,
@@ -481,11 +459,10 @@ const caSDKEventListener = (data: any) => {
       break;
     }
     case "STEP_DONE": {
-      console.log("Step done", data.data);
       const v = submitSteps.value.steps.find((s) => {
         return s.typeID === data.data.typeID;
       });
-      console.log({ v });
+
       if (v) {
         v.done = true;
         if (data.data.data) {
@@ -567,7 +544,6 @@ const setupAllowanceHook = (caSdkAuth: CA) => {
 
 const setupIntentHook = (caSdkAuth: CA) => {
   caSdkAuth.setOnIntentHook(({ intent, allow, deny, refresh }: any) => {
-    console.log({ intent });
     resetAllowanceData();
     intentData.value.open = true;
     intentData.value.allow = allow;
@@ -577,11 +553,9 @@ const setupIntentHook = (caSdkAuth: CA) => {
     setTimeout(() => {
       intentData.value.intervalHandler = setAsyncInterval(async () => {
         if (intentData.value.refresh) {
-          console.log("intentRefreshStarted");
           intentData.value.intentRefreshing = true;
           intentData.value.intent = await intentData.value.refresh!();
           intentData.value.intentRefreshing = false;
-          console.log("intentRefreshEnded");
         }
       }, 5000);
     }, 5000);

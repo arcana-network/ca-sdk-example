@@ -103,7 +103,6 @@ const allowanceSteps = computed(() => {
     return statusText !== "Unknown status. Please contact support.";
   });
 });
-console.log(props.allowanceDetails.data);
 
 watch(
   () => allowanceSteps.value,
