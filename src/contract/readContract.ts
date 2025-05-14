@@ -4,6 +4,7 @@ import { Account, createPublicClient, createWalletClient, custom } from "viem";
 =======
 import {
   arbitrum,
+  avalanche,
   base,
   linea,
   mainnet,
@@ -45,6 +46,8 @@ export const readContractFunction = async ({
         ? scroll
         : chain === 59144
         ? linea
+        : chain === 43114
+        ? avalanche
         : base;
 
     const walletClient = createPublicClient({
@@ -60,7 +63,6 @@ export const readContractFunction = async ({
       account,
     });
 
-    console.log(`Transaction successfully sent! Tx Hash: ${txResult}`);
     return txResult;
   } catch (error: any) {
     console.error("Error executing contract function:", error);

@@ -75,14 +75,6 @@ const selectedChain = computed(() => {
   );
 });
 
-const selectedChainName = computed(() => {
-  return chainList.value.find(
-    (c) => c.id.toString() === singleAssetChain.value.chain[0]
-  );
-});
-
-console.log(selectedChainName);
-
 const setBalancePolling = (ca: CA) => {
   setInterval(async () => {
     const allBalance = await ca.getUnifiedBalances();
@@ -96,8 +88,6 @@ onMounted(async () => {
   const allBalance = await ca.getUnifiedBalances();
   balances.value = allBalance;
   user.setAsset(allBalance);
-  console.log(allBalance);
-
   balanceLoader.value = false;
   setBalancePolling(ca);
 });
@@ -234,7 +224,7 @@ onBeforeUnmount(() => {
           </Select.Control>
           <Select.Positioner class="w-full z-50">
             <Select.Content
-              class="max-h-80 w-full rounded-lg text-sm bg-white-100 font-inter"
+              class="max-h-56 overflow-y-auto w-full rounded-lg text-sm bg-white-100 font-inter"
             >
               <Select.ItemGroup>
                 <Select.Item
