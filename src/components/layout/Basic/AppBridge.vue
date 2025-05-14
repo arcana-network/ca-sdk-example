@@ -462,6 +462,10 @@ const handleBridge = async () => {
     if (timerInterval.value) {
       clearTime();
     }
+    if (caSdkAuth) {
+      const allBalance = await caSdkAuth.getUnifiedBalances();
+      user.setAsset(allBalance);
+    }
   }
 };
 

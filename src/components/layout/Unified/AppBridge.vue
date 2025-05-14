@@ -334,6 +334,10 @@ const handleBridge = async () => {
       intentURL: intentURL.value ? intentURL.value : "",
       timestamp: new Date().toISOString(),
     });
+    if (caSdkAuth) {
+      const allBalance = await caSdkAuth.getUnifiedBalances();
+      user.setAsset(allBalance);
+    }
   }
 };
 

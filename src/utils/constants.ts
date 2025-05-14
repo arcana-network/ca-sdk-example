@@ -325,6 +325,36 @@ const MAINNET_CHAINS: Chain[] = [
       knownTokens: [],
     },
   },
+  {
+    id: 43114,
+    name: "Avalanche C-Chain",
+    rpcUrls: {
+      default: {
+        publicHttp: [
+          "https://1rpc.io/avax/c",
+          "https://avalanche-c-chain-rpc.publicnode.com",
+          "https://ava-mainnet.public.blastapi.io/ext/bc/C/rpc",
+          "https://rpc.ankr.com/avalanche",
+          "https://avalanche-mainnet.gateway.tenderly.co",
+        ],
+      },
+    },
+    blockExplorers: {
+      default: {
+        name: "Snowscan",
+        url: "https://snowscan.xyz",
+      },
+    },
+    nativeCurrency: {
+      name: "AVAX",
+      symbol: "AVAX",
+      decimals: 18,
+    },
+    custom: {
+      icon: "/images/logos/avax.svg",
+      knownTokens: [],
+    },
+  },
 ];
 
 export { MAINNET_CHAINS, TOAST_TIME_OUT };

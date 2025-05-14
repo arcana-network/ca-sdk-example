@@ -408,6 +408,10 @@ const handleTransfer = async () => {
     allLoader.value.startTransaction = false;
     resetIntentData();
     clearTransferData();
+    if (caSdkAuth) {
+      const allBalance = await caSdkAuth.getUnifiedBalances();
+      user.setAsset(allBalance);
+    }
   }
 };
 
