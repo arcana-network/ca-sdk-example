@@ -42,7 +42,7 @@ const props = defineProps<{
       type: string;
       typeID: string;
       done: boolean;
-      data: any;
+      data?: any;
     }[];
   };
 }>();
