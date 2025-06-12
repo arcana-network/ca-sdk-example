@@ -24,7 +24,7 @@ import { Asset, Chain as ChainDetails } from "@/types/balanceTypes";
 import Decimal from "decimal.js";
 import { Chain } from "@/types/chainTypes";
 import { MAINNET_CHAINS } from "@/utils/constants";
-import { SwitchChainError, zeroAddress } from "viem";
+import { zeroAddress } from "viem";
 import { clearAsyncInterval, setAsyncInterval } from "@/utils/async_interval";
 import dayjs from "dayjs";
 import { getCA } from "@/utils/getCA";

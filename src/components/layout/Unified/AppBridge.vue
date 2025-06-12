@@ -18,7 +18,7 @@ import { CA, ProgressStep } from "@arcana/ca-sdk";
 import { Avatar, Field, NumberInput, Select } from "@ark-ui/vue";
 import dayjs from "dayjs";
 import Decimal from "decimal.js";
-import { SwitchChainError, zeroAddress } from "viem";
+import { zeroAddress } from "viem";
 import {
   computed,
   nextTick,
