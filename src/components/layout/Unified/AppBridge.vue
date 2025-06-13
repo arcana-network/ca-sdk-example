@@ -18,7 +18,7 @@ import { CA, ProgressStep } from "@arcana/ca-sdk";
 import { Avatar, Field, NumberInput, Select } from "@ark-ui/vue";
 import dayjs from "dayjs";
 import Decimal from "decimal.js";
-import { SwitchChainError, zeroAddress } from "viem";
+import { zeroAddress } from "viem";
 import {
   computed,
   nextTick,
@@ -33,6 +33,7 @@ import { switchChain } from "@/utils/switchChain";
 import AppTooltip from "@/components/shared/AppTooltip.vue";
 import { trackEvent } from "@/segment/segment";
 import { devLogger } from "@/utils/devLogger";
+import { EthereumProvider } from "@/types/ProviderTypes";
 
 type StepState = {
   currentStep: number;
@@ -88,7 +89,7 @@ const selectedOptions = ref<{
 const submitSteps = ref<{
   inProgress: boolean;
   completed: boolean;
-  steps: { type: string; typeID: string; done: boolean; data: any }[];
+  steps: { type: string; typeID: string; done: boolean; data?: any }[];
 }>({
   inProgress: false,
   steps: [],
@@ -275,18 +276,32 @@ const handleBridge = async () => {
   txErrorMsg.value = "";
   resetSubmitSteps();
   try {
+    const providerIns = ref<EthereumProvider | null>(user?.provider);
+
+    if (providerIns.value) {
+      const currentChainIdHex = await providerIns.value.request({
+        method: "eth_chainId",
+      });
+      const currentChainId = parseInt(currentChainIdHex as string, 16);
+      const selectedChainId = Number(selectedOptions.value.chain[0]);
+
+      if (currentChainId !== selectedChainId) {
+        await switchChain(selectedChainId.toString());
+      }
+    }
+
     const token = getSymbolByContractAddress(
       availableTokens.value,
       selectedOptions.value.token[0]
     );
 
     if (caSdkAuth) {
-      await caSdkAuth
-        .bridge()
-        .amount(Number(selectedOptions.value.amount))
-        .chain(Number(selectedOptions.value.chain[0]))
-        .token(token)
-        .exec();
+      const result = await caSdkAuth.bridge({
+        token: token,
+        amount: Number(selectedOptions.value.amount),
+        chainID: Number(selectedOptions.value.chain[0]),
+      });
+      await result.exec();
 
       submitSteps.value.completed = true;
     }
@@ -310,13 +325,6 @@ const handleBridge = async () => {
     userToast.createErrorToast(error);
     if (error?.message) {
       txErrorMsg.value = error?.message;
-    }
-    if (
-      error instanceof SwitchChainError &&
-      error.message.includes("Unrecognized chain ID")
-    ) {
-      console.error("Chain not recognized. Try adding the chain first.");
-      await switchChain(selectedOptions.value.chain[0] as string);
     }
   } finally {
     clearInterval(timerInterval.value);
@@ -348,28 +356,17 @@ const intentURL = computed(() => {
   return stepWithIntentURL?.data?.explorerURL || "";
 });
 
-const caSDKEventListener = (data: any) => {
-  switch (data.type) {
-    case "EXPECTED_STEPS": {
-      submitSteps.value.steps = data.data.map((s: ProgressStep) => ({
-        ...s,
-        done: false,
-      }));
-      submitSteps.value.inProgress = true;
-      break;
-    }
-    case "STEP_DONE": {
-      const v = submitSteps.value.steps.find((s) => {
-        return s.typeID === data.data.typeID;
-      });
+const handleExpectedSteps = (data: ProgressStep[]) => {
+  submitSteps.value.steps = data.map((s) => ({ ...s, done: false }));
+  submitSteps.value.inProgress = true;
+};
 
-      if (v) {
-        v.done = true;
-        if (data.data.data) {
-          v.data = data.data.data;
-        }
-      }
-      break;
+const handleStepComplete = (data: { typeID: string; data?: any }) => {
+  const step = submitSteps.value.steps.find((s) => s.typeID === data.typeID);
+  if (step) {
+    step.done = true;
+    if (data.data) {
+      step.data = data.data;
     }
   }
 };
@@ -484,7 +481,8 @@ onMounted(async () => {
     if (caSdkAuth) {
       setupAllowanceHook(caSdkAuth);
       setupIntentHook(caSdkAuth);
-      caSdkAuth.addCAEventListener(caSDKEventListener);
+      caSdkAuth.caEvents.on("expected_steps", handleExpectedSteps);
+      caSdkAuth.caEvents.on("step_complete", handleStepComplete);
     }
   } catch (error) {
     console.error("Error initializing CA SDK Auth:", error);
@@ -493,7 +491,8 @@ onMounted(async () => {
 
 onUnmounted(() => {
   if (caSdkAuth) {
-    caSdkAuth.removeCAEventListener(caSDKEventListener);
+    caSdkAuth.caEvents.removeListener("expected_steps", handleExpectedSteps);
+    caSdkAuth.caEvents.removeListener("step_complete", handleStepComplete);
   }
 });
 </script>

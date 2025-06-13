@@ -581,7 +581,7 @@ onBeforeUnmount(() => {
                         <div class="flex flex-col gap-4">
                           <div
                             v-for="token in asset.breakdown"
-                            :key="token.network"
+                            :key="token.universe"
                             class="flex items-center justify-between font-inter text-base font-normal leading-5 text-black-700"
                           >
                             <span class="flex items-center gap-3">

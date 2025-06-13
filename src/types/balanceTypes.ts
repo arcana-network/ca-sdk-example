@@ -1,17 +1,25 @@
+export declare enum Universe {
+  ETHEREUM = 0,
+  FUEL = 1,
+  SOLANA = 2,
+  UNRECOGNIZED = -1,
+}
+
 type Chain = {
   id: number;
   name: string;
   logo: string;
-  abstracted?: boolean | undefined;
+  abstracted?: boolean;
 };
 
 type Breakdown = {
   chain: Chain;
-  network: string;
+  universe: Universe;
   contractAddress: string;
   balance: string;
   balanceInFiat: number;
-  isNative: boolean | undefined;
+  isNative?: boolean;
+  decimals: number;
 };
 
 type Asset = {
@@ -19,9 +27,9 @@ type Asset = {
   balance: string;
   balanceInFiat: number;
   decimals: number;
-  icon: string | undefined;
+  icon?: string;
   breakdown: Breakdown[];
-  abstracted: boolean | undefined;
+  abstracted?: boolean;
 };
 
 export type { Asset, Breakdown, Chain };
