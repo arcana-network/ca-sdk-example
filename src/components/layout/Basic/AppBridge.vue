@@ -107,7 +107,7 @@ const selectedOptions = ref<{
 const submitSteps = ref<{
   inProgress: boolean;
   completed: boolean;
-  steps: { type: string; typeID: string; done: boolean; data: any }[];
+  steps: { type: string; typeID: string; done: boolean; data?: any }[];
 }>({
   inProgress: false,
   steps: [],
@@ -448,28 +448,17 @@ const handleBridge = async () => {
   }
 };
 
-const caSDKEventListener = (data: any) => {
-  switch (data.type) {
-    case "EXPECTED_STEPS": {
-      submitSteps.value.steps = data.data.map((s: ProgressStep) => ({
-        ...s,
-        done: false,
-      }));
-      submitSteps.value.inProgress = true;
-      break;
-    }
-    case "STEP_DONE": {
-      const v = submitSteps.value.steps.find((s) => {
-        return s.typeID === data.data.typeID;
-      });
+const handleExpectedSteps = (data: ProgressStep[]) => {
+  submitSteps.value.steps = data.map((s) => ({ ...s, done: false }));
+  submitSteps.value.inProgress = true;
+};
 
-      if (v) {
-        v.done = true;
-        if (data.data.data) {
-          v.data = data.data.data;
-        }
-      }
-      break;
+const handleStepComplete = (data: { typeID: string; data?: any }) => {
+  const step = submitSteps.value.steps.find((s) => s.typeID === data.typeID);
+  if (step) {
+    step.done = true;
+    if (data.data) {
+      step.data = data.data;
     }
   }
 };
@@ -581,7 +570,8 @@ onMounted(async () => {
     if (caSdkAuth) {
       setupAllowanceHook(caSdkAuth);
       setupIntentHook(caSdkAuth);
-      caSdkAuth.addCAEventListener(caSDKEventListener);
+      caSdkAuth.caEvents.on("expected_steps", handleExpectedSteps);
+      caSdkAuth.caEvents.on("step_complete", handleStepComplete);
     }
   } catch (error) {
     console.error("Error initializing CA SDK Auth:", error);
@@ -590,7 +580,8 @@ onMounted(async () => {
 
 onUnmounted(() => {
   if (caSdkAuth) {
-    caSdkAuth.removeCAEventListener(caSDKEventListener);
+    caSdkAuth.caEvents.removeListener("expected_steps", handleExpectedSteps);
+    caSdkAuth.caEvents.removeListener("step_complete", handleStepComplete);
   }
 });
 </script>

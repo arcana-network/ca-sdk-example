@@ -24,7 +24,7 @@ import { Asset, Chain as ChainDetails } from "@/types/balanceTypes";
 import Decimal from "decimal.js";
 import { Chain } from "@/types/chainTypes";
 import { MAINNET_CHAINS } from "@/utils/constants";
-import { SwitchChainError, zeroAddress } from "viem";
+import { zeroAddress } from "viem";
 import { clearAsyncInterval, setAsyncInterval } from "@/utils/async_interval";
 import dayjs from "dayjs";
 import { getCA } from "@/utils/getCA";
@@ -33,6 +33,7 @@ import AppTransaction from "../AppTransaction.vue";
 import { switchChain } from "@/utils/switchChain";
 import { trackEvent } from "@/segment/segment";
 import { devLogger } from "@/utils/devLogger";
+import { EthereumProvider } from "@/types/ProviderTypes";
 
 type StepState = {
   currentStep: number;
@@ -116,7 +117,7 @@ const intentData = ref<IntentDataType>({
 const submitSteps = ref<{
   inProgress: boolean;
   completed: boolean;
-  steps: { type: string; typeID: string; done: boolean; data: any }[];
+  steps: { type: string; typeID: string; done: boolean; data?: any }[];
 }>({
   inProgress: false,
   steps: [],
@@ -290,22 +291,37 @@ const handleTransfer = async () => {
   txErrorMsg.value = "";
   resetSubmitSteps();
   try {
+    const providerIns = ref<EthereumProvider | null>(user?.provider);
+
+    if (providerIns.value) {
+      const currentChainIdHex = await providerIns.value.request({
+        method: "eth_chainId",
+      });
+      const currentChainId = parseInt(currentChainIdHex as string, 16);
+      const selectedChainId = Number(selectedOptions.value.chain[0]);
+
+      if (currentChainId !== selectedChainId) {
+        await switchChain(selectedChainId.toString());
+      }
+    }
+
     const token = getSymbolByContractAddress(
       availableTokens.value,
       selectedOptions.value.token[0]
     );
 
     if (caSdkAuth) {
-      const result = await caSdkAuth
-        .transfer()
-        .amount(Number(selectedOptions.value.amount))
-        .chain(Number(selectedOptions.value.chain[0]))
-        .token(token)
-        .to(`0x${selectedOptions.value.to.slice(2)}`)
-        .exec();
+      const result = await caSdkAuth.transfer({
+        to: `0x${selectedOptions.value.to.slice(2)}`,
+        amount: Number(selectedOptions.value.amount),
+        chainID: Number(selectedOptions.value.chain[0]),
+        token: token,
+      });
 
-      if (result) {
-        txHash.value = result as string;
+      const response = await result.exec();
+
+      if (response) {
+        txHash.value = response as unknown as string;
         chainExplorerToken.value = Number(
           selectedOptions.value.chain[0]
         ).toString();
@@ -327,6 +343,7 @@ const handleTransfer = async () => {
       buttonName: "Failed Send",
       timestamp: new Date().toISOString(),
     });
+
     allLoader.value.startTransaction = false;
     txError.value = true;
     txHash.value = "";
@@ -335,13 +352,6 @@ const handleTransfer = async () => {
     userToast.createErrorToast(error);
     if (error?.message) {
       txErrorMsg.value = error?.message;
-    }
-    if (
-      error instanceof SwitchChainError &&
-      error.message.includes("Unrecognized chain ID")
-    ) {
-      console.error("Chain not recognized. Try adding the chain first.");
-      await switchChain(selectedOptions.value.chain[0] as string);
     }
   } finally {
     clearInterval(timerInterval.value);
@@ -374,28 +384,45 @@ const intentURL = computed(() => {
   return stepWithIntentURL?.data?.explorerURL || "";
 });
 
-const caSDKEventListener = (data: any) => {
-  switch (data.type) {
-    case "EXPECTED_STEPS": {
-      submitSteps.value.steps = data.data.map((s: ProgressStep) => ({
-        ...s,
-        done: false,
-      }));
-      submitSteps.value.inProgress = true;
-      break;
-    }
-    case "STEP_DONE": {
-      const v = submitSteps.value.steps.find((s) => {
-        return s.typeID === data.data.typeID;
-      });
+// const caSDKEventListener = (data: any) => {
+//   switch (data.type) {
+//     case "EXPECTED_STEPS": {
+//       submitSteps.value.steps = data.data.map((s: ProgressStep) => ({
+//         ...s,
+//         done: false,
+//       }));
+//       submitSteps.value.inProgress = true;
+//       break;
+//     }
+//     case "STEP_DONE": {
+//       const v = submitSteps.value.steps.find((s) => {
+//         return s.typeID === data.data.typeID;
+//       });
 
-      if (v) {
-        v.done = true;
-        if (data.data.data) {
-          v.data = data.data.data;
-        }
-      }
-      break;
+//       if (v) {
+//         v.done = true;
+//         if (data.data.data) {
+//           v.data = data.data.data;
+//         }
+//       }
+//       break;
+//     }
+//   }
+// };
+
+const handleExpectedSteps = (data: ProgressStep[]) => {
+  console.log(data, "data");
+
+  submitSteps.value.steps = data.map((s) => ({ ...s, done: false }));
+  submitSteps.value.inProgress = true;
+};
+
+const handleStepComplete = (data: { typeID: string; data?: any }) => {
+  const step = submitSteps.value.steps.find((s) => s.typeID === data.typeID);
+  if (step) {
+    step.done = true;
+    if (data.data) {
+      step.data = data.data;
     }
   }
 };
@@ -444,9 +471,19 @@ const isNativeTokenInAllBreakdowns = (
   );
 };
 
-const isNative = computed(() =>
-  isNativeTokenInAllBreakdowns(user.assets, selectedOptions.value.token[0])
-);
+const isNative = computed(() => {
+  const simplified = user.assets.map((asset) => ({
+    breakdown: asset.breakdown.map((b) => ({
+      isNative: b.isNative ?? false,
+      contractAddress: b.contractAddress,
+    })),
+  }));
+
+  return isNativeTokenInAllBreakdowns(
+    simplified,
+    selectedOptions.value.token[0]
+  );
+});
 
 const handleAmountInput = (event: Event) => {
   const input = (event.target as HTMLInputElement).value;
@@ -481,6 +518,8 @@ const resetAllowanceData = () => {
 
 const setupAllowanceHook = (caSdkAuth: CA) => {
   caSdkAuth.setOnAllowanceHook(async ({ allow, deny, sources }: any) => {
+    console.log(allow, deny, sources, "ksksk");
+
     allowanceData.value.open = true;
     allowanceData.value.allow = allow;
     allowanceData.value.deny = deny;
@@ -490,6 +529,8 @@ const setupAllowanceHook = (caSdkAuth: CA) => {
 
 const setupIntentHook = (caSdkAuth: CA) => {
   caSdkAuth.setOnIntentHook(({ intent, allow, deny, refresh }: any) => {
+    console.log(intent, allow, deny, refresh);
+
     resetAllowanceData();
     intentData.value.open = true;
     intentData.value.allow = allow;
@@ -527,16 +568,19 @@ onMounted(async () => {
     if (caSdkAuth) {
       setupAllowanceHook(caSdkAuth);
       setupIntentHook(caSdkAuth);
-      caSdkAuth.addCAEventListener(caSDKEventListener);
+      caSdkAuth.caEvents.on("expected_steps", handleExpectedSteps);
+      caSdkAuth.caEvents.on("step_complete", handleStepComplete);
     }
   } catch (error) {
     console.error("Error initializing CA SDK Auth:", error);
   }
 });
+console.log(selectedChain, "selectedChain");
 
 onUnmounted(() => {
   if (caSdkAuth) {
-    caSdkAuth.removeCAEventListener(caSDKEventListener);
+    caSdkAuth.caEvents.removeListener("expected_steps", handleExpectedSteps);
+    caSdkAuth.caEvents.removeListener("step_complete", handleStepComplete);
   }
 });
 </script>

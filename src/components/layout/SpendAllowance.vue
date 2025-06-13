@@ -26,7 +26,7 @@ const props = defineProps<{
   submitSteps: {
     inProgress: boolean;
     completed: boolean;
-    steps: { type: string; typeID: string; done: boolean; data: any }[];
+    steps: { type: string; typeID: string; done: boolean; data?: any }[];
   };
 }>();
 
@@ -47,7 +47,7 @@ const submitAllowance = () => {
     emit("allowanceLoaderOpen");
     emit("intentDataOpen");
     emit("startTimer");
-    const values = props.allowanceDetails.data.map(() => "1.15");
+    const values = props.allowanceDetails.data.map(() => "max");
     props.allowanceDetails.allow(values);
     emit("startSubmitLoader");
     let name =
@@ -290,7 +290,7 @@ watch(
       <div
         v-for="allowance in props.allowanceDetails.data"
         v-else
-        :key="allowance.chainID"
+        :key="allowance?.chain?.id"
         class="flex items-center justify-between bg-orange-200 shadow-md rounded-lg p-4 border border-background-400"
       >
         <div class="flex items-center space-x-4">
@@ -302,7 +302,9 @@ watch(
             />
             <img
               :src="
-                getLogo(getChainDetails(allowance.chainID)?.custom.icon || '')
+                getLogo(
+                  getChainDetails(allowance?.chain?.id)?.custom.icon || ''
+                )
               "
               class="absolute z-50 rounded-full border border-solid border-white-100 h-3.5 w-3.5 -bottom-1 -right-1"
               alt="Logo"
@@ -316,7 +318,7 @@ watch(
             <div
               class="inline-block align-middle font-inter text-ellipsis overflow-hidden text-xs font-normal leading-4 text-blueGray-600"
             >
-              {{ allowance.chainName }}
+              {{ allowance.chain.name }}
             </div>
           </div>
         </div>
@@ -325,9 +327,9 @@ watch(
           class="text-right font-inter text-base font-semibold text-blueGray-800"
         >
           {{
-            isMaxAllowance(allowance.currentAllowance)
+            isMaxAllowance(allowance?.allowance?.current)
               ? "Unlimited"
-              : allowance.currentAllowance
+              : allowance?.allowance?.current
           }}
         </div>
       </div>

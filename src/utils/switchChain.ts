@@ -43,8 +43,10 @@ export async function switchChain(chainId: string) {
           });
         }
       } catch (e) {
-        throw e;
+        console.warn(e);
       }
-    } else throw e;
+    } else {
+      console.warn(e);
+    }
   }
 }

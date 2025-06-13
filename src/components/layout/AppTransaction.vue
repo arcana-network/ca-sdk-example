@@ -28,7 +28,7 @@ const props = defineProps<{
   submitSteps: {
     inProgress: boolean;
     completed: boolean;
-    steps: { type: string; typeID: string; done: boolean; data: any }[];
+    steps: { type: string; typeID: string; done: boolean; data?: any }[];
   };
 }>();
 
