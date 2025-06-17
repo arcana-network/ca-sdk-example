@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Checkbox } from "@ark-ui/vue";
-import { computed, ref, watch } from "vue";
+import { computed, watch } from "vue";
 
 import InfoIcon from "@/assets/images/svg/InfoCircle.svg";
 import { AllowanceDataType } from "@/types/allowanceTypes";
@@ -13,7 +13,6 @@ import { symbolToLogo } from "@/utils/getLogoFromSymbol";
 import { getTextFromStep } from "@/utils/getTextFromSteps";
 import { trackEvent } from "@/segment/segment";
 import { useUserStore } from "@/stores/user";
-import { EthereumProvider } from "@/types/ProviderTypes";
 import { switchChain } from "@/utils/switchChain";
 
 const props = defineProps<{
