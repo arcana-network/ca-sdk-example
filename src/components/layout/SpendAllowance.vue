@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Checkbox } from "@ark-ui/vue";
-import { computed, watch } from "vue";
+import { computed, ref, watch } from "vue";
 
 import InfoIcon from "@/assets/images/svg/InfoCircle.svg";
 import { AllowanceDataType } from "@/types/allowanceTypes";
@@ -13,6 +13,8 @@ import { symbolToLogo } from "@/utils/getLogoFromSymbol";
 import { getTextFromStep } from "@/utils/getTextFromSteps";
 import { trackEvent } from "@/segment/segment";
 import { useUserStore } from "@/stores/user";
+import { EthereumProvider } from "@/types/ProviderTypes";
+import { switchChain } from "@/utils/switchChain";
 
 const props = defineProps<{
   allowanceDetails: AllowanceDataType;
@@ -42,11 +44,14 @@ const emit = defineEmits([
 
 const user = useUserStore();
 
-const submitAllowance = () => {
+const submitAllowance = async () => {
   if (props.allowanceDetails.allow) {
     emit("allowanceLoaderOpen");
     emit("intentDataOpen");
     emit("startTimer");
+    for (const item of props.allowanceDetails.data) {
+      await switchChain(item.chain?.id.toString());
+    }
     const values = props.allowanceDetails.data.map(() => "max");
     props.allowanceDetails.allow(values);
     emit("startSubmitLoader");
