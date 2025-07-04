@@ -600,11 +600,21 @@ onBeforeUnmount(() => {
                           >
                             <span class="flex items-center gap-3">
                               <div class="relative isolate">
-                                <img
-                                  :src="asset.icon"
-                                  class="relative z-10 h-5 w-5 rounded-full bg-white-100"
-                                  alt="Logo"
-                                />
+                                <Avatar.Root>
+                                  <Avatar.Fallback
+                                    class="w-5 h-5 rounded-full"
+                                    >{{
+                                      token.chain.name
+                                        .split(" ")[0]
+                                        .substring(0, 2)
+                                        .toUpperCase()
+                                    }}</Avatar.Fallback
+                                  >
+                                  <Avatar.Image
+                                    :src="asset.icon"
+                                    class="h-7 w-7 rounded-full bg-white-100"
+                                  />
+                                </Avatar.Root>
                                 <img
                                   :src="token.chain.logo"
                                   class="absolute h-3 w-3 z-20 rounded-full -bottom-3px -right-3px border border-solid border-white-100"
