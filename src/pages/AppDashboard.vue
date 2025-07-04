@@ -78,6 +78,8 @@ const selectedChain = computed(() => {
 const setBalancePolling = (ca: CA) => {
   setInterval(async () => {
     const allBalance = await ca.getUnifiedBalances();
+    console.log(allBalance, "allBalance");
+
     balances.value = allBalance;
     // user.setAsset(allBalance);
   }, 2000);
@@ -302,11 +304,15 @@ onBeforeUnmount(() => {
             >
               <div class="flex items-center h-14 space-x-4">
                 <div class="relative isolate">
-                  <img
-                    :src="balance.icon"
-                    class="h-7 w-7 rounded-full bg-white-100"
-                    alt="Logo"
-                  />
+                  <Avatar.Root>
+                    <Avatar.Fallback class="w-5 h-5 rounded-full">{{
+                      balance.symbol.split(" ")[0].substring(0, 2).toUpperCase()
+                    }}</Avatar.Fallback>
+                    <Avatar.Image
+                      :src="balance.icon"
+                      class="h-7 w-7 rounded-full bg-white-100"
+                    />
+                  </Avatar.Root>
                   <img
                     :src="balance.chainLogo"
                     class="absolute z-50 rounded-full border border-solid border-white-100 h-3.5 w-3.5 -bottom-1 -right-1"
@@ -459,11 +465,19 @@ onBeforeUnmount(() => {
                       <div class="flex items-center gap-1">
                         <div class="flex items-center gap-4">
                           <div class="relative isolate">
-                            <img
-                              :src="asset.icon"
-                              class="h-7 w-7 rounded-full bg-white-100"
-                              alt="Logo"
-                            />
+                            <Avatar.Root>
+                              <Avatar.Fallback class="w-5 h-5 rounded-full">{{
+                                asset.symbol
+                                  .split(" ")[0]
+                                  .substring(0, 2)
+                                  .toUpperCase()
+                              }}</Avatar.Fallback>
+                              <Avatar.Image
+                                :src="asset.icon"
+                                class="h-7 w-7 rounded-full bg-white-100"
+                              />
+                            </Avatar.Root>
+
                             <img
                               v-for="(b, index) in getBreakdownImageArray(
                                 asset.breakdown

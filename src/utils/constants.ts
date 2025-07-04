@@ -355,6 +355,94 @@ const MAINNET_CHAINS: Chain[] = [
       knownTokens: [],
     },
   },
+  {
+    id: 8217,
+    name: "Kaia Mainnet",
+
+    rpcUrls: {
+      default: {
+        publicHttp: ["https://go.getblock.io/d7094dbd80ab474ba7042603fe912332"],
+      },
+    },
+    custom: {
+      icon: "/images/logos/kaia.webp",
+      knownTokens: [],
+    },
+    nativeCurrency: {
+      name: "Kaia",
+      symbol: "KAIA",
+      decimals: 18,
+    },
+    blockExplorers: {
+      default: {
+        name: "KaiaScan",
+        url: "https://kaiascan.io",
+      },
+    },
+  },
+
+  {
+    id: 50104,
+    name: "Sophon",
+    rpcUrls: {
+      default: {
+        publicHttp: ["https://rpc.sophon.xyz"],
+      },
+    },
+    blockExplorers: {
+      default: {
+        name: "Sophscan",
+        url: "https://sophscan.xyz",
+      },
+    },
+    nativeCurrency: {
+      name: "Sophon",
+      symbol: "SOPH",
+      decimals: 18,
+    },
+    custom: {
+      icon: "/images/logos/sophon.svg",
+      knownTokens: [],
+    },
+  },
+
+  {
+    id: 999,
+    name: "HyperEVM",
+    rpcUrls: {
+      default: {
+        publicHttp: [
+          "https://rpc.hypurrscan.io",
+          "https://rpc.hyperlend.finance",
+          "https://rpc.hyperliquid.xyz/evm",
+        ],
+      },
+    },
+    nativeCurrency: {
+      name: "Hype",
+      symbol: "HYPE",
+      decimals: 18,
+    },
+
+    custom: {
+      icon: "/images/logos/hype.svg",
+      knownTokens: [
+        {
+          contractAddress: "0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb",
+          symbol: "USDT",
+          decimals: 6,
+          name: "Tether USD",
+          logo: "/images/logos/usdt.svg",
+        },
+      ],
+    },
+    blockExplorers: {
+      default: {
+        name: "Purrsec",
+        url: "https://purrsec.com",
+      },
+    },
+  },
 ];
 
 export { MAINNET_CHAINS, TOAST_TIME_OUT };

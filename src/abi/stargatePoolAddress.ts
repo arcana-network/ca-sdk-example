@@ -33,6 +33,11 @@ export const stargatePoolAddress: any = {
     USDC: "0x5634c4a5FEd09819E3c46D86A965Dd9447d86e47",
     USDT: "0x12dC9256Acc9895B076f6638D628382881e62CeE",
   },
+  8217: {
+    ETH: "0xBB4957E44401a31ED81Cab33539d9e8993FA13Ce",
+    USDC: "0x01A7c805cc47AbDB254CD8AaD29dE5e447F59224",
+    USDT: "0x8619bA1B324e099CB2227060c4BC5bDEe14456c6",
+  },
 };
 
 export const stargatePoolEndPointId: any = {
@@ -59,5 +64,8 @@ export const stargatePoolEndPointId: any = {
   },
   43114: {
     endpointID: 30106,
+  },
+  8217: {
+    endpointID: 30150,
   },
 };

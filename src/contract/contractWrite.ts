@@ -1,14 +1,5 @@
-import {
-  arbitrum,
-  avalanche,
-  base,
-  linea,
-  mainnet,
-  optimism,
-  polygon,
-  scroll,
-} from "viem/chains";
 import { Account, createWalletClient, custom } from "viem";
+import { getChainName } from "./chainName";
 
 export const executeContractFunction = async ({
   contractAddress,
@@ -28,22 +19,7 @@ export const executeContractFunction = async ({
   provider: any;
 }): Promise<string | undefined> => {
   try {
-    const chainName =
-      chain === 1
-        ? mainnet
-        : chain === 10
-        ? optimism
-        : chain === 42161
-        ? arbitrum
-        : chain === 137
-        ? polygon
-        : chain === 534352
-        ? scroll
-        : chain === 59144
-        ? linea
-        : chain === 43114
-        ? avalanche
-        : base;
+    const chainName = getChainName(chain);
 
     const walletClient = createWalletClient({
       chain: chainName,

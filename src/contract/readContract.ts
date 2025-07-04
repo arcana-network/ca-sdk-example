@@ -1,19 +1,5 @@
-<<<<<<< HEAD
-import { arbitrum, base, mainnet, optimism, polygon } from "viem/chains";
-import { Account, createPublicClient, createWalletClient, custom } from "viem";
-=======
-import {
-  arbitrum,
-  avalanche,
-  base,
-  linea,
-  mainnet,
-  optimism,
-  polygon,
-  scroll,
-} from "viem/chains";
 import { Account, createPublicClient, custom } from "viem";
->>>>>>> 47c1ad2 (Feat: Implemented Scroll and Linea (#7))
+import { getChainName } from "./chainName";
 
 export const readContractFunction = async ({
   contractAddress,
@@ -33,22 +19,7 @@ export const readContractFunction = async ({
   provider: any;
 }): Promise<string | undefined> => {
   try {
-    const chainName =
-      chain === 1
-        ? mainnet
-        : chain === 10
-        ? optimism
-        : chain === 42161
-        ? arbitrum
-        : chain === 137
-        ? polygon
-        : chain === 534352
-        ? scroll
-        : chain === 59144
-        ? linea
-        : chain === 43114
-        ? avalanche
-        : base;
+    const chainName = getChainName(chain);
 
     const walletClient = createPublicClient({
       chain: chainName,
