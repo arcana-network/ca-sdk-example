@@ -3,28 +3,21 @@ import { onMounted, ref } from 'vue';
 import { Accordion } from '@ark-ui/vue/accordion'
 import { getCA } from "../utils/getCA"
 import ChevronDownIcon from "./ChevronDown.vue"
-import { CA } from '@arcana/ca-sdk';
-import Decimal from "decimal.js";
+import { UserAsset } from '@arcana/ca-sdk';
 
-type BalancesType = Awaited<ReturnType<CA["getUnifiedBalances"]>>
-const balances = ref<BalancesType>([]);
-let address = ref("");
+const props = defineProps({
+    balances: Array<UserAsset>,
+});
 
-const setBalancePolling = (ca: CA) => {
-    setInterval(async () => {
-        balances.value = await ca.getUnifiedBalances();
-    }, 20000)
-}
+console.log({ bs: props.balances, props })
+const address = ref("");
 onMounted(async () => {
     const ca = await getCA();
-
-    const accounts = (await ca.request({ method: "eth_accounts" }) as string[])[0]
+    const provider = ca.getEVMProviderWithCA()
+    const accounts = (await provider.request({ method: "eth_accounts" }) as string[])[0]
     console.log({ accounts })
     address.value = accounts;
 
-    balances.value = await ca.getUnifiedBalances();
-    console.log({ balances })
-    setBalancePolling(ca)
 });
 
 </script>
@@ -37,13 +30,13 @@ onMounted(async () => {
                 {{ address }}</p>
             <h5 id="drawer-navigation-label" class="mb-4 text-xl font-bold leading-none text-gray-900 dark:text-white">
                 Balances</h5>
-            <!-- <hr class="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700"> -->
 
             <Accordion.Root collapsible multiple
                 class="flex px-3 flex-col overflow-y-auto field divide-y divide-gray-200 dark:divide-gray-700"
-                v-if="balances.length">
-                <Accordion.Item v-for="balance in balances" :key="JSON.stringify(balance.breakdown)"
-                    :value="JSON.stringify(balance.breakdown)" class="py-3">
+                v-if="props.balances?.length">
+                <Accordion.Item v-for="(balance, i) in balances" :key="i"
+                    :value="JSON.stringify(balance.breakdown, (_, v) => typeof v === 'bigint' ? v.toString() : v)"
+                    class="py-3">
                     <div class="flex justify-between">
                         <div class="text-sm font-medium text-gray-900 dark:text-white">
                             {{ balance.symbol }}
@@ -51,14 +44,14 @@ onMounted(async () => {
                             <Accordion.ItemTrigger class="flex items-center gap-1">
                                 <span class="text-[12px] text-gray-500">{{ balance.breakdown.length }} chain{{
                                     balance.breakdown.length > 1 ? "s" : ""
-                                }}</span>
+                                    }}</span>
                                 <Accordion.ItemIndicator>
                                     <ChevronDownIcon class="h-3 w-3 text-gray-500" />
                                 </Accordion.ItemIndicator>
                             </Accordion.ItemTrigger>
                         </div>
                         <div class="text-gray-900 dark:text-white text-base font-semibold">
-                            {{ new Decimal(balance.balance).toDecimalPlaces(4).toNumber() }} {{ balance.symbol }}
+                            {{ balance.balance }} {{ balance.symbol }}
                         </div>
                     </div>
                     <Accordion.ItemContent class="pt-2">
@@ -68,9 +61,7 @@ onMounted(async () => {
                                     (${token.chain.name})` }}
                                 </div>
                                 <div class="text-xs text-gray-900 dark:text-white">
-                                    {{ `${new Decimal(token.balance)
-                                        .toDecimalPlaces(4)
-                                        .toNumber()} ${balance.symbol}` }}
+                                    {{ token.balance }}
                                 </div>
                             </div>
                         </div>

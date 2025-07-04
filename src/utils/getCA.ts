@@ -1,23 +1,26 @@
-import { CA } from "@arcana/ca-sdk";
+import { CA, Network } from "@arcana/ca-sdk";
+
 import { EthereumProvider } from "./typings";
 
-let ca: CA | null = null;
+const network = Network.CORAL;
+
+const ca = new CA({
+  debug: true,
+  network,
+});
+
+const getSupportedChains = () => {
+  return CA.getSupportedChains(network);
+};
 
 const getCA = async () => {
-  if (!ca) {
-    // @ts-ignore
-    throw new Error("CA not initialized");
-  }
   await ca.init();
   return ca;
 };
 
 const initCA = async (provider: EthereumProvider) => {
-  ca = new CA({
-    network: "testnet",
-  });
   ca.setEVMProvider(provider);
   await ca.init();
 };
 
-export { getCA, initCA };
+export { getCA, getSupportedChains, initCA };

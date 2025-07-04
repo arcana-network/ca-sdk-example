@@ -6,9 +6,17 @@ import BalanceSidebar from './components/BalanceSidebar.vue'
 import './style.css'
 import { onMounted, ref } from 'vue';
 import { getCA } from './utils/getCA'
-
+import type { CA, UserAsset } from '@arcana/ca-sdk'
+const balances = ref<UserAsset[]>([]);
 const currentTab = ref<'transfer' | 'bridge' | 'refund'>('transfer')
-
+const balancePoller = ref<number | undefined>(undefined)
+const setBalancePolling = (ca: CA) => {
+  balancePoller.value = window.setInterval(async () => {
+    const b = await ca.getUnifiedBalances();
+    console.log({ b })
+    balances.value = b
+  }, 20000)
+}
 const onSidebarClick = (tab: 'transfer' | 'bridge' | 'refund') => {
   console.log("got click?")
   currentTab.value = tab
@@ -17,11 +25,23 @@ const onSidebarClick = (tab: 'transfer' | 'bridge' | 'refund') => {
 const connected = ref(false)
 const connect = async () => {
   connected.value = true
+  const ca = await getCA()
+  const b = await ca.getUnifiedBalances();
+  const intents = await ca.getMyIntents(1)
+  console.log({ balances2: b, intents })
+  balances.value = b
+  setBalancePolling(ca)
 }
 const disconnect = async () => {
+  if (balancePoller.value != undefined) {
+    window.clearTimeout(balancePoller.value)
+    balancePoller.value = undefined
+  }
+
   localStorage.removeItem("xar-casdk-last-connected-wallet")
   const ca = await getCA()
-  await ca.request({
+  const provider = ca.getEVMProviderWithCA()
+  await provider.request({
     method: "wallet_revokePermissions",
     params: [{
       eth_accounts: {}
@@ -50,7 +70,7 @@ onMounted(async () => {
         </div>
         <Tranfer :current-tab="currentTab"></Tranfer>
       </div>
-      <BalanceSidebar></BalanceSidebar>
+      <BalanceSidebar :balances="balances"></BalanceSidebar>
     </div>
     <div v-else class="min-h-screen flex flex-col justify-center align-center">
       <PreLogin :connect="connect"></PreLogin>
