@@ -75,15 +75,15 @@ const selectedChain = computed(() => {
   );
 });
 
-const setBalancePolling = (ca: CA) => {
-  setInterval(async () => {
-    const allBalance = await ca.getUnifiedBalances();
-    console.log(allBalance, "allBalance");
+// const setBalancePolling = (ca: CA) => {
+//   setInterval(async () => {
+//     const allBalance = await ca.getUnifiedBalances();
+//     console.log(allBalance, "allBalance");
 
-    balances.value = allBalance;
-    // user.setAsset(allBalance);
-  }, 2000);
-};
+//     balances.value = allBalance;
+//     // user.setAsset(allBalance);
+//   }, 2000);
+// };
 
 onMounted(async () => {
   const ca = await getCA();
