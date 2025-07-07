@@ -4,7 +4,6 @@ import { Asset, Breakdown, Chain as ChainDetails } from "@/types/balanceTypes";
 import readable from "readable-numbers";
 import { formatNumber } from "@/utils/commonFunction";
 import { getCA } from "@/utils/getCA";
-import { CA } from "@arcana/ca-sdk";
 import { Accordion, Avatar, Select } from "@ark-ui/vue";
 import Decimal from "decimal.js";
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
