@@ -14,6 +14,7 @@ import AppBridge from "@/components/layout/Unified/AppBridge.vue";
 import AppBasicSend from "@/components/layout/Basic/AppSend.vue";
 import AppBasicBridge from "@/components/layout/Basic/AppBridge.vue";
 import FadeLoader from "vue-spinner/src/FadeLoader.vue";
+import { CA } from "@arcana/ca-sdk";
 
 const user = useUserStore();
 const balances = ref<Asset[]>([]);
@@ -74,15 +75,34 @@ const selectedChain = computed(() => {
   );
 });
 
-// const setBalancePolling = (ca: CA) => {
-//   setInterval(async () => {
-//     const allBalance = await ca.getUnifiedBalances();
-//     console.log(allBalance, "allBalance");
+let prevBalance: any = null;
 
-//     balances.value = allBalance;
-//     // user.setAsset(allBalance);
-//   }, 2000);
-// };
+const setBalancePolling = async (ca: CA) => {
+  const poll = async () => {
+    try {
+      const allBalance = await ca.getUnifiedBalances();
+
+      const hasChanged =
+        JSON.stringify(prevBalance) !== JSON.stringify(allBalance);
+
+      if (hasChanged) {
+        prevBalance = allBalance;
+        balances.value = allBalance;
+        user.setAsset(allBalance);
+        console.log("Balance updated");
+      } else {
+        console.log("No balance change");
+      }
+
+      setTimeout(poll, 2000);
+    } catch (err) {
+      console.error("Balance polling error:", err);
+      setTimeout(poll, 2000);
+    }
+  };
+
+  await poll();
+};
 
 onMounted(async () => {
   const ca = await getCA();
@@ -90,7 +110,7 @@ onMounted(async () => {
   balances.value = allBalance;
   user.setAsset(allBalance);
   balanceLoader.value = false;
-  // setBalancePolling(ca);
+  setBalancePolling(ca);
 });
 
 const getBreakdownImageArray = (breakdown: Breakdown[]) => {
