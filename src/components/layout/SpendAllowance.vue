@@ -99,12 +99,24 @@ const handleButtonClick = () => {
 };
 
 const allowanceSteps = computed(() => {
+  const seen = new Set<string>();
+
   return props.submitSteps.steps.filter((item) => {
     if (!item.type.startsWith("ALLOWANCE")) {
       return false;
     }
+
     const statusText = getTextFromStep(item.type, item.done);
-    return statusText !== "Unknown status. Please contact support.";
+
+    if (
+      statusText === "Unknown status. Please contact support." ||
+      seen.has(statusText)
+    ) {
+      return false;
+    }
+
+    seen.add(statusText);
+    return true;
   });
 });
 
