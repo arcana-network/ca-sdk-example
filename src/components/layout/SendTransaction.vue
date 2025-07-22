@@ -118,15 +118,25 @@ const closeModal = () => {
 };
 
 const intentSteps = computed(() => {
+  const seen = new Set<string>();
+
   return props.submitSteps.steps.filter((item) => {
     if (!item.type.startsWith("INTENT")) {
       return false;
     }
+
     const statusText = getTextFromStep(item.type, item.done);
-    return (
-      statusText !== "Unknown status. Please contact support." &&
-      statusText !== "Request Accepted"
-    );
+
+    if (
+      statusText === "Unknown status. Please contact support." ||
+      statusText === "Request Accepted" ||
+      seen.has(statusText)
+    ) {
+      return false;
+    }
+
+    seen.add(statusText);
+    return true;
   });
 });
 </script>
