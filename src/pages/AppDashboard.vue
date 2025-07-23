@@ -2,7 +2,7 @@
 import { useUserStore } from "@/stores/user";
 import { Asset, Breakdown, Chain as ChainDetails } from "@/types/balanceTypes";
 import readable from "readable-numbers";
-import { formatNumber } from "@/utils/commonFunction";
+import { extractBalanceMap, formatNumber } from "@/utils/commonFunction";
 import { getCA } from "@/utils/getCA";
 import { Accordion, Avatar, Select } from "@ark-ui/vue";
 import Decimal from "decimal.js";
@@ -81,12 +81,18 @@ const setBalancePolling = async (ca: CA) => {
   const poll = async () => {
     try {
       const allBalance = await ca.getUnifiedBalances();
+      if (!Array.isArray(allBalance))
+        throw new Error("Invalid balance response");
 
-      const hasChanged =
-        JSON.stringify(prevBalance) !== JSON.stringify(allBalance);
+      const newBalanceMap = extractBalanceMap(allBalance);
+      const prevBalanceMap = extractBalanceMap(prevBalance);
+
+      const hasChanged = Object.keys(newBalanceMap).some((symbol) => {
+        return newBalanceMap[symbol] !== prevBalanceMap[symbol];
+      });
 
       if (hasChanged) {
-        prevBalance = allBalance;
+        prevBalance = allBalance ?? [];
         balances.value = allBalance;
         user.setAsset(allBalance);
         console.log("Balance updated");

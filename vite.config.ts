@@ -1,8 +1,11 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
-import svgLoader from 'vite-svg-loader'
-import path from 'path'
+import svgLoader from "vite-svg-loader";
+import path from "path";
+import { EventEmitter } from "events";
+
+EventEmitter.defaultMaxListeners = 20;
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -22,12 +25,12 @@ export default defineConfig({
   define: {
     "process.env": process.env,
   },
-   server: {
+  server: {
     port: 3000,
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      "@": path.resolve(__dirname, "./src"),
     },
   },
   build: {
